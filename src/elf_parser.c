@@ -8,7 +8,6 @@ t_elf_ctx	*elf_load(const char *path)
 	t_elf_ctx *ctx;
 	FILE *f;
 	long current_position;
-	char *buf;
 
 	if (!path)
 		return (NULL);
@@ -43,7 +42,7 @@ t_elf_ctx	*elf_load(const char *path)
 	memset(ctx->raw, 0, ctx->size);
 	if (fread(ctx->raw, 1, ctx->size, f) != ctx->size)
 	{
-		printf("Error reading %s\n" path);
+		printf("Error reading %s\n", path);
 		fclose(f);
 		free(ctx->raw);
 		return (NULL);
