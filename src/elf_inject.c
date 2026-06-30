@@ -86,7 +86,7 @@ int	elf_write(t_elf_ctx *ctx, const char *out_path)
 
 	if (!out_path)
 		return (1);
-	*f = fopen(out_path, "wb");
+	f = fopen(out_path, "wb");
 	if (f == NULL)
 	{
 		printf("Error writing %s\n", out_path);
