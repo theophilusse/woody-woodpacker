@@ -1,10 +1,5 @@
 #include "woody.h"
 
-static void	patch_disp32(t_emitter *e, size_t at, int32_t value)
-{
-	memcpy(e->buf + at, &value, sizeof(int32_t));   // little-endian natif sur x86_64
-}
-
 static int	emit(t_emitter *e, const uint8_t *bytes, size_t n)
 {
 	uint8_t	*tmp;
