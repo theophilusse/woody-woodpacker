@@ -13,6 +13,8 @@
 # include <stdint.h>
 # include <stddef.h>
 
+# include "emit.h"
+
 # define KEY_LEN 16
 # define WOODY_MSG "....WOODY....\n"
 # define WOODY_MSG_LEN 14
