@@ -10,6 +10,7 @@ static int	usage(const char *prog)
 
 int	main(int argc, char **argv)
 {
+	int		debug;
 	t_elf_ctx		*ctx;
 	t_crypto_ctx	crypto;
 	t_stub			*stub;
@@ -24,9 +25,9 @@ int	main(int argc, char **argv)
 		fprintf(stderr, "error: cannot load %s\n", argv[1]);
 		return (1);
 	}
-	if (elf_validate(ctx) != 0)
+	if ((debug = elf_validate(ctx)) != 0)
 	{
-		fprintf(stderr, "File architecture not supported. x86_64 only\n");
+		fprintf(stderr, "Filr architecture not supported. x86_64 only (error %d)\n", debug);
 		elf_free(ctx);
 		return (1);
 	}
