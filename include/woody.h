@@ -43,6 +43,7 @@ typedef struct s_stub
 	size_t		len;
 	uint64_t	load_vaddr;
 	uint64_t	original_oep;
+	size_t		patch_jmp_oep;
 }	t_stub;
 
 /* elf_parser.c */
