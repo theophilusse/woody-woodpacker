@@ -39,5 +39,10 @@ fclean: clean
 
 re: fclean all
 
+config:
+	@sudo apt update
+	@sudo apt install gcc
+	@sudo apt install libpcap0.8-dev
+
 # ── phony ────────────────────────────────────────────────────────────────────
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re config
