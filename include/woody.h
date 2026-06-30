@@ -7,6 +7,7 @@
 
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <sys/random.h>
 
 # include <elf.h>
 # include <stdint.h>
