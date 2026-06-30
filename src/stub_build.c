@@ -1,22 +1,5 @@
 #include "woody.h"
 
-static int	emit(t_emitter *e, const uint8_t *bytes, size_t n)
-{
-	uint8_t	*tmp;
-
-	if (e->len + n > e->cap)
-	{
-		e->cap = (e->cap + n) * 2;
-		tmp = realloc(e->buf, e->cap);
-		if (!tmp)
-			return (-1);
-		e->buf = tmp;
-	}
-	memcpy(e->buf + e->len, bytes, n);
-	e->len += n;
-	return (0);
-}
-
 t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 {
 	t_emitter	e = {0};
