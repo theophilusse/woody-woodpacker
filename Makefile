@@ -1,4 +1,4 @@
-NAME		= ft_nmap
+NAME		= woody-woodpacker
 
 CC		= gcc
 CFLAGS		= -Wall -Wextra -Werror
@@ -19,11 +19,13 @@ RESET		= \033[0m
 all: $(NAME)
 
 $(NAME): $(OBJS)
+	echo "Executable"
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) -lpcap -lpthread -lm
 	@echo "$(GREEN)✓ $(NAME) compilé$(RESET)"
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	@mkdir -p $(OBJ_DIR)
+	@echo Compile $<
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # ── nettoyage ────────────────────────────────────────────────────────────────
