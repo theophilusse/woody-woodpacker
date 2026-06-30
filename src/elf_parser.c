@@ -62,12 +62,6 @@ int	elf_validate(t_elf_ctx *ctx)
 		return (1);
 	if (ctx->size < sizeof(Elf64_Ehdr))
 		return (2);
-	/*
-	if (ctx->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-		ctx->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-		ctx->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-		ctx->ehdr->e_ident[EI_MAG3] != ELFMAG3)
-	*/
 	if (memcmp(ctx->ehdr->e_ident, ELFMAG, SELFMAG) != 0)
 		return (3);
 	if (ctx->ehdr->e_ident[EI_CLASS] != ELFCLASS64)
@@ -83,6 +77,7 @@ void	elf_free(t_elf_ctx *ctx)
 {
 	if (!ctx)
 		return ;
-	free(ctx->raw);
+	if (ctx->raw)
+		free(ctx->raw);
 	free(ctx);
 }
