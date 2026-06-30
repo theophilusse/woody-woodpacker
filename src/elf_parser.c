@@ -30,7 +30,7 @@ t_elf_ctx	*elf_load(const char *path)
 		fclose(f);
 		free(ctx);
 		return (NULL);
-	{
+	}
 	ctx->size = (size_t)ftell(f);
 	fseek(f, current_position, SEEK_SET);
 	if (!(ctx->raw = malloc(ctx->size)))
