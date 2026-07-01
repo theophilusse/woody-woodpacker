@@ -72,7 +72,7 @@ static const char STUB_SRC[] =
     "msg:\n"
     ".msg\n"
     "key:\n"
-    ".key\n";
+    ".key\n"
 
 	/* preserves _dl_fini que le kernel passe dans rdx */
 	"push rdx\n"
