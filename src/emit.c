@@ -1,4 +1,6 @@
-#include "woody.h"
+#include <stdlib.h>
+#include <string.h>
+#include "emit.h"
 
 int	emit_raw(t_emitter *e, const uint8_t *bytes, size_t n)
 {
@@ -9,7 +11,7 @@ int	emit_raw(t_emitter *e, const uint8_t *bytes, size_t n)
 		return (-1);
 	if (e->len + n > e->cap)
 	{
-		new_cap = e->cap == 0 ? 16 : e->cap;
+		new_cap = e->cap == 0 ? 64 : e->cap;
 		while (new_cap < e->len + n)
 			new_cap *= 2;
 		tmp = realloc(e->buf, new_cap);
@@ -32,6 +34,17 @@ int	emit_mov_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm)
 	return (emit_raw(e, bytes, 5));
 }
 
+/* MOV r64, imm64 : REX.W + B8+r + 8 octets */
+int	emit_mov_r64_imm64(t_emitter *e, t_reg dst, uint64_t imm)
+{
+	uint8_t	bytes[10];
+
+	bytes[0] = 0x48;
+	bytes[1] = 0xB8 + dst;
+	memcpy(bytes + 2, &imm, 8);
+	return (emit_raw(e, bytes, 10));
+}
+
 int	emit_lea_rip(t_emitter *e, t_reg dst, size_t *patch_offset)
 {
 	uint8_t	bytes[7];
@@ -39,7 +52,7 @@ int	emit_lea_rip(t_emitter *e, t_reg dst, size_t *patch_offset)
 
 	bytes[0] = 0x48;
 	bytes[1] = 0x8D;
-	bytes[2] = (0 << 6) + (dst << 3) + 5;
+	bytes[2] = (dst << 3) | 0x05;
 	placeholder = 0;
 	memcpy(bytes + 3, &placeholder, 4);
 	*patch_offset = e->len + 3;
@@ -52,7 +65,7 @@ int	emit_mov_r64_r64(t_emitter *e, t_reg dst, t_reg src)
 
 	bytes[0] = 0x48;
 	bytes[1] = 0x89;
-	bytes[2] = (3 << 6) + (src << 3) + dst;
+	bytes[2] = (3 << 6) | (src << 3) | dst;
 	return (emit_raw(e, bytes, 3));
 }
 
@@ -61,7 +74,7 @@ int	emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src)
 	uint8_t	bytes[2];
 
 	bytes[0] = 0x31;
-	bytes[1] = (3 << 6) + (src << 3) + dst;
+	bytes[1] = (3 << 6) | (src << 3) | dst;
 	return (emit_raw(e, bytes, 2));
 }
 
@@ -70,9 +83,19 @@ int	emit_cmp_r32_imm8(t_emitter *e, t_reg reg, int8_t imm)
 	uint8_t	bytes[3];
 
 	bytes[0] = 0x83;
-	bytes[1] = (3 << 6) + (7 << 3) + reg;
+	bytes[1] = (3 << 6) | (7 << 3) | reg;
 	memcpy(bytes + 2, &imm, 1);
 	return (emit_raw(e, bytes, 3));
+}
+
+int	emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm)
+{
+	uint8_t	bytes[6];
+
+	bytes[0] = 0x81;
+	bytes[1] = (3 << 6) | (7 << 3) | reg;
+	memcpy(bytes + 2, &imm, 4);
+	return (emit_raw(e, bytes, 6));
 }
 
 int	emit_jcc_rel8(t_emitter *e, uint8_t cc_opcode, size_t *patch_offset)
@@ -82,6 +105,15 @@ int	emit_jcc_rel8(t_emitter *e, uint8_t cc_opcode, size_t *patch_offset)
 	bytes[0] = cc_opcode;
 	bytes[1] = 0;
 	*patch_offset = e->len + 1;
+	return (emit_raw(e, bytes, 2));
+}
+
+int	emit_jcc_rel8_direct(t_emitter *e, uint8_t cc_opcode, int8_t disp)
+{
+	uint8_t	bytes[2];
+
+	bytes[0] = cc_opcode;
+	bytes[1] = (uint8_t)disp;
 	return (emit_raw(e, bytes, 2));
 }
 
@@ -112,4 +144,179 @@ void	patch_disp32(t_emitter *e, size_t at, int32_t value)
 void	patch_disp32_buf(uint8_t *buf, size_t at, int32_t value)
 {
 	memcpy(buf + at, &value, sizeof(int32_t));
+}
+
+int	emit_push_r64(t_emitter *e, t_reg reg)
+{
+	uint8_t	byte;
+
+	byte = 0x50 + reg;
+	return (emit_raw(e, &byte, 1));
+}
+
+int	emit_pop_r64(t_emitter *e, t_reg reg)
+{
+	uint8_t	byte;
+
+	byte = 0x58 + reg;
+	return (emit_raw(e, &byte, 1));
+}
+
+/* SUB rsp, imm32 : 48 81 EC imm32 */
+int	emit_sub_rsp_imm32(t_emitter *e, uint32_t imm)
+{
+	uint8_t	bytes[7];
+
+	bytes[0] = 0x48;
+	bytes[1] = 0x81;
+	bytes[2] = (3 << 6) | (5 << 3) | 4;
+	memcpy(bytes + 3, &imm, 4);
+	return (emit_raw(e, bytes, 7));
+}
+
+/* ADD rsp, imm32 : 48 81 C4 imm32 */
+int	emit_add_rsp_imm32(t_emitter *e, uint32_t imm)
+{
+	uint8_t	bytes[7];
+
+	bytes[0] = 0x48;
+	bytes[1] = 0x81;
+	bytes[2] = (3 << 6) | (0 << 3) | 4;
+	memcpy(bytes + 3, &imm, 4);
+	return (emit_raw(e, bytes, 7));
+}
+
+/* INC r/m8 : FE /0    ex: inc cl = FE C1 */
+int	emit_inc_r8(t_emitter *e, t_reg reg)
+{
+	uint8_t	bytes[2];
+
+	bytes[0] = 0xFE;
+	bytes[1] = (3 << 6) | (0 << 3) | reg;
+	return (emit_raw(e, bytes, 2));
+}
+
+/* INC r/m64 : 48 FF /0 */
+int	emit_inc_r64(t_emitter *e, t_reg reg)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x48;
+	bytes[1] = 0xFF;
+	bytes[2] = (3 << 6) | (0 << 3) | reg;
+	return (emit_raw(e, bytes, 3));
+}
+
+/* MOV [base+idx], src_low8 : 88 /r SIB
+ * ex: mov [rsp+rcx], cl = 88 0C 0C */
+int	emit_mov_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x88;
+	bytes[1] = (0 << 6) | (src << 3) | 4;
+	bytes[2] = (0 << 6) | (idx << 3) | base;
+	return (emit_raw(e, bytes, 3));
+}
+
+/* MOVZX r32, byte [base+idx] : 0F B6 /r SIB
+ * ex: movzx eax, [rsp+rcx] = 0F B6 04 0C */
+int	emit_movzx_r32_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
+{
+	uint8_t	bytes[4];
+
+	bytes[0] = 0x0F;
+	bytes[1] = 0xB6;
+	bytes[2] = (0 << 6) | (dst << 3) | 4;
+	bytes[3] = (0 << 6) | (idx << 3) | base;
+	return (emit_raw(e, bytes, 4));
+}
+
+/* MOVZX r32, r8 : 0F B6 /r mod=11
+ * ex: movzx eax, al = 0F B6 C0 */
+int	emit_movzx_r32_r8(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x0F;
+	bytes[1] = 0xB6;
+	bytes[2] = (3 << 6) | (dst << 3) | src;
+	return (emit_raw(e, bytes, 3));
+}
+
+/* ADD r/m8, r8 : 00 /r    ex: add dl, al = 00 C2 */
+int	emit_add_r8_r8(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t	bytes[2];
+
+	bytes[0] = 0x00;
+	bytes[1] = (3 << 6) | (src << 3) | dst;
+	return (emit_raw(e, bytes, 2));
+}
+
+/* ADD r8, [base+idx] : 02 /r SIB
+ * ex: add al, [rsp+rdx] = 02 04 14 */
+int	emit_add_r8_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x02;
+	bytes[1] = (0 << 6) | (dst << 3) | 4;
+	bytes[2] = (0 << 6) | (idx << 3) | base;
+	return (emit_raw(e, bytes, 3));
+}
+
+/* MOV r/m8, r8 registre->registre : 88 /r mod=11
+ * ex: mov al, cl = 88 C8 */
+int	emit_mov_r8_r8(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t	bytes[2];
+
+	bytes[0] = 0x88;
+	bytes[1] = (3 << 6) | (src << 3) | dst;
+	return (emit_raw(e, bytes, 2));
+}
+
+/* AND r/m8, imm8 : forme courte AL=24ib, generale=80 /4 ib
+ * ex: and al, 0x0F = 24 0F
+ * NOTE: fonctionne uniquement si key_len est une puissance de 2 */
+int	emit_and_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+	uint8_t	bytes[3];
+
+	if (reg == REG_RAX)
+	{
+		bytes[0] = 0x24;
+		bytes[1] = imm;
+		return (emit_raw(e, bytes, 2));
+	}
+	bytes[0] = 0x80;
+	bytes[1] = (3 << 6) | (4 << 3) | reg;
+	bytes[2] = imm;
+	return (emit_raw(e, bytes, 3));
+}
+
+/* XCHG [base+idx], r8 : 86 /r SIB
+ * ex: xchg [rsp+rdx], al = 86 04 14
+ * bidirectionnel : al <- mem, mem <- al */
+int	emit_xchg_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x86;
+	bytes[1] = (0 << 6) | (reg << 3) | 4;
+	bytes[2] = (0 << 6) | (idx << 3) | base;
+	return (emit_raw(e, bytes, 3));
+}
+
+/* XOR [base+idx], r8 : 30 /r SIB
+ * ex: xor [rdi+rbx], al = 30 04 1F */
+int	emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x30;
+	bytes[1] = (0 << 6) | (reg << 3) | 4;
+	bytes[2] = (0 << 6) | (idx << 3) | base;
+	return (emit_raw(e, bytes, 3));
 }

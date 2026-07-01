@@ -50,7 +50,6 @@ int	main(int argc, char **argv)
 	// remplir crypto.text_vaddr / crypto.text_len depuis ctx,
 	// copier .text dans crypto.encrypted_text, puis rc4_apply() en place
 	// localiser .text dans le segment cible
-	/*
 	Elf64_Shdr *shdrs = (Elf64_Shdr *)(ctx->raw + ctx->ehdr->e_shoff);
 	for (int i = 0; i < ctx->ehdr->e_shnum; i++)
 	{
@@ -62,7 +61,6 @@ int	main(int argc, char **argv)
 			rc4_apply(crypto.encrypted_text, crypto.text_len, crypto.key, crypto.key_len);
 		}
 	}
-	*/
 
 	/* 4. Construction du stub (forme unique) */
 	stub = stub_build(ctx, &crypto);
