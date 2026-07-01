@@ -511,31 +511,24 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	first_pass.out = out;
 	first_pass.crypto = crypto;
 
-	DEBUG //
-
 	// PREMIÈRE PASSE : Collecte tous les labels
 	const char *p;
+
+	p = src;
 	while (*p)
 	{
-		DEBUG //
 		const char *start = p;
 		while (*p && *p != '\n') p++;
 		llen = (int)(p - start);
 		if (*p == '\n') p++;
 		if (llen <= 0 || llen > 255) continue;
-		DEBUG //
 		strncpy(line, start, (size_t)llen);
 		line[llen] = '\0';
 
-		DEBUG //
-
 		memset(toks, 0, sizeof(toks));
-
-		DEBUG //
 		n = tokenize(line, toks, 8);
 		if (n == 0) continue;
 
-		DEBUG //
 		tok0len = (int)strlen(toks[0]);
 		if (tok0len > 1 && toks[0][tok0len - 1] == ':')
 		{
@@ -543,14 +536,13 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			deflabel(&first_pass, toks[0]);
 			if (ainstr(&a, toks + 1, n - 1) < 0)
 			{
-				printf("asm: erreur dans l'instruction ");
+					("asm: erreur dans l'instruction ");
 				for (int i = 0; i < n; i++) printf("'%s' ", toks[i]);
 				printf("\n");
 				return -1;
 			}
 			continue;
 		}
-		DEBUG //
 		if (ainstr(&first_pass, toks, n) < 0)
 		{
 			printf("asm: erreur dans l'instruction ");
@@ -559,8 +551,6 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			return -1;
 		}
 	}
-
-	DEBUG //
 
 	a.nlabels = first_pass.nlabels;
 	a.nfixups = first_pass.nfixups;
@@ -607,8 +597,6 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			return -1;
 		}
 	}
-
-	DEBUG //
 
 	// Résolution des fixups
 	for (int i = 0; i < a.nfixups; i++)
