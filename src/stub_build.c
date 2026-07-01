@@ -34,9 +34,7 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 	disp = (int32_t)(msg_offset - (patch_lea_msg + 4));
 	patch_disp32(&e, patch_lea_msg, disp);
 
-	/* --- patch OEP : impossible ici, load_vaddr pas encore connu ---
-	 * sera fait dans elf_patch() après injection du stub dans le segment */
-	patch_jmp_oep = 0xBBBBBBBB;
+	stub->patch_jmp_oep = patch_jmp_eop;
 
 	/* --- construction du t_stub --- */
 	stub = malloc(sizeof(t_stub));
