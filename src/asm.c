@@ -508,6 +508,8 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		if (ainstr(&a, toks, n) < 0) return -1;
 	}
 
+	DEBUG //
+
 	for (int i = 0; i < a.nfixups; i++)
 	{
 		target = sym(&a, a.fixups[i].name);
