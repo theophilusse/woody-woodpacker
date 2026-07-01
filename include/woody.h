@@ -14,6 +14,7 @@
 # include <stddef.h>
 
 # include "emit.h"
+# include "ams.h"
 
 # define KEY_LEN 16
 # define WOODY_MSG "....WOODY....\n"
