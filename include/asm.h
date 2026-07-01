@@ -38,6 +38,6 @@ typedef struct
 	int              nfixups;
 }	t_asm;
 
-int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, size_t *patch_jmp_oep);
+int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out);
 
 #endif

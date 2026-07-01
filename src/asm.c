@@ -45,11 +45,13 @@ static void	deflabel(t_asm *a, const char *name)
 	a->nlabels++;
 }
 
-static void	fixup(t_asm *a, const char *name, size_t off, size_t end)
+//static void	fixup(t_asm *a, const char *name, size_t off, size_t end)
+static void	addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
 {
 	if (a->nfixups >= MAX_FIXUPS) return;
 	a->fixups[a->nfixups].off = off;
 	a->fixups[a->nfixups].end = end;
+	a->fixups[a->nfixups].is_rel8 = is_rel8;
 	strncpy(a->fixups[a->nfixups].name, name, 63);
 	a->nfixups++;
 }
@@ -140,7 +142,7 @@ static void	lea_label(t_asm *a, t_reg dst, const char *label)
 		patch_disp32(&a->out->e, patch, disp);
 	}
 	else
-		fixup(a, label, patch, patch + 4);
+		addfixup(a, label, patch, patch + 4, 0);
 }
 
 /* ── assemblage d une instruction ──────────────────────────────── */
