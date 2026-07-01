@@ -24,6 +24,6 @@ int		emit_jcc_rel8(t_emitter *e, uint8_t cc_opcode, size_t *patch_offset);
 int		emit_jmp_rel32(t_emitter *e, size_t *patch_offset);
 int		emit_syscall(t_emitter *e);
 void		patch_disp32(t_emitter *e, size_t at, int32_t value);
-
+void		patch_disp32_buf(uint8_t *buf, size_t at, int32_t value);
 
 #endif

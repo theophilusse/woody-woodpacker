@@ -108,3 +108,8 @@ void	patch_disp32(t_emitter *e, size_t at, int32_t value)
 {
 	memcpy(e->buf + at, &value, sizeof(int32_t));
 }
+
+void	patch_disp32_buf(uint8_t *buf, size_t at, int32_t value)
+{
+	memcpy(buf + at, &value, sizeof(int32_t));
+}
