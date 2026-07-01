@@ -316,7 +316,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			return 0;
 		}
 	}
-	if (!strcmp(toks[0], "jmp") && n == 2 && !strcmp(toks[1], "@oep"))
+	if (!strcmp(toks[0], "jmp") && n == 2)// && !strcmp(toks[1], "@oep"))
 	{
 		a->out->patch_jmp_oep = a->out->e.len + 1;
 		emit_jmp_rel32(&a->out->e, &p);
