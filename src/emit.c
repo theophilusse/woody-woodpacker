@@ -194,13 +194,14 @@ int	emit_inc_r8(t_emitter *e, t_reg reg)
 	return (emit_raw(e, bytes, 2));
 }
 
-/* INC r/m64 : FF /0 */
+/* INC r/m64 : FF /0 (avec préfixe REX.W implicite) */
 int emit_inc_r64(t_emitter *e, t_reg reg) {
-    uint8_t bytes[2];
+    uint8_t bytes[3]; // 3 octets : préfixe REX.W + opcode + ModR/M
 
-    bytes[0] = 0xFF;                     // Opcode principal
-    bytes[1] = (3 << 6) | (0 << 3) | reg; // ModR/M: [r/m64], 0 (opcode extension 0)
-    return emit_raw(e, bytes, 2);
+    bytes[0] = 0x48;                      // Préfixe REX.W (obligatoire pour 64 bits)
+    bytes[1] = 0xFF;                      // Opcode principal
+    bytes[2] = (3 << 6) | (0 << 3) | reg; // ModR/M: [r/m64], 0 (opcode extension 0)
+    return emit_raw(e, bytes, 3);
 }
 
 /* MOV [base+idx], src_low8 : 88 /r SIB
