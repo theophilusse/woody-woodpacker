@@ -266,6 +266,16 @@ int	emit_add_r8_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
 	return (emit_raw(e, bytes, 3));
 }
 
+/* ADD r/m8, r8 : 00 /r    ex: add [rsp+rdx], al = 00 04 14 */
+int emit_add_r8_mem_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src) {
+    uint8_t bytes[3];
+
+    bytes[0] = 0x00;
+    bytes[1] = (0 << 6) | (src << 3) | 4;  // ModR/M: [base+idx], src
+    bytes[2] = (0 << 6) | (idx << 3) | base; // SIB
+    return emit_raw(e, bytes, 3);
+}
+
 /* ADD r8, imm8 : 80 /0 ib
  * ex: add al, 42 = 80 C0 2A */
 int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm)

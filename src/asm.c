@@ -336,7 +336,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			emit_add_r32_imm32(t_emitter *e, r1, val);
+			emit_add_r32_imm32(&a->out->e, r1, val);
 		}
 		key_index++;
 		return 0;
