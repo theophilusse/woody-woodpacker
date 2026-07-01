@@ -63,7 +63,8 @@ int	elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto)
 	memmove(ctx->raw + stub_offset, stub->bytes, stub->len);
 
 	stub->load_vaddr = p->p_vaddr + p->p_filesz;
-	stub->original_oep = ctx->ehdr->e_entry;
+	//stub->original_oep = ctx->ehdr->e_entry;
+	stub->original_oep = 0xBBBBBBBB;
 	printf("oep %lx\n", stub->original_oep);
 
 	p->p_filesz += stub->len;
