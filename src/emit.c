@@ -266,7 +266,43 @@ int	emit_add_r8_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
 	return (emit_raw(e, bytes, 3));
 }
 
-/* MOV r/m8, r8 registre->registre : 88 /r mod=11
+/* ADD r8, imm8 : 80 /0 ib
+ * ex: add al, 42 = 80 C0 2A */
+int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm)
+{
+    uint8_t bytes[3];
+
+    bytes[0] = 0x80;
+    bytes[1] = (0 << 6) | (0 << 3) | dst;  // ModR/M: dst, 0 (opcode extension)
+    bytes[2] = imm;
+    return emit_raw(e, bytes, 3);
+}
+
+/* ADD r16, imm16 : 83 /0 iw    ex: add ax, 42 = 66 83 C0 2A */
+int emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm) {
+    uint8_t bytes[4];
+
+    bytes[0] = 0x66; // Prefix 16-bit
+    bytes[1] = 0x83;
+    bytes[2] = (3 << 6) | (0 << 3) | dst;  // ModR/M: dst, 0 (opcode extension)
+    bytes[3] = (uint8_t)imm;
+    return emit_raw(e, bytes, 4);
+}
+
+/* ADD r32, imm32 : 83 /0 id    ex: add eax, 42 = 83 C0 2A */
+int emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm) {
+    uint8_t bytes[6];
+
+    bytes[0] = 0x83;
+    bytes[1] = (3 << 6) | (0 << 3) | dst;  // ModR/M: dst, 0 (opcode extension)
+    bytes[2] = (uint8_t)imm;
+    bytes[3] = (uint8_t)(imm >> 8);
+    bytes[4] = (uint8_t)(imm >> 16);
+    bytes[5] = (uint8_t)(imm >> 24);
+    return emit_raw(e, bytes, 6);
+}
+
+/* MOV r/m8, r8 registre->registre : 88 /r mod=11	
  * ex: mov al, cl = 88 C8 */
 int	emit_mov_r8_r8(t_emitter *e, t_reg dst, t_reg src)
 {
