@@ -262,13 +262,32 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
 			{ emit_xchg_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
 	}
-	if (!strcmp(toks[0], "cmp") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
+	if (!strcmp(toks[0], "cmp") && n == 3 && preg(toks[1], &r1, &s1))
 	{
-		val = sym(a, toks[2]);
-		if (val < 0) val = strtoll(toks[2], NULL, 0);
-		if (val >= -128 && val <= 127) emit_cmp_r32_imm8(&a->out->e, r1, (int8_t)val);
-		else emit_cmp_r32_imm32(&a->out->e, r1, (int32_t)val);
-		return 0;
+		/* cmp r64, r64 : 48 39 /r */
+		if (s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
+		{
+			emit_cmp_r64_r64(&a->out->e, r1, r2);
+			return 0;
+		}
+		/* cmp r32, r32 : 39 /r */
+		if (s1 == 32 && preg(toks[2], &r2, &s2) && s2 == 32)
+		{
+			uint8_t bytes[2] = {0x39, (3 << 6) | (r2 << 3) | r1};
+			emit_raw(&a->out->e, bytes, 2);
+			return 0;
+		}
+		/* cmp r32, imm */
+		if (s1 == 32)
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (val >= -128 && val <= 127)
+				emit_cmp_r32_imm8(&a->out->e, r1, (int8_t)val);
+			else
+				emit_cmp_r32_imm32(&a->out->e, r1, (int32_t)val);
+			return 0;
+		}
 	}
 	if (n == 2 && (
     !strcmp(toks[0],"jne") || !strcmp(toks[0],"je")  ||
