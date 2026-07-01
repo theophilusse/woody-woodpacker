@@ -202,31 +202,30 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], "sar") && n == 3)
 	{
 		// Cas 1: SAR r32, imm8 (ex: "sar eax, 3")
-		// Cas 1: SAR r32, imm8 (ex: "sar eax, 3")
 		if (toks[1][0] != '[' && toks[2][0] != '[') {
 			t_reg r1;
-			int s1;
-			if (preg(toks[1], &r1, &s1) && s1 == 32) {  // Vérifie que c'est un registre 32 bits
-				char* endptr;
-				long imm = strtoll(toks[2], &endptr, 0);
-				if (*endptr == '\0' && imm >= 0 && imm <= 255) {  // Vérifie que c'est un immédiat 8 bits valide
+			int size;
+			if (preg(toks[1], &r1, &size) && size == 32) {
+				char *end;
+				long imm = strtoll(toks[2], &end, 0);
+				if (*end == '\0' && imm >= 0 && imm <= 255) {
 					emit_sar_r32_imm8(&a->out->e, r1, (uint8_t)imm);
-					return 0;  // Succès
+					return 0;
 				}
 			}
 		}
 
 		// Cas 2: SAR [mem], imm8 (ex: "sar [eax], 3")
 		else if (toks[1][0] == '[' && toks[2][0] != '[') {
-			int base, idx, d8, mt;
-			char* lbl;
-			if ((mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1) {
+			int base, idx, disp, mt;
+			char *lbl;
+			if ((mt = pmem(toks[1], &base, &idx, lbl, &disp)) == 1) {
 				t_reg r2;
-				int s2;
-				if (preg(toks[2], &r2, &s2) && s2 == 8) {
-					char* endptr;
-					long imm = strtoll(toks[2], &endptr, 0);
-					if (*endptr == '\0' && imm >= 0 && imm <= 255) {
+				int size;
+				if (preg(toks[2], &r2, &size) && size == 8) {
+					char *end;
+					long imm = strtoll(toks[2], &end, 0);
+					if (*end == '\0' && imm >= 0 && imm <= 255) {
 						emit_sar_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)imm);
 						return 0;
 					}
