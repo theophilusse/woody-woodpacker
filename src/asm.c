@@ -215,18 +215,21 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			}
 		}
 
-		// Cas 2: SAR [mem], imm8 (ex: "sar [eax], 3")
-		else if (toks[1][0] == '[' && toks[2][0] != '[') {
-			int base, idx, disp, mt;
-			char *lbl;
-			if ((mt = pmem(toks[1], (t_reg *)&base, (t_reg *)&idx, lbl, (int8_t *)&disp)) == 1) {
+		else if (toks[1][0] == '[' && toks[2][0] != '[')
+		{
+			t_reg base, idx;
+			int8_t disp;
+			char *lbl = NULL;  // Initialisation explicite
+			int mt;
+
+			if ((mt = pmem(toks[1], &base, &idx, lbl, &disp)) == 1) {
 				t_reg r2;
 				int size;
 				if (preg(toks[2], &r2, &size) && size == 8) {
 					char *end;
 					long imm = strtoll(toks[2], &end, 0);
 					if (*end == '\0' && imm >= 0 && imm <= 255) {
-						emit_sar_mem_sib_imm8(&a->out->e, (t_reg)base, idx, (uint8_t)imm);
+						emit_sar_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)imm);
 						return 0;
 					}
 				}
