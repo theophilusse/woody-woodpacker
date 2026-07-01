@@ -4,8 +4,7 @@
 #define MAX_FIXUPS 16
 
 typedef struct { char name[64]; size_t off; }               t_lbl;
-typedef struct { size_t off; size_t end; char name[64]; }   t_fix;
-
+typedef struct { size_t off; size_t end; char name[64]; int is_rel8; } t_fix;
 typedef struct
 {
 	t_asm_result    *out;
@@ -273,20 +272,33 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		else emit_cmp_r32_imm32(&a->out->e, r1, (int32_t)val);
 		return 0;
 	}
-	if ((!strcmp(toks[0], "jnz") || !strcmp(toks[0], "jl")) && n == 2)
+	if (n == 2 && (
+    !strcmp(toks[0],"jne") || !strcmp(toks[0],"je")  ||
+    !strcmp(toks[0],"jg")  || !strcmp(toks[0],"jl")  ||
+    !strcmp(toks[0],"jae") || !strcmp(toks[0],"jge") ||
+    !strcmp(toks[0],"jnz")))
 	{
-		uint8_t op = !strcmp(toks[0], "jnz") ? 0x75 : 0x7C;
-		val = sym(a, toks[1]);
-		if (val < 0) { fprintf(stderr, "asm: unresolved '%s' (must be backward)\n", toks[1]); return -1; }
-		d8 = (int8_t)(val - (int64_t)(a->out->e.len + 2));
-		emit_jcc_rel8_direct(&a->out->e, op, d8);
-		return 0;
-	}
-	/* jmp @oep : placeholder patche par elf_patch */
-	if (!strcmp(toks[0], "jmp") && n == 2 && !strcmp(toks[1], "@oep"))
-	{
-		a->out->patch_jmp_oep = a->out->e.len + 1;
-		emit_jmp_rel32(&a->out->e, &p);
+		uint8_t op = !strcmp(toks[0],"jne")||!strcmp(toks[0],"jnz") ? 0x75 :
+					!strcmp(toks[0],"je")  ? 0x74 :
+					!strcmp(toks[0],"jg")  ? 0x7F :
+					!strcmp(toks[0],"jl")  ? 0x7C :
+					!strcmp(toks[0],"jge") ? 0x7D : 0x73; /* jae */
+		int64_t val = sym(a, toks[1]);
+		if (val >= 0) {
+			int8_t d = (int8_t)(val - (int64_t)(a->out->e.len + 2));
+			emit_jcc_rel8_direct(&a->out->e, op, d);
+		} else {
+			uint8_t bytes[2] = {op, 0};
+			size_t foff = a->out->e.len + 1;
+			size_t fend = a->out->e.len + 2;
+			emit_raw(&a->out->e, bytes, 2);
+			// fixup REL8
+			a->fixups[a->nfixups].off = foff;
+			a->fixups[a->nfixups].end = fend;
+			a->fixups[a->nfixups].is_rel8 = 1;
+			strncpy(a->fixups[a->nfixups].name, toks[1], 63);
+			a->nfixups++;
+		}
 		return 0;
 	}
 	/* directives de donnees */
@@ -410,13 +422,20 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		if (ainstr(&a, toks, n) < 0) return -1;
 	}
 
-	/* resolution des fixups (references en avant : msg, key) */
 	for (int i = 0; i < a.nfixups; i++)
 	{
 		target = sym(&a, a.fixups[i].name);
 		if (target < 0) { fprintf(stderr, "asm: non resolu '%s'\n", a.fixups[i].name); return -1; }
-		disp = (int32_t)(target - (int64_t)a.fixups[i].end);
-		patch_disp32_buf(a.out->e.buf, a.fixups[i].off, disp);
+		if (a.fixups[i].is_rel8)
+		{
+			int8_t d = (int8_t)(target - (int64_t)a.fixups[i].end);
+			a.out->e.buf[a.fixups[i].off] = (uint8_t)d;
+		}
+		else
+		{
+			int32_t d = (int32_t)(target - (int64_t)a.fixups[i].end);
+			patch_disp32_buf(a.out->e.buf, a.fixups[i].off, d);
+		}
 	}
 	return 0;
 }

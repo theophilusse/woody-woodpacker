@@ -439,3 +439,57 @@ int	emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg)
 	return (emit_raw(e, bytes, 3));
 }
 
+///
+
+/* MOVZX r32, [reg]         : 0F B6 mod=00 */
+int emit_movzx_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base)
+{
+    uint8_t bytes[3] = {0x0F, 0xB6, (0 << 6) | (dst << 3) | base};
+    return emit_raw(e, bytes, 3);
+}
+
+/* MOVZX r32, [reg+disp8]   : 0F B6 mod=01 */
+int emit_movzx_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
+{
+    uint8_t bytes[4] = {0x0F, 0xB6, (1 << 6) | (dst << 3) | base, (uint8_t)disp};
+    return emit_raw(e, bytes, 4);
+}
+
+/* ADD r/m64, imm8          : 48 83 /0 ib */
+int emit_add_r64_imm8(t_emitter *e, t_reg reg, int8_t imm)
+{
+    uint8_t bytes[4] = {0x48, 0x83, (3 << 6) | (0 << 3) | reg, (uint8_t)imm};
+    return emit_raw(e, bytes, 4);
+}
+
+/* AND r/m32, imm8          : 83 /4 ib  (valeurs 0x00-0x7F seulement) */
+int emit_and_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    uint8_t bytes[3] = {0x83, (3 << 6) | (4 << 3) | reg, imm};
+    return emit_raw(e, bytes, 3);
+}
+
+/* AND r/m32, imm32         : 25 id (eax) ou 81 /4 id */
+int emit_and_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm)
+{
+    uint8_t bytes[6];
+    if (reg == REG_RAX) {
+        bytes[0] = 0x25; memcpy(bytes + 1, &imm, 4); return emit_raw(e, bytes, 5);
+    }
+    bytes[0] = 0x81; bytes[1] = (3 << 6) | (4 << 3) | reg;
+    memcpy(bytes + 2, &imm, 4); return emit_raw(e, bytes, 6);
+}
+
+/* SAR r/m32, imm8          : C1 /7 ib */
+int emit_sar_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    uint8_t bytes[3] = {0xC1, (3 << 6) | (7 << 3) | reg, imm};
+    return emit_raw(e, bytes, 3);
+}
+
+/* CMP r/m64, r64           : 48 39 /r */
+int emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src)
+{
+    uint8_t bytes[3] = {0x48, 0x39, (3 << 6) | (src << 3) | dst};
+    return emit_raw(e, bytes, 3);
+}

@@ -24,28 +24,168 @@ static const char STUB_SRC[] =
 	"_SET edi, 1\n" //"mov edi, 1\n"
 	//"mov eax, 1\n"
 	//"mov edi, 1\n"
-	"inc eax\n"
-	"inc eax\n"
-	"inc eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
-	"_INC eax\n"
 	"lea rsi, [msg]\n"
 	"mov edx, 14\n"
 	"syscall\n"
+
+// ; rsi = pointeur de scan (adresse de base du stub, set avant)
+// ; rbx = fin de scan (= rsi + 0x3E8, set avant)
+// ; rax = byte courant + temp
+
+"@lde_loop:\n"
+"cmp rsi, rbx\n"
+"jae @lde_done\n"
+
+"movzx eax, [rsi]\n"
+
+// ; ── 0x24 : AND al, imm8 (2 octets) ──────────────────────────
+"cmp eax, 0x24\n"
+"jne @check_80\n"
+"movzx eax, [rsi+1]\n"
+"cmp eax, 0x0\n"
+"jne @adv2_a\n"
+// ; ACTION : instruction suspecte (imm=0)
+"@adv2_a:\n"
+"add rsi, 2\n"
+"jmp @lde_loop\n"
+
+// ; ── 0x80 : AND r/m8, imm8 (3 octets) ────────────────────────
+"@check_80:\n"
+"cmp eax, 0x80\n"
+"jne @check_31\n"
+"movzx eax, [rsi+2]\n"
+"cmp eax, 0x0\n"
+"jne @adv3_a\n"
+// ; ACTION : instruction suspecte
+"@adv3_a:\n"
+"add rsi, 3\n"
+"jmp @lde_loop\n"
+
+// ; ── 0x31 : XOR r, r (2 octets) — extrait bit de cle ─────────
+"@check_31:\n"
+"cmp eax, 0x31\n"
+"vjne @check_b8\n"
+"movzx eax, [rsi+1]\n"
+"mov ecx, eax\n"
+"and eax, 0x18\n"
+"sar eax, 3\n"
+"and ecx, 0x3\n"
+"cmp eax, ecx\n"
+"jne @adv3_b\n"
+// ; ACTION : XOR r,r valide (reg==rm) → bit de cle = 0
+"@adv3_b:\n"
+"add rsi, 3\n"
+"jmp @lde_loop\n"
+
+// ; ── 0xB8-0xBF : MOV r32, imm32 (5 octets) ───────────────────
+"@check_b8:\n"
+"cmp eax, 0xb8\n"
+"jl @check_48lea\n"
+"cmp eax, 0xbf\n"
+"jg @check_48lea\n"
+// ; ACTION : MOV r32, imm32 → lit imm32 si utile
+"add rsi, 5\n"
+"jmp @lde_loop\n"
+
+// ; ── 0x48 0x8D xx 0x25 : LEA r64, [abs] (8 octets) ───────────
+"@check_48lea:\n"
+"cmp eax, 0x48\n"
+"jne @check_fe_ff\n"
+"movzx eax, [rsi+1]\n"
+"cmp eax, 0x8d\n"
+"jne @check_fe_ff\n"
+"movzx eax, [rsi+2]\n"
+"and eax, 0x7\n"
+"cmp eax, 0x4\n"
+"jne @check_fe_ff\n"
+"movzx eax, [rsi+3]\n"
+"cmp eax, 0x25\n"
+"jne @check_fe_ff\n"
+// ; ACTION : LEA r64, [abs] → lit disp32 si utile
+"add rsi, 8\n"
+"jmp @lde_loop\n"
+
+// ; ── 0xFE / 0xFF / 0x48 0xFF : INC/DEC (2 ou 3 octets) ───────
+"@check_fe_ff:\n"
+"movzx eax, [rsi]\n"
+"cmp eax, 0xfe\n"
+"je @check_incdec_modrm\n"
+"cmp eax, 0xff\n"
+"je @check_incdec_modrm\n"
+"cmp eax, 0x48\n"
+"jne @check_83_cmp\n"
+"movzx eax, [rsi+1]\n"
+"cmp eax, 0xff\n"
+"jne @check_83_cmp\n"
+
+"@check_incdec_modrm:\n"
+"movzx eax, [rsi+1]\n"
+"and eax, 0xf8\n"
+"cmp eax, 0xc0\n"
+"jne @check_dec_c8\n"
+// ; INC r : 2 octets (FE/FF) ou 3 (48 FF)
+"movzx eax, [rsi]\n"
+"cmp eax, 0x48\n"
+"jne @incdec2\n"
+"add rsi, 3\n"
+"jmp @lde_loop\n"
+"@incdec2:\n"
+"add rsi, 2\n"
+"jmp @lde_loop\n"
+
+"@check_dec_c8:\n"
+"movzx eax, [rsi+1]\n"
+"and eax, 0xf8\n"
+"cmp eax, 0xc8\n"
+"jne @check_83_sub1\n"
+// ; DEC r : 2 ou 3 octets
+"movzx eax, [rsi]\n"
+"cmp eax, 0x48\n"
+"jne @dec2\n"
+"add rsi, 3\n"
+"jmp @lde_loop\n"
+"@dec2:\n"
+"add rsi, 2\n"
+"jmp @lde_loop\n"
+
+// ; ── 0x83 /7 : CMP r32, imm8 (3 octets) ──────────────────────
+"@check_83_cmp:\n"
+"movzx eax, [rsi]\n"
+"cmp eax, 0x83\n"
+"jne @check_83_sub1\n"
+"movzx eax, [rsi+1]\n"
+"and eax, 0xf8\n"
+"cmp eax, 0xf8\n"
+"jne @check_83_sub1\n"
+// ; ACTION : CMP r32, imm8
+"add rsi, 3\n"
+"jmp @lde_loop\n"
+
+// ; ── 0x83 /5 : SUB r32, imm8=1 (3 octets) ────────────────────
+"@check_83_sub1:\n"
+"movzx eax, [rsi]\n"
+"cmp eax, 0x83\n"
+"jne @check_83_add1\n"
+"movzx eax, [rsi+1]\n"
+"and eax, 0xf8\n"
+"cmp eax, 0xe8\n"
+"jne @check_83_add1\n"
+"movzx eax, [rsi+2]\n"
+"cmp eax, 0x1\n"
+"jne @check_83_add1\n"
+// ; ACTION : SUB r32, 1
+"add rsi, 3\n"
+"jmp @lde_loop\n"
+
+// ; ── 0x83 /0 : ADD r32, imm8=1 (3 octets) ────────────────────
+"@check_83_add1:\n"
+// ; ... meme pattern, /0 = 0x00 dans ModRM & 0xF8
+
+// ; ── fallback : octet inconnu, avance de 1 ────────────────────
+"add rsi, 1\n"
+"jmp @lde_loop\n"
+
+"@lde_done:\n"
 
 	/* mprotect(page_vaddr, page_size, PROT_RWX) */
 	"mov rdi, prot_addr\n"
