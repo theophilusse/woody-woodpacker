@@ -216,6 +216,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
         		return emit_add_r8_mem_r8(&a->out->e, base, idx, r2);
 		if (toks[2][0] == '[' && preg(toks[1], &r1, &s1) && s1 == 8 && (mt = pmem(toks[2], &base, &idx, lbl, &d8)) == 1)
 			return emit_add_r8_mem_sib8(&a->out->e, r1, base, idx);
+		printf("%d : %d\n", preg(toks[1], &r1, &s1), s1);
 		if (toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 8)
 		{
 			DEBUG //
