@@ -323,24 +323,20 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		key_index++;
 		return 0;
 	}
-	if (!strcmp(toks[0], "_inc")) { // Encodage d'un bit via INC ou ADD
-		if (0)//lsb_value) // Bit = 1 → INC
+	if (!strcmp(toks[0], "_inc") && n == 2)
+	{
+		if (!preg(toks[1], &r1, &s1))     // ← manquait
+			return (-1);
+		if (key_index % 2 == 0)           // variante 0 : INC
 		{
-			if (s1 == 8)
-				emit_inc_r8(&a->out->e, r1);
-			else if (s1 == 32)
-				emit_inc_r32(&a->out->e, r1);
-			else
-				emit_inc_r64(&a->out->e, r1);
+			if (s1 == 8)       emit_inc_r8(&a->out->e, r1);
+			else if (s1 == 32) emit_inc_r32(&a->out->e, r1);
+			else               emit_inc_r64(&a->out->e, r1);
 		}
-		else
-		{ // Bit = 0 → ADD reg, 1 (équivalent à INC)
-			val = sym(a, toks[2]);
-			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			emit_add_r32_imm32(&a->out->e, r1, val); // ADD r32, 1
-		}
+		else                               // variante 1 : ADD reg, 1
+			emit_add_r32_imm8(&a->out->e, r1, 1);
 		key_index++;
-		return 0;
+		return (0);
 	}
 
 /*

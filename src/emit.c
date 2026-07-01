@@ -295,6 +295,16 @@ int emit_add_r8_mem_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src) {
     return emit_raw(e, bytes, 3);
 }
 
+/* ADD r/m32, imm8 : 83 /0 ib    ex: add eax, 1 = 83 C0 01 */
+int emit_add_r32_imm8(t_emitter *e, t_reg dst, uint8_t imm)
+{
+    uint8_t bytes[3];
+    bytes[0] = 0x83;
+    bytes[1] = (3 << 6) | (0 << 3) | dst;
+    bytes[2] = imm;
+    return emit_raw(e, bytes, 3);
+}
+
 /* ADD r8, imm8 : 80 /0 ib
  * ex: add al, 42 = 80 C0 2A */
 int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm)
