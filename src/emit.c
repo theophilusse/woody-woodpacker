@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <string.h>
 #include "emit.h"
 
 int	emit_raw(t_emitter *e, const uint8_t *bytes, size_t n)
@@ -196,15 +194,13 @@ int	emit_inc_r8(t_emitter *e, t_reg reg)
 	return (emit_raw(e, bytes, 2));
 }
 
-/* INC r/m64 : 48 FF /0 */
-int	emit_inc_r64(t_emitter *e, t_reg reg)
-{
-	uint8_t	bytes[3];
+/* INC r/m64 : FF /0 */
+int emit_inc_r64(t_emitter *e, t_reg reg) {
+    uint8_t bytes[2];
 
-	bytes[0] = 0x48;
-	bytes[1] = 0xFF;
-	bytes[2] = (3 << 6) | (0 << 3) | reg;
-	return (emit_raw(e, bytes, 3));
+    bytes[0] = 0xFF;
+    bytes[1] = (3 << 6) | (0 << 3) | reg;
+    return emit_raw(e, bytes, 2);
 }
 
 /* MOV [base+idx], src_low8 : 88 /r SIB
