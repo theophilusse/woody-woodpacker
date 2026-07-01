@@ -529,6 +529,7 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		n = tokenize(line, toks, 8);
 		if (n == 0) continue;
 
+		DEBUG //
 		tok0len = (int)strlen(toks[0]);
 		if (tok0len > 1 && toks[0][tok0len - 1] == ':')
 		{
