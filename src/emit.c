@@ -439,22 +439,6 @@ int	emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg)
 	return (emit_raw(e, bytes, 3));
 }
 
-///
-
-/* MOVZX r32, [reg]         : 0F B6 mod=00 */
-int emit_movzx_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base)
-{
-    uint8_t bytes[3] = {0x0F, 0xB6, (0 << 6) | (dst << 3) | base};
-    return emit_raw(e, bytes, 3);
-}
-
-/* MOVZX r32, [reg+disp8]   : 0F B6 mod=01 */
-int emit_movzx_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
-{
-    uint8_t bytes[4] = {0x0F, 0xB6, (1 << 6) | (dst << 3) | base, (uint8_t)disp};
-    return emit_raw(e, bytes, 4);
-}
-
 /* ADD r/m64, imm8          : 48 83 /0 ib */
 int emit_add_r64_imm8(t_emitter *e, t_reg reg, int8_t imm)
 {
