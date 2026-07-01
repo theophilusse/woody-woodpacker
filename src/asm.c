@@ -300,8 +300,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], "_set")) // Met un registre à une valeur
 	{
 		if (lsb_value)
-		{
-			
+		{	
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
 			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
