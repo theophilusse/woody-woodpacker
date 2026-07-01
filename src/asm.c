@@ -324,7 +324,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		return 0;
 	}
 	if (!strcmp(toks[0], "_inc")) { // Encodage d'un bit via INC ou ADD
-		if (lsb_value) { // Bit = 1 → INC
+		if (0)//lsb_value) { // Bit = 1 → INC
 			if (s1 == 8)
 				emit_inc_r8(&a->out->e, r1);
 			else if (s1 == 32)
