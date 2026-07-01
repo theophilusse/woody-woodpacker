@@ -43,6 +43,8 @@ int		emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src);
 int		emit_cmp_r32_imm8(t_emitter *e, t_reg reg, int8_t imm);
 int		emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm);
 int		emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm);
+int		emit_add_r32_imm8(t_emitter *e, t_reg dst, uint8_t imm);
+
 
 /* 16 bits */
 int		emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm);
