@@ -502,10 +502,18 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		{
 			toks[0][tok0len - 1] = '\0';
 			deflabel(&a, toks[0]);
-			if (ainstr(&a, toks + 1, n - 1) < 0) return -1;
+			if (ainstr(&a, toks + 1, n - 1) < 0)
+			{
+				fprintf(stderr, "asm: erreur dans l'instruction apres label '%s'\n", toks[0]);
+				return -1;
+			}
 			continue;
 		}
-		if (ainstr(&a, toks, n) < 0) return -1;
+		if (ainstr(&a, toks, n) < 0)
+		{
+			printf(stderr, "asm: erreur dans l'instruction '%s'\n", toks[0]);
+			return -1;
+		}
 	}
 
 	DEBUG //
