@@ -323,20 +323,18 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		key_index++;
 		return 0;
 	}
-	if (!strcmp(toks[0], "_inc")) // Incrémente un registre
-	{
-		if (1)//lsb_value)
-		{
+	if (!strcmp(toks[0], "_inc")) { // Encodage d'un bit via INC ou ADD
+		if (lsb_value) { // Bit = 1 → INC
 			if (s1 == 8)
-				emit_inc_r8(&a->out->e, r1);
+				emit_inc_r8(&a->out->e, r1); // INC r8
 			else
-				emit_inc_r64(&a->out->e, r1);
+				emit_inc_r64(&a->out->e, r1); // INC r64 (sans préfixe REX manuel)
 		}
 		else
-		{
+		{ // Bit = 0 → ADD reg, 1 (équivalent à INC)
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			emit_add_r32_imm32(&a->out->e, r1, val);
+			emit_add_r32_imm32(&a->out->e, r1, val); // ADD r32, 1
 		}
 		key_index++;
 		return 0;
