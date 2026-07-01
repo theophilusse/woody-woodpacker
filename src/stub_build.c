@@ -64,7 +64,7 @@ static const char STUB_SRC[] =
 // ; ── 0x31 : XOR r, r (2 octets) — extrait bit de cle ─────────
 "@check_31:\n"
 "cmp eax, 0x31\n"
-"vjne @check_b8\n"
+"jne @check_b8\n"
 "movzx eax, [rsi+1]\n"
 "mov ecx, eax\n"
 "and eax, 0x18\n"
