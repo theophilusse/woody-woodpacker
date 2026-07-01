@@ -194,6 +194,15 @@ int emit_inc_r8(t_emitter *e, t_reg reg)
     return emit_raw(e, bytes, 2);
 }
 
+/* INC r/m32 : FF /0 sans REX.W */
+int emit_inc_r32(t_emitter *e, t_reg reg)
+{
+    uint8_t bytes[2];
+    bytes[0] = 0xFF;
+    bytes[1] = (3 << 6) | (0 << 3) | reg;
+    return emit_raw(e, bytes, 2);
+}
+
 /* INC r/m64 : FF /0 (avec préfixe REX.W implicite) */
 int emit_inc_r64(t_emitter *e, t_reg reg)
 {

@@ -305,20 +305,22 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		key_index++;
 		return 0;
 	}
-	if (!strcmp(toks[0], "_set")) // Met un registre à une valeur
+	if (!strcmp(toks[0], "_set") && n == 3)
 	{
-		if (lsb_value)
-		{	
-			val = sym(a, toks[2]);
-			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
+		if (!preg(toks[1], &r1, &s1))   // ← manquait
+		{
+			fprintf(stderr, "asm: _set: registre invalide '%s'\n", toks[1]);
+			return -1;
 		}
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+
+		if (lsb_value)
+			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 		else
 		{
 			emit_lea_rip(&a->out->e, r1, &patch);
-			val = sym(a, toks[2]);
-			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			patch_disp32(&a->out->e, patch, val);
+			patch_disp32(&a->out->e, patch, (int32_t)val);
 		}
 		key_index++;
 		return 0;
@@ -326,9 +328,11 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], "_inc")) { // Encodage d'un bit via INC ou ADD
 		if (lsb_value) { // Bit = 1 → INC
 			if (s1 == 8)
-				emit_inc_r8(&a->out->e, r1); // INC r8
+				emit_inc_r8(&a->out->e, r1);
+			else if (s1 == 32)
+				emit_inc_r32(&a->out->e, r1);
 			else
-				emit_inc_r64(&a->out->e, r1); // INC r64 (sans préfixe REX manuel)
+				emit_inc_r64(&a->out->e, r1);
 		}
 		else
 		{ // Bit = 0 → ADD reg, 1 (équivalent à INC)
