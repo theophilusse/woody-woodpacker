@@ -159,6 +159,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 {
 	static size_t key_index = 0;
 	unsigned int		lsb_value;
+	size_t			patch;
 	t_reg	r1, r2, base, idx;
 	int		s1, s2;
 	int64_t	val;
@@ -169,6 +170,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
+	lsb_value = a->crypto->key[(key_index / 8) % a->crypto->key_len] & (0x01 << key_index);
 
 	if (!strcmp(toks[0], "syscall"))
 		{ emit_syscall(&a->out->e); return 0; }
@@ -286,9 +288,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], ".key"))
 		{ emit_raw(&a->out->e, a->crypto->key, a->crypto->key_len); return 0; }
 
-	if (!strcmp(toks[0], "_zero"))
+	if (!strcmp(toks[0], "_zero")) // Met a zero un registre
 	{
-		lsb_value = a->crypto->key[(key_index / 8) % a->crypto->key_len] & (0x01 << key_index);
 		if (lsb_value)
 			emit_and_r8_imm8(&a->out->e, r1, 0);
 		else
@@ -296,9 +297,26 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		key_index++;
 		return 0;
 	}
-/*    
-SET,        // Met un registre à une valeur
-    INC,        // Incrémente un registre
+	if (!strcmp(toks[0], "_set")) // Met un registre à une valeur
+	{
+		if (lsb_value)
+		{
+			
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
+		}
+		else
+		{
+			emit_lea_rip(&a->out->e, r1, &patch);
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			patch_disp32(&a->out->e, patch, val);
+		}
+		key_index++;
+		return 0;
+	}
+    /*INC,        // Incrémente un registre
     DEC,        // Décrémente un registre
     PUSH,       // Empile un registre
     POP,        // Dépile un registre
