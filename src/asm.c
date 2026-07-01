@@ -216,7 +216,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
         		return emit_add_r8_mem_r8(&a->out->e, base, idx, r2);
 		if (toks[2][0] == '[' && preg(toks[1], &r1, &s1) && s1 == 8 && (mt = pmem(toks[2], &base, &idx, lbl, &d8)) == 1)
 			return emit_add_r8_mem_sib8(&a->out->e, r1, base, idx);
-		printf("%d : %d\n", preg(toks[1], &r1, &s1), s1);
+		printf("%d : %d\n", preg(toks[1], &r1, &s1), s1); // BATMAN
 		if (toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 8)
 		{
 			DEBUG //
@@ -225,6 +225,13 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (val >= -128 && val <= 127)
             		return emit_add_r8_imm8(&a->out->e, r1, (uint8_t)val);
         }
+		if (toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 64)
+		{
+			DEBUG //
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			return emit_add_r64_imm8(&a->out->e, r1, (int64_t)val);
+		}
 	}
 	if (!strcmp(toks[0], "mov") && n == 3)
 	{
