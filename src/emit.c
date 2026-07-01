@@ -198,8 +198,8 @@ int	emit_inc_r8(t_emitter *e, t_reg reg)
 int emit_inc_r64(t_emitter *e, t_reg reg) {
     uint8_t bytes[2];
 
-    bytes[0] = 0xFF;
-    bytes[1] = (3 << 6) | (0 << 3) | reg;
+    bytes[0] = 0xFF;                     // Opcode principal
+    bytes[1] = (3 << 6) | (0 << 3) | reg; // ModR/M: [r/m64], 0 (opcode extension 0)
     return emit_raw(e, bytes, 2);
 }
 
