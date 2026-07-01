@@ -168,6 +168,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	char	lbl[64];
 	int		mt;
 	int8_t d8 = 0;
+	size_t	p;
 
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
