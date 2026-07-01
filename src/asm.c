@@ -53,6 +53,7 @@ static int64_t	sym(t_asm *a, const char *n)
 
 static void	deflabel(t_asm *a, const char *name)
 {
+	printf("deflabel: %s at %zu\n", name, a->out->e.len);
 	if (a->nlabels >= MAX_LABELS) return;
 	strncpy(a->labels[a->nlabels].name, name, 63);
 	a->labels[a->nlabels].off = a->out->e.len;
@@ -170,9 +171,12 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	int8_t d8 = 0;
 	size_t	p;
 
-	for (int i = 0; i < n; i++)
-		printf("%s ", toks[i]);
-	printf("\n");
+	if (DEBUG_MODE)
+	{
+		for (int i = 0; i < n; i++)
+			printf("%s ", toks[i]);
+		printf("\n");
+	}
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
 	lsb_value = a->crypto->key[(key_index / 8) % a->crypto->key_len] & (0x01 << key_index);
@@ -419,7 +423,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					!strcmp(toks[0],"jl")  ? 0x7C :
 					!strcmp(toks[0],"jge") ? 0x7D : 0x73; /* jae */
 		int64_t val = sym(a, toks[1]);
-		printf("val = %ld\n", val);//
 		if (val >= 0) {
 			int8_t d = (int8_t)(val - (int64_t)(a->out->e.len + 2));
 			emit_jcc_rel8_direct(&a->out->e, op, d);
@@ -637,7 +640,7 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			deflabel(&a, toks[0]);
 			if (ainstr(&a, toks + 1, n - 1) < 0)
 			{
-				printf("asm: erreur dans l'instruction ");
+					("asm: erreur dans l'instruction ");
 				for (int i = 0; i < n; i++) printf("'%s' ", toks[i]);
 				printf("\n");
 				return -1;
