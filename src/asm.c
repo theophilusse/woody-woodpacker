@@ -512,7 +512,7 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	first_pass.crypto = crypto;
 
 	DEBUG //
-	
+
 	// PREMIÈRE PASSE : Collecte tous les labels
 	const char *p;
 	while (*p)
@@ -533,8 +533,17 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		if (tok0len > 1 && toks[0][tok0len - 1] == ':')
 		{
 			toks[0][tok0len - 1] = '\0';
-			deflabel(&first_pass, toks[0]);  // Enregistre le label immédiatement
+			deflabel(&first_pass, toks[0]);
+			if (ainstr(&a, toks + 1, n - 1) < 0)
+			{
+					("asm: erreur dans l'instruction ");
+				for (int i = 0; i < n; i++) printf("'%s' ", toks[i]);
+				printf("\n");
+				return -1;
+			}
+			continue;
 		}
+		DEBUG //
 		if (ainstr(&first_pass, toks, n) < 0)
 		{
 			printf("asm: erreur dans l'instruction ");
