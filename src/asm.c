@@ -191,8 +191,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], "sub") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
 		{ emit_sub_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
 
-	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
-		{ emit_add_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
 	if (!strcmp(toks[0], "xor") && n == 3)
 	{
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
@@ -207,6 +205,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		emit_and_r8_imm8(&a->out->e, r1, (uint8_t)val);
 		return 0;
 	}
+	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
+		{ emit_add_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
 	if (!strcmp(toks[0], "add") && n == 3)
 	{
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
@@ -221,7 +221,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
 			if (val >= -128 && val <= 127)
             			return emit_add_r8_imm8(&a->out->e, r1, (uint8_t)val);
-        	}
+        }
 	}
 	if (!strcmp(toks[0], "mov") && n == 3)
 	{
@@ -406,6 +406,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
     SUB         // Soustrait une valeur à un registre
 */
 	fprintf(stderr, "asm: inconnu: '%s' (%d tokens)\n", toks[0], n);
+	for (int i = 0; i < n; i++)
+		fprintf(stderr, "  tok[%d] = '%s'\n", i, toks[i]);
 	return -1;
 }
 
