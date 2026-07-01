@@ -48,6 +48,7 @@ int		emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm);
 
 /* 8 bits */
 int		emit_inc_r8(t_emitter *e, t_reg reg);
+int		emit_inc_r32(t_emitter *e, t_reg reg);
 int		emit_inc_r64(t_emitter *e, t_reg reg);
 int		emit_and_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 int		emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm);
