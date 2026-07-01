@@ -51,13 +51,17 @@ int	main(int argc, char **argv)
 	// copier .text dans crypto.encrypted_text, puis rc4_apply() en place
 	// localiser .text dans le segment cible
 	/*
-	Elf64_Phdr	*p = &ctx->phdrs[ctx->target_phdr_idx];
-	crypto.text_vaddr = p->p_vaddr;
-	crypto.text_len   = p->p_filesz;
-	crypto.encrypted_text = ctx->raw + p->p_offset;
-
-	// chiffrer en place dans ctx->raw
-	rc4_apply(crypto.encrypted_text, crypto.text_len, crypto.key, crypto.key_len);
+	Elf64_Shdr *shdrs = (Elf64_Shdr *)(ctx->raw + ctx->ehdr->e_shoff);
+	for (int i = 0; i < ctx->ehdr->e_shnum; i++)
+	{
+		if (shdrs[i].sh_flags & SHF_EXECINSTR)
+		{
+			crypto.text_vaddr = shdrs[i].sh_addr;
+			crypto.text_len   = shdrs[i].sh_size;
+			crypto.encrypted_text = ctx->raw + shdrs[i].sh_offset;
+			rc4_apply(crypto.encrypted_text, crypto.text_len, crypto.key, crypto.key_len);
+		}
+	}
 	*/
 
 	/* 4. Construction du stub (forme unique) */

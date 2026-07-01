@@ -12,12 +12,20 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 	(void)crypto;
 	e = (t_emitter){0};
 
+	/* push rdx : préserve _dl_fini avant d'écraser rdx=14 */
+	uint8_t push_rdx = 0x52;
+	emit_raw(&e, &push_rdx, 1);
+
 	/* --- write(1, WOODY_MSG, 14) --- */
 	emit_mov_r32_imm32(&e, REG_RAX, 1);
 	emit_mov_r32_imm32(&e, REG_RDI, 1);
 	emit_lea_rip(&e, REG_RSI, &patch_lea_msg);
 	emit_mov_r32_imm32(&e, REG_RDX, WOODY_MSG_LEN);
 	emit_syscall(&e);
+
+	/* pop rdx : restaure _dl_fini avant le jmp vers _start */
+	uint8_t pop_rdx = 0x5A;
+	emit_raw(&e, &pop_rdx, 1);
 
 	/* ... mprotect + boucle de déchiffrement : TODO ... */
 
