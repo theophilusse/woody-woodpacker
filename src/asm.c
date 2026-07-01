@@ -209,6 +209,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{ emit_add_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
 	if (!strcmp(toks[0], "add") && n == 3)
 	{
+		DEBUG //
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
 			return emit_add_r8_r8(&a->out->e, r1, r2);
 		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
