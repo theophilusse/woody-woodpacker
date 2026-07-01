@@ -209,8 +209,10 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			int size;
 			if (preg(toks[1], &r1, &size) && size == 32) {
 				char *end;
+				DEBUG //
 				long imm = strtoll(toks[2], &end, 0);
 				if (*end == '\0' && imm >= 0 && imm <= 255) {
+					DEBUG //
 					emit_sar_r32_imm8(&a->out->e, r1, (uint8_t)imm);
 					return 0;
 				}
