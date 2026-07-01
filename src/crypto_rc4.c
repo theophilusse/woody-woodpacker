@@ -29,10 +29,39 @@ int	crypto_generate_key(t_crypto_ctx *crypto)
 
 void	rc4_apply(uint8_t *data, size_t len, const uint8_t *key, size_t key_len)
 {
-	(void)data;
-	(void)len;
-	(void)key;
-	(void)key_len;
-	/* TODO: KSA puis PRGA (cf. blueprint), XOR octet par octet.
-	 * Symétrique : sert au chiffrement ET au déchiffrement. */
+	uint8_t	s[256];
+	uint8_t	tmp;
+	size_t	i;
+	size_t	j;
+	size_t	k;
+
+	i = 0;
+	while (i < 256)
+	{
+		s[i] = (uint8_t)i;
+		i++;
+	}
+	j = 0;
+	i = 0;
+	while (i < 256)
+	{
+		j = (j + s[i] + key[i % key_len]) % 256;
+		tmp = s[i];
+		s[i] = s[j];
+		s[j] = tmp;
+		i++;
+	}
+	i = 0;
+	j = 0;
+	k = 0;
+	while (k < len)
+	{
+		i = (i + 1) % 256;
+		j = (j + s[i]) % 256;
+		tmp = s[i];
+		s[i] = s[j];
+		s[j] = tmp;
+		data[k] ^= s[(s[i] + s[j]) % 256];
+		k++;
+	}
 }
