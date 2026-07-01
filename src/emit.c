@@ -184,18 +184,19 @@ int	emit_add_rsp_imm32(t_emitter *e, uint32_t imm)
 	return (emit_raw(e, bytes, 7));
 }
 
-/* INC r/m8 : FE /0    ex: inc cl = FE C1 */
-int	emit_inc_r8(t_emitter *e, t_reg reg)
+/* INC r/m8 : FE /0 */
+int emit_inc_r8(t_emitter *e, t_reg reg)
 {
-	uint8_t	bytes[2];
+    uint8_t bytes[2];
 
-	bytes[0] = 0xFE;
-	bytes[1] = (3 << 6) | (0 << 3) | reg;
-	return (emit_raw(e, bytes, 2));
+    bytes[0] = 0xFE;                      // Opcode principal
+    bytes[1] = (3 << 6) | (0 << 3) | reg; // ModR/M: [r/m8], 0 (opcode extension 0)
+    return emit_raw(e, bytes, 2);
 }
 
 /* INC r/m64 : FF /0 (avec préfixe REX.W implicite) */
-int emit_inc_r64(t_emitter *e, t_reg reg) {
+int emit_inc_r64(t_emitter *e, t_reg reg)
+{
     uint8_t bytes[3]; // 3 octets : préfixe REX.W + opcode + ModR/M
 
     bytes[0] = 0x48;                      // Préfixe REX.W (obligatoire pour 64 bits)
