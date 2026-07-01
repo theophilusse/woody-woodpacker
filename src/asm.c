@@ -199,6 +199,16 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
 			{ emit_xor_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
 	}
+	if (!strcmp(toks[0], "sar") && n == 3)
+	{
+		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
+			{ emit_sar_r32_imm8(&a->out->e, r1, (uint8_t)strtoll(toks[2], NULL, 0)); return 0; }
+		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
+			{ emit_sar_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)strtoll(toks[2], NULL, 0)); return 0; }
+	}
+	{
+		int emit_sar_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+	}
 	if (!strcmp(toks[0], "and") && n == 3 && preg(toks[1], &r1, &s1))
 	{
 		if (s1 == 8)
