@@ -154,7 +154,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	char	lbl[64];
 	int		mt;
 	int8_t d8 = 0;
-	size_t	p;
 
 	if (DEBUG_MODE)
 	{
@@ -400,6 +399,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		a->out->patch_jmp_oep = a->out->e.len + 1;
 		emit_jmp_rel32(&a->out->e, &a->out->patch_jmp_oep);
+		//emit_jmp_rel32(&a->out->e, &p);
 		return 0;
 	}
 	if (n == 2 && (
