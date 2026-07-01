@@ -511,6 +511,8 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	first_pass.out = out;
 	first_pass.crypto = crypto;
 
+	DEBUG //
+	
 	// PREMIÈRE PASSE : Collecte tous les labels
 	const char *p;
 	while (*p)
@@ -541,6 +543,8 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			return -1;
 		}
 	}
+
+	DEBUG //
 
 	a.nlabels = first_pass.nlabels;
 	a.nfixups = first_pass.nfixups;
@@ -587,6 +591,8 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			return -1;
 		}
 	}
+
+	DEBUG //
 
 	// Résolution des fixups
 	for (int i = 0; i < a.nfixups; i++)
