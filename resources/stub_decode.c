@@ -1,8 +1,6 @@
-#include <stdio.h>
-
-void push(int n)
+int push(int n)
 {
-    printf("push %d\n", n);
+	return n;
 }
 
 int main()
