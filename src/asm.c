@@ -316,7 +316,22 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		key_index++;
 		return 0;
 	}
-    /*INC,        // Incrémente un registre
+	if (!strcmp(toks[0], "_inc")) // Incrémente un registre
+	{
+		if (lsb_value)
+		{
+			if (s1 == 8)
+				emit_inc_r8(&a->out->e, r1);
+			else
+				emit_inc_r64(&a->out->e, r1);
+		}
+		else
+		{
+			emit_add_r8_mem_sib8(&a->out->e, r1, base, 1);
+		}
+		key_index++;
+		return 0;
+	}
     DEC,        // Décrémente un registre
     PUSH,       // Empile un registre
     POP,        // Dépile un registre
