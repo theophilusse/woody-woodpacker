@@ -353,6 +353,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{
 			if (s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
 				{ emit_mov_r8_r8(&a->out->e, r1, r2); return 0; }
+			if (s1 == 32 && preg(toks[2], &r2, &s2) && s2 == 32)  /* ← MANQUAIT */
+				{ emit_mov_r32_r32(&a->out->e, r1, r2); return 0; }
 			if (s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
 				{ emit_mov_r64_r64(&a->out->e, r1, r2); return 0; }
 			if (s1 == 32) {

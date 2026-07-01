@@ -527,3 +527,8 @@ int emit_movzx_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
     uint8_t bytes[4] = {0x0F, 0xB6, (1 << 6) | (dst << 3) | base, (uint8_t)disp};
     return emit_raw(e, bytes, 4);
 }
+
+int emit_mov_r32_r32(t_emitter *e, t_reg dst, t_reg src) {
+    uint8_t b[2] = {0x89, (uint8_t)((3<<6)|(src<<3)|dst)};
+    return emit_raw(e, b, 2);
+}
