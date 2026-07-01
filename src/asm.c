@@ -148,7 +148,6 @@ static void	lea_label(t_asm *a, t_reg dst, const char *label)
 /* ── assemblage d une instruction ──────────────────────────────── */
 static int	ainstr(t_asm *a, char toks[][64], int n)
 {
-	static size_t key_index = 0;
 	unsigned int		lsb_value;
 	t_reg	r1, r2, base, idx;
 	int		s1, s2;
@@ -165,7 +164,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
-	lsb_value = a->crypto->key[(key_index / 8) % a->crypto->key_len] & (0x01 << key_index);
+	lsb_value = a->crypto->key[(a->key_index / 8) % a->crypto->key_len] & (0x01 << a->key_index);
 	if (!strcmp(toks[0], "syscall"))
 		{ emit_syscall(&a->out->e); return 0; }
 
@@ -468,7 +467,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_and_r8_imm8(&a->out->e, r1, 0);
 		else
 			emit_xor_r32_r32(&a->out->e, r1, r1);
-		key_index++;
+		a->key_index++;
 		return 0;
 	}
 	if (!strcmp(toks[0], "_set") && n == 3)
@@ -485,7 +484,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 		else
 			emit_lea_abs(&a->out->e, r1, (int32_t)val);
-		key_index++;
+		a->key_index++;
 		return 0;
 	}
 	if (!strcmp(toks[0], "_inc") && n == 2)
@@ -500,7 +499,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		else                               // variante 1 : ADD reg, 1
 			emit_add_r32_imm8(&a->out->e, r1, 1);
-		key_index++;
+		a->key_index++;
 		return (0);
 	}
 	if (!strcmp(toks[0], "_dec") && n == 2)
@@ -515,7 +514,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		else                               // variante 1 : SUB reg, 1
 			emit_sub_r32_imm8(&a->out->e, r1, 1);
-		key_index++;
+		a->key_index++;
 		return (0);
 	}
 	fprintf(stderr, "asm: inconnu: '%s' (%d tokens)\n", toks[0], n);
@@ -579,6 +578,8 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		}
 	}
 
+	out->e.len = 0;
+	out->patch_jmp_oep = 0;
 	memset(&a, 0, sizeof(a));
 	a.out    = out;
 	a.crypto = crypto;

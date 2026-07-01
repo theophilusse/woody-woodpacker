@@ -32,10 +32,11 @@ typedef struct
 {
 	t_asm_result    *out;
 	t_crypto_ctx    *crypto;
-	t_lbl            labels[MAX_LABELS];
-	int              nlabels;
-	t_fix            fixups[MAX_FIXUPS];
-	int              nfixups;
+	t_lbl           labels[MAX_LABELS];
+	int             nlabels;
+	t_fix           fixups[MAX_FIXUPS];
+	int             nfixups;
+	size_t			key_index;
 }	t_asm;
 
 int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out);
