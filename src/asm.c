@@ -1,0 +1,345 @@
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdio.h>
+#include "asm.h"
+
+#define MAX_LABELS 32
+#define MAX_FIXUPS 16
+
+typedef struct { char name[64]; size_t off; }               t_lbl;
+typedef struct { size_t off; size_t end; char name[64]; }   t_fix;
+
+typedef struct
+{
+	t_asm_result    *out;
+	t_crypto_ctx    *crypto;
+	t_lbl            labels[MAX_LABELS];
+	int              nlabels;
+	t_fix            fixups[MAX_FIXUPS];
+	int              nfixups;
+}	t_asm;
+
+/* ── registres ─────────────────────────────────────────────────── */
+static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi"};
+static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi"};
+static const char *R8[]  = {"al","cl","dl","bl"};
+
+static int	preg(const char *s, t_reg *r, int *sz)
+{
+	int	i;
+
+	for (i = 0; i < 8; i++) {
+		if (!strcmp(s,R64[i])) { *r=(t_reg)i; *sz=64; return 1; }
+		if (!strcmp(s,R32[i])) { *r=(t_reg)i; *sz=32; return 1; }
+	}
+	for (i = 0; i < 4; i++)
+		if (!strcmp(s,R8[i])) { *r=(t_reg)i; *sz=8; return 1; }
+	return 0;
+}
+
+/* ── symboles ───────────────────────────────────────────────────── */
+static int64_t	sym(t_asm *a, const char *n)
+{
+	int i;
+
+	if (!strcmp(n,"prot_addr"))
+		return (int64_t)(a->crypto->text_vaddr & ~(uint64_t)0xFFF);
+	if (!strcmp(n,"prot_size"))
+		return (int64_t)(((a->crypto->text_vaddr & 0xFFF)
+				+ a->crypto->text_len + 0xFFF) & ~(size_t)0xFFF);
+	if (!strcmp(n,"text_vaddr"))  return (int64_t)a->crypto->text_vaddr;
+	if (!strcmp(n,"text_len"))    return (int64_t)a->crypto->text_len;
+	if (!strcmp(n,"key_mask"))    return (int64_t)(a->crypto->key_len - 1);
+	for (i = 0; i < a->nlabels; i++)
+		if (!strcmp(a->labels[i].name, n)) return (int64_t)a->labels[i].off;
+	return -1;
+}
+
+static void	deflabel(t_asm *a, const char *name)
+{
+	if (a->nlabels >= MAX_LABELS) return;
+	strncpy(a->labels[a->nlabels].name, name, 63);
+	a->labels[a->nlabels].off = a->out->e.len;
+	a->nlabels++;
+}
+
+static void	fixup(t_asm *a, const char *name, size_t off, size_t end)
+{
+	if (a->nfixups >= MAX_FIXUPS) return;
+	a->fixups[a->nfixups].off = off;
+	a->fixups[a->nfixups].end = end;
+	strncpy(a->fixups[a->nfixups].name, name, 63);
+	a->nfixups++;
+}
+
+/* ── tokeniseur ─────────────────────────────────────────────────── */
+/* retourne nb tokens, tokenise une ligne.
+ * crochets [base+idx] = un seul token.
+ * pas de lowercase dans les identifiants commencant par @. */
+static int	tokenize(const char *line, char toks[][64], int max)
+{
+	const char	*p = line;
+	int			n = 0;
+	int			i;
+
+	while (*p && *p != ';' && *p != '\n')
+	{
+		while (*p == ' ' || *p == '\t') p++;
+		if (!*p || *p == ';' || *p == '\n') break;
+		if (*p == ',') { p++; continue; }
+		if (*p == '[')
+		{
+			char tmp[64]; i = 0; tmp[i++] = '['; p++;
+			while (*p && *p != ']') tmp[i++] = tolower((unsigned char)*p++);
+			if (*p == ']') { tmp[i++] = ']'; p++; }
+			tmp[i] = '\0';
+			if (n < max) { strncpy(toks[n++], tmp, 63); }
+			continue;
+		}
+		if (*p)
+		{
+			char tmp[64]; i = 0;
+			while (*p && *p != ' ' && *p != '\t' && *p != ',' && *p != '[' && *p != ']' && *p != ';' && *p != '\n')
+				tmp[i++] = *p++;
+			tmp[i] = '\0';
+			if (i > 0 && n < max)
+			{
+				int j = 0;
+				while (tmp[j]) { toks[n][j] = tolower((unsigned char)tmp[j]); j++; }
+				toks[n][j] = '\0';
+				n++;
+			}
+		}
+	}
+	return n;
+}
+
+/* ── parse memoire [base+idx] ou [label] ──────────────────────── */
+/* retourne 1 = SIB, 2 = label RIP-relative, 0 = erreur */
+static int	pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl)
+{
+	char	inner[64];
+	char	*plus;
+	t_reg	r;
+	int		sz;
+
+	if (tok[0] != '[') return 0;
+	strncpy(inner, tok + 1, 63);
+	int n = (int)strlen(inner);
+	if (n > 0 && inner[n - 1] == ']') inner[n - 1] = '\0';
+	plus = strchr(inner, '+');
+	if (plus)
+	{
+		*plus = '\0';
+		if (!preg(inner, base, &sz) || !preg(plus + 1, idx, &sz)) return 0;
+		return 1;
+	}
+	if (preg(inner, &r, &sz)) { *base = r; return 1; }
+	strncpy(lbl, inner, 63);
+	return 2;
+}
+
+/* ── lea avec label et fixup si necessaire ──────────────────────── */
+static void	lea_label(t_asm *a, t_reg dst, const char *label)
+{
+	size_t	patch;
+	int32_t	disp;
+	int64_t	val;
+
+	emit_lea_rip(&a->out->e, dst, &patch);
+	val = sym(a, label);
+	if (val >= 0)
+	{
+		disp = (int32_t)(val - (int64_t)(patch + 4));
+		patch_disp32(&a->out->e, patch, disp);
+	}
+	else
+		fixup(a, label, patch, patch + 4);
+}
+
+/* ── assemblage d une instruction ──────────────────────────────── */
+static int	ainstr(t_asm *a, char toks[][64], int n)
+{
+	t_reg	r1, r2, base, idx;
+	int		s1, s2;
+	int64_t	val;
+	int8_t	d8;
+	char	lbl[64];
+	int		mt;
+	size_t	p;
+
+	if (n == 0) return 0;
+	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
+
+	if (!strcmp(toks[0], "syscall"))
+		{ emit_syscall(&a->out->e); return 0; }
+
+	if (!strcmp(toks[0], "push") && n == 2 && preg(toks[1], &r1, &s1))
+		{ emit_push_r64(&a->out->e, r1); return 0; }
+
+	if (!strcmp(toks[0], "pop") && n == 2 && preg(toks[1], &r1, &s1))
+		{ emit_pop_r64(&a->out->e, r1); return 0; }
+
+	if (!strcmp(toks[0], "inc") && n == 2 && preg(toks[1], &r1, &s1))
+	{
+		if (s1 == 8) emit_inc_r8(&a->out->e, r1);
+		else emit_inc_r64(&a->out->e, r1);
+		return 0;
+	}
+	if (!strcmp(toks[0], "sub") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
+		{ emit_sub_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
+
+	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
+		{ emit_add_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
+
+	if (!strcmp(toks[0], "xor") && n == 3)
+	{
+		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
+			{ emit_xor_r32_r32(&a->out->e, r1, r2); return 0; }
+		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl)) == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
+			{ emit_xor_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
+	}
+	if (!strcmp(toks[0], "and") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 8)
+	{
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		emit_and_r8_imm8(&a->out->e, r1, (uint8_t)val);
+		return 0;
+	}
+	if (!strcmp(toks[0], "add") && n == 3)
+	{
+		if (toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
+			{ emit_add_r8_r8(&a->out->e, r1, r2); return 0; }
+		if (toks[2][0] == '[' && preg(toks[1], &r1, &s1) && s1 == 8 && (mt = pmem(toks[2], &base, &idx, lbl)) == 1)
+			{ emit_add_r8_mem_sib8(&a->out->e, r1, base, idx); return 0; }
+	}
+	if (!strcmp(toks[0], "mov") && n == 3)
+	{
+		if (toks[1][0] == '[' && toks[2][0] != '[')
+		{
+			mt = pmem(toks[1], &base, &idx, lbl);
+			if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
+				{ emit_mov_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
+		}
+		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1))
+		{
+			if (s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
+				{ emit_mov_r8_r8(&a->out->e, r1, r2); return 0; }
+			if (s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
+				{ emit_mov_r64_r64(&a->out->e, r1, r2); return 0; }
+			if (s1 == 32) {
+				val = sym(a, toks[2]);
+				if (val < 0) val = strtoll(toks[2], NULL, 0);
+				emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val); return 0;
+			}
+			if (s1 == 64) {
+				val = sym(a, toks[2]);
+				if (val < 0) val = strtoll(toks[2], NULL, 0);
+				emit_mov_r64_imm64(&a->out->e, r1, (uint64_t)val); return 0;
+			}
+		}
+	}
+	if (!strcmp(toks[0], "lea") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
+	{
+		mt = pmem(toks[2], &base, &idx, lbl);
+		if (mt == 2) { lea_label(a, r1, lbl); return 0; }
+	}
+	if (!strcmp(toks[0], "movzx") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
+	{
+		if (toks[2][0] != '[' && preg(toks[2], &r2, &s2) && s2 == 8)
+			{ emit_movzx_r32_r8(&a->out->e, r1, r2); return 0; }
+		if (toks[2][0] == '[' && (mt = pmem(toks[2], &base, &idx, lbl)) == 1)
+			{ emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx); return 0; }
+	}
+	if (!strcmp(toks[0], "xchg") && n == 3 && toks[1][0] == '[')
+	{
+		mt = pmem(toks[1], &base, &idx, lbl);
+		if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
+			{ emit_xchg_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
+	}
+	if (!strcmp(toks[0], "cmp") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
+	{
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		if (val >= -128 && val <= 127) emit_cmp_r32_imm8(&a->out->e, r1, (int8_t)val);
+		else emit_cmp_r32_imm32(&a->out->e, r1, (int32_t)val);
+		return 0;
+	}
+	if ((!strcmp(toks[0], "jnz") || !strcmp(toks[0], "jl")) && n == 2)
+	{
+		uint8_t op = !strcmp(toks[0], "jnz") ? 0x75 : 0x7C;
+		val = sym(a, toks[1]);
+		if (val < 0) { fprintf(stderr, "asm: unresolved '%s' (must be backward)\n", toks[1]); return -1; }
+		d8 = (int8_t)(val - (int64_t)(a->out->e.len + 2));
+		emit_jcc_rel8_direct(&a->out->e, op, d8);
+		return 0;
+	}
+	/* jmp @oep : placeholder patche par elf_patch */
+	if (!strcmp(toks[0], "jmp") && n == 2 && !strcmp(toks[1], "@oep"))
+	{
+		a->out->patch_jmp_oep = a->out->e.len + 1;
+		emit_jmp_rel32(&a->out->e, &p);
+		return 0;
+	}
+	/* directives de donnees */
+	if (!strcmp(toks[0], ".msg"))
+		{ emit_raw(&a->out->e, (const uint8_t *)WOODY_MSG, WOODY_MSG_LEN); return 0; }
+	if (!strcmp(toks[0], ".key"))
+		{ emit_raw(&a->out->e, a->crypto->key, a->crypto->key_len); return 0; }
+
+	fprintf(stderr, "asm: inconnu: '%s' (%d tokens)\n", toks[0], n);
+	return -1;
+}
+
+/* ── entree publique ────────────────────────────────────────────── */
+int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
+{
+	t_asm	a;
+	char	toks[8][64];
+	char	line[256];
+	int		n, llen, tok0len;
+	int32_t	disp;
+	int64_t	target;
+
+	memset(&a, 0, sizeof(a));
+	a.out    = out;
+	a.crypto = crypto;
+
+	const char *p = src;
+	while (*p)
+	{
+		const char *start = p;
+		while (*p && *p != '\n') p++;
+		llen = (int)(p - start);
+		if (*p == '\n') p++;
+		if (llen <= 0 || llen > 255) continue;
+		strncpy(line, start, (size_t)llen);
+		line[llen] = '\0';
+
+		memset(toks, 0, sizeof(toks));
+		n = tokenize(line, toks, 8);
+		if (n == 0) continue;
+
+		/* detection de label : dernier char du premier token == ':' */
+		tok0len = (int)strlen(toks[0]);
+		if (tok0len > 1 && toks[0][tok0len - 1] == ':')
+		{
+			toks[0][tok0len - 1] = '\0';
+			deflabel(&a, toks[0]);
+			if (ainstr(&a, toks + 1, n - 1) < 0) return -1;
+			continue;
+		}
+		if (ainstr(&a, toks, n) < 0) return -1;
+	}
+
+	/* resolution des fixups (references en avant : msg, key) */
+	for (int i = 0; i < a.nfixups; i++)
+	{
+		target = sym(&a, a.fixups[i].name);
+		if (target < 0) { fprintf(stderr, "asm: non resolu '%s'\n", a.fixups[i].name); return -1; }
+		disp = (int32_t)(target - (int64_t)a.fixups[i].end);
+		patch_disp32_buf(a.out->e.buf, a.fixups[i].off, disp);
+	}
+	return 0;
+}
