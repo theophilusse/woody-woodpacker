@@ -325,7 +325,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "_inc")) // Incrémente un registre
 	{
-		if (lsb_value)
+		if (1)//lsb_value)
 		{
 			if (s1 == 8)
 				emit_inc_r8(&a->out->e, r1);
