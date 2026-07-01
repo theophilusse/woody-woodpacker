@@ -87,7 +87,13 @@ static const char STUB_SRC[] =
 	"mov edx, 14\n"
 	"syscall\n"
 
-/*
+"push rdx\n"
+
+/* stub_start = adresse courante du stub, recuperee via RIP */
+"@stub_start:\n"
+"lea rsi, [@stub_start]\n"   /* rsi = debut du stub en memoire */
+"lea rbx, [@lde_done]\n"     /* rbx = fin de la zone a scanner */
+
 // ; rsi = pointeur de scan (adresse de base du stub, set avant)
 // ; rbx = fin de scan (= rsi + 0x3E8, set avant)
 // ; rax = byte courant + temp
@@ -246,7 +252,6 @@ static const char STUB_SRC[] =
 "jmp @lde_loop\n"
 
 "@lde_done:\n"
-*/
 
 	/* mprotect(page_vaddr, page_size, PROT_RWX) */
 	"mov rdi, prot_addr\n"
