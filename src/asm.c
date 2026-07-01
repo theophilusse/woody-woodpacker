@@ -240,9 +240,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			}
 
 			char *end = NULL;
-			errno = 0;
 			long imm = strtoll(toks[2], &end, 0);
-			if (errno != 0 || end == toks[2] || *end != '\0' || imm < 0 || imm > 255) {
+			if (end == toks[2] || *end != '\0' || imm < 0 || imm > 255) {
 				return -1;  // Immédiat invalide
 			}
 
