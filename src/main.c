@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "woody.h"
 
 static int	usage(const char *prog)
