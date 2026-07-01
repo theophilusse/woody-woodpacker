@@ -481,6 +481,31 @@ int emit_sar_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm)
     return emit_raw(e, bytes, 4);
 }
 
+/* SAR r32, r32          : D3 /7 */
+int emit_sar_r32_r32(t_emitter *e, t_reg reg_dest, t_reg reg_src)
+{
+    uint8_t bytes[2] = {0xD3, (0b11 << 6) | (7 << 3) | reg_dest};
+    return emit_raw(e, bytes, 2);
+}
+
+/* SAR [r/m32], r32      : D3 /7 */
+int emit_sar_mem_r32(t_emitter *e, t_reg base, t_reg idx, t_reg reg_src)
+{
+    uint8_t modrm = (0b00 << 6) | (7 << 3) | 0b100;  // mod=00, r/m=100 (SIB)
+    uint8_t sib = (0b00 << 6) | (idx << 3) | base;
+    uint8_t bytes[3] = {0xD3, modrm, sib};
+    return emit_raw(e, bytes, 3);
+}
+
+/* SAR [r/m32 + disp8], imm8 : C1 /7 ib */
+int emit_sar_mem_sib_imm8_disp(t_emitter *e, t_reg base, t_reg idx, int8_t disp, uint8_t imm)
+{
+    uint8_t modrm = (0b01 << 6) | (7 << 3) | 0b100;  // mod=01 (disp8)
+    uint8_t sib = (0b00 << 6) | (idx << 3) | base;
+    uint8_t bytes[4] = {0xC1, modrm, sib, (uint8_t)disp, imm};
+    return emit_raw(e, bytes, 5);
+}
+
 /* CMP r/m64, r64           : 48 39 /r */
 int emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src)
 {
