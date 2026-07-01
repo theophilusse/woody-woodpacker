@@ -16,6 +16,7 @@
 */
 
 static const char STUB_SRC[] =
+/*
     "push rdx\n"
     "_SET eax, 1\n"
     "_SET edi, 1\n"
@@ -73,7 +74,7 @@ static const char STUB_SRC[] =
     ".msg\n"
     "key:\n"
     ".key\n"
-
+*/
 	/* preserves _dl_fini que le kernel passe dans rdx */
 	"push rdx\n"
 
@@ -86,6 +87,7 @@ static const char STUB_SRC[] =
 	"mov edx, 14\n"
 	"syscall\n"
 
+/*
 // ; rsi = pointeur de scan (adresse de base du stub, set avant)
 // ; rbx = fin de scan (= rsi + 0x3E8, set avant)
 // ; rax = byte courant + temp
@@ -244,6 +246,7 @@ static const char STUB_SRC[] =
 "jmp @lde_loop\n"
 
 "@lde_done:\n"
+*/
 
 	/* mprotect(page_vaddr, page_size, PROT_RWX) */
 	"mov rdi, prot_addr\n"
