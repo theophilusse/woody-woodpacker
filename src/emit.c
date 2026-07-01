@@ -320,3 +320,4 @@ int	emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg)
 	bytes[2] = (0 << 6) | (idx << 3) | base;
 	return (emit_raw(e, bytes, 3));
 }
+
