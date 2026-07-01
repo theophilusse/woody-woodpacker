@@ -145,6 +145,19 @@ static void	lea_label(t_asm *a, t_reg dst, const char *label)
 		addfixup(a, label, patch, patch + 4, 0);
 }
 
+static uint8_t jcc_opcode(const char *m)
+{
+    if (!strcmp(m,"jne")||!strcmp(m,"jnz")) return 0x75;
+    if (!strcmp(m,"je") ||!strcmp(m,"jz"))  return 0x74;
+    if (!strcmp(m,"jl") ||!strcmp(m,"jnge"))return 0x7C;
+    if (!strcmp(m,"jg") ||!strcmp(m,"jnle"))return 0x7F;
+    if (!strcmp(m,"jle")||!strcmp(m,"jng")) return 0x7E;
+    if (!strcmp(m,"jge")||!strcmp(m,"jnl")) return 0x7D;
+    if (!strcmp(m,"jae")||!strcmp(m,"jnb")) return 0x73;
+    if (!strcmp(m,"jbe")||!strcmp(m,"jna")) return 0x76;
+    return 0;
+}
+
 /* ── assemblage d une instruction ──────────────────────────────── */
 static int	ainstr(t_asm *a, char toks[][64], int n)
 {
@@ -155,6 +168,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	char	lbl[64];
 	int		mt;
 	int8_t d8 = 0;
+	uint8_t op;
 
 	if (DEBUG_MODE)
 	{
@@ -167,7 +181,21 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	lsb_value = a->crypto->key[(a->key_index / 8) % a->crypto->key_len] & (0x01 << a->key_index);
 	if (!strcmp(toks[0], "syscall"))
 		{ emit_syscall(&a->out->e); return 0; }
-
+	if (n == 2 && (op = jcc_opcode(toks[0])))
+	{
+		int64_t lval = sym(a, toks[1]);
+		if (lval >= 0) {
+			int8_t d = (int8_t)(lval - (int64_t)(a->out->e.len + 2));
+			emit_jcc_rel8_direct(&a->out->e, op, d);
+		} else {
+			uint8_t bytes[2] = {op, 0};
+			size_t foff = a->out->e.len + 1;
+			size_t fend = a->out->e.len + 2;
+			emit_raw(&a->out->e, bytes, 2);
+			addfixup(a, toks[1], foff, fend, 1);
+		}
+		return 0;
+	}
 	if (!strcmp(toks[0], "push") && n == 2 && preg(toks[1], &r1, &s1))
 		{ emit_push_r64(&a->out->e, r1); return 0; }
 

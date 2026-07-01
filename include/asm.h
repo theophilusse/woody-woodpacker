@@ -5,8 +5,8 @@
 # include "emit.h"
 # include "woody.h"
 
-#define MAX_LABELS 32
-#define MAX_FIXUPS 16
+#define MAX_LABELS 128
+#define MAX_FIXUPS 128
 
 typedef struct
 {
