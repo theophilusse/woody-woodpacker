@@ -471,6 +471,16 @@ int emit_sar_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
     return emit_raw(e, bytes, 3);
 }
 
+/* SAR r/m32, imm8          : C1 /7 ib */
+int emit_sar_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm)
+{
+    uint8_t modrm = (0b11 << 6) | (7 << 3) | 3;
+	uint8_t sib = (0b00 << 6) | (idx << 3) | base;
+    uint8_t bytes[4] = {0xC1, modrm, sib, imm};
+
+    return emit_raw(e, bytes, 4);
+}
+
 /* CMP r/m64, r64           : 48 39 /r */
 int emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src)
 {
