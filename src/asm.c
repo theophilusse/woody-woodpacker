@@ -394,7 +394,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (!strcmp(toks[1], "@oep"))
 		{
 			a->out->patch_jmp_oep = a->out->e.len + 1;
-			emit_jmp_rel32(&a->out->e, &a->out->patch_jmp_oep);
+			emit_jmp_rel32(&a->out->e, &a->patch_jmp_oep);
 			return 0;
 		}
 		a->out->patch_jmp_oep = a->out->e.len + 1;
@@ -500,7 +500,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 }
 
 /* ── entree publique ────────────────────────────────────────────── */
-int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
+int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, size_t *patch_jmp_oep)
 {
 	t_asm	first_pass;
 	t_asm	a;
@@ -508,10 +508,6 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	char	line[256];
 	int		n, llen, tok0len;
 	int64_t	target;
-
-	memset(&a, 0, sizeof(a));
-	a.out    = out;
-	a.crypto = crypto;
 
 	memset(&first_pass, 0, sizeof(first_pass));
 	first_pass.out = out;
@@ -558,6 +554,10 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		}
 	}
 
+	memset(&a, 0, sizeof(a));
+	a.out    = out;
+	a.crypto = crypto;
+	a.patch_jmp_oep = *patch_jmp_oep;
 	a.nlabels = first_pass.nlabels;
 	a.nfixups = first_pass.nfixups;
 	memcpy(a.labels, first_pass.labels, sizeof(first_pass.labels));

@@ -262,7 +262,7 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 	t_stub			*stub;
 
 	memset(&res, 0, sizeof(res));
-	if (asm_build(STUB_SRC, crypto, &res) < 0)
+	if (asm_build(STUB_SRC, crypto, &res, &ctx->ehdr->e_entry) < 0)
 	{
 		free(res.e.buf);
 		return (NULL);

@@ -36,8 +36,9 @@ typedef struct
 	int              nlabels;
 	t_fix            fixups[MAX_FIXUPS];
 	int              nfixups;
+	size_t 			patch_jmp_oep;
 }	t_asm;
 
-int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out);
+int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, size_t *patch_jmp_oep);
 
 #endif
