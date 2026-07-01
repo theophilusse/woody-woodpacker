@@ -161,10 +161,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	t_reg	r1, r2, base, idx;
 	int		s1, s2;
 	int64_t	val;
-	int8_t	d8;
 	char	lbl[64];
 	int		mt;
-	size_t	p;
 
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
@@ -388,7 +386,6 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	char	toks[8][64];
 	char	line[256];
 	int		n, llen, tok0len;
-	int32_t	disp;
 	int64_t	target;
 
 	memset(&a, 0, sizeof(a));
