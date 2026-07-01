@@ -332,6 +332,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		key_index++;
 		return 0;
 	}
+
+/*
     DEC,        // Décrémente un registre
     PUSH,       // Empile un registre
     POP,        // Dépile un registre
