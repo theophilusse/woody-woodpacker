@@ -16,7 +16,6 @@
 */
 
 static const char STUB_SRC[] =
-static const char STUB_SRC[] =
     "push rdx\n"
     "_SET eax, 1\n"
     "_SET edi, 1\n"
