@@ -159,7 +159,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 {
 	static size_t key_index = 0;
 	unsigned int		lsb_value;
-	size_t			patch;
 	t_reg	r1, r2, base, idx;
 	int		s1, s2;
 	int64_t	val;
