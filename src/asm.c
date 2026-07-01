@@ -517,15 +517,21 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	const char *p;
 	while (*p)
 	{
+		DEBUG //
 		const char *start = p;
 		while (*p && *p != '\n') p++;
 		llen = (int)(p - start);
 		if (*p == '\n') p++;
 		if (llen <= 0 || llen > 255) continue;
+		DEBUG //
 		strncpy(line, start, (size_t)llen);
 		line[llen] = '\0';
 
+		DEBUG //
+
 		memset(toks, 0, sizeof(toks));
+
+		DEBUG //
 		n = tokenize(line, toks, 8);
 		if (n == 0) continue;
 
