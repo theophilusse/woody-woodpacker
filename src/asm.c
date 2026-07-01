@@ -1,21 +1,5 @@
 #include "asm.h"
 
-#define MAX_LABELS 32
-#define MAX_FIXUPS 16
-
-typedef struct { char name[64]; size_t off; }               t_lbl;
-typedef struct { size_t off; size_t end; char name[64]; int is_rel8; } t_fix;
-typedef struct
-{
-	t_asm_result    *out;
-	t_crypto_ctx    *crypto;
-	t_lbl            labels[MAX_LABELS];
-	int              nlabels;
-	t_fix            fixups[MAX_FIXUPS];
-	int              nfixups;
-}	t_asm;
-
-/* ── registres ─────────────────────────────────────────────────── */
 static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi"};
 static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi"};
 static const char *R8[]  = {"al","cl","dl","bl"};
@@ -53,7 +37,8 @@ static int64_t	sym(t_asm *a, const char *n)
 
 static void	deflabel(t_asm *a, const char *name)
 {
-	printf("deflabel: %s at %zu\n", name, a->out->e.len);
+	if (DEBUG_MODE)
+		printf("deflabel: %s at %zu\n", name, a->out->e.len);
 	if (a->nlabels >= MAX_LABELS) return;
 	strncpy(a->labels[a->nlabels].name, name, 63);
 	a->labels[a->nlabels].off = a->out->e.len;
@@ -511,6 +496,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 /* ── entree publique ────────────────────────────────────────────── */
 int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 {
+	t_asm	first_pass;
 	t_asm	a;
 	char	toks[8][64];
 	char	line[256];
@@ -521,8 +507,12 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	a.out    = out;
 	a.crypto = crypto;
 
+	memset(&first_pass, 0, sizeof(first_pass));
+	first_pass.out = out;
+	first_pass.crypto = crypto;
+
 	// PREMIÈRE PASSE : Collecte tous les labels
-	const char *p = src;
+	const char *p;
 	while (*p)
 	{
 		const char *start = p;
@@ -541,9 +531,21 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		if (tok0len > 1 && toks[0][tok0len - 1] == ':')
 		{
 			toks[0][tok0len - 1] = '\0';
-			deflabel(&a, toks[0]);  // Enregistre le label immédiatement
+			deflabel(&first_pass, toks[0]);  // Enregistre le label immédiatement
+		}
+		if (ainstr(&first_pass, toks, n) < 0)
+		{
+			printf("asm: erreur dans l'instruction ");
+			for (int i = 0; i < n; i++) printf("'%s' ", toks[i]);
+			printf("\n");
+			return -1;
 		}
 	}
+
+	a.nlabels = first_pass.nlabels;
+	a.nfixups = first_pass.nfixups;
+	memcpy(a.labels, first_pass.labels, sizeof(first_pass.labels));
+	memcpy(a.fixups, first_pass.fixups, sizeof(first_pass.fixups));
 
 	// DEUXIÈME PASSE : Traite les instructions
 	p = src;

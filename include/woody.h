@@ -17,7 +17,7 @@
 # define WOODY_MSG "....WOODY....\n"
 # define WOODY_MSG_LEN 14
 
-# define DEBUG_MODE 0
+# define DEBUG_MODE 1
 # define DEBUG printf("DEBUG: %s:%d\n", __FILE__, __LINE__);
 
 typedef struct s_elf_ctx
