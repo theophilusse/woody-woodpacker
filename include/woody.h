@@ -13,9 +13,6 @@
 # include <stdint.h>
 # include <stddef.h>
 
-# include "emit.h"
-# include "asm.h"
-
 # define KEY_LEN 16
 # define WOODY_MSG "....WOODY....\n"
 # define WOODY_MSG_LEN 14
@@ -46,6 +43,9 @@ typedef struct s_stub
 	uint64_t	original_oep;
 	size_t		patch_jmp_oep;
 }	t_stub;
+
+# include "emit.h"
+# include "asm.h"
 
 /* elf_parser.c */
 t_elf_ctx	*elf_load(const char *path);
