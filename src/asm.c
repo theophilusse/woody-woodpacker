@@ -552,126 +552,49 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 }
 
 /* ── entree publique ────────────────────────────────────────────── */
-int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
+int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 {
-	t_asm	first_pass;
-	t_asm	a;
-	char	toks[8][64];
-	char	line[256];
-	int		n, llen, tok0len;
-	int64_t	target;
+    t_asm   a;
+    char    toks[8][64];
+    char    line[256];
+    int     n, llen, tok0len;
 
-	memset(&first_pass, 0, sizeof(first_pass));
-	first_pass.out = out;
-	first_pass.crypto = crypto;
+    memset(&a, 0, sizeof(a));
+    a.out    = out;
+    a.crypto = crypto;
 
-	// PREMIÈRE PASSE : Collecte tous les labels
-	const char *p;
-
-	p = src;
-	while (*p)
-	{
-		const char *start = p;
-		while (*p && *p != '\n') p++;
-		llen = (int)(p - start);
-		if (*p == '\n') p++;
-		if (llen <= 0 || llen > 255) continue;
-		strncpy(line, start, (size_t)llen);
-		line[llen] = '\0';
-
-		memset(toks, 0, sizeof(toks));
-		n = tokenize(line, toks, 8);
-		if (n == 0) continue;
-
-		tok0len = (int)strlen(toks[0]);
-		if (tok0len > 1 && toks[0][tok0len - 1] == ':')
-		{
-			toks[0][tok0len - 1] = '\0';
-			deflabel(&first_pass, toks[0]);
-			if (ainstr(&first_pass, toks + 1, n - 1) < 0)
-			{
-				printf("asm: erreur dans l'instruction ");
-				for (int i = 0; i < n; i++) printf("'%s' ", toks[i]);
-				printf("\n");
-				return -1;
-			}
-			continue;
-		}
-		if (ainstr(&first_pass, toks, n) < 0)
-		{
-			printf("asm: erreur dans l'instruction ");
-			for (int i = 0; i < n; i++) printf("'%s' ", toks[i]);
-			printf("\n");
-			return -1;
-		}
-	}
-
-	out->e.len = 0;
-	out->patch_jmp_oep = 0;
-	memset(&a, 0, sizeof(a));
-	a.out    = out;
-	a.crypto = crypto;
-	a.nlabels = first_pass.nlabels;
-	a.nfixups = first_pass.nfixups;
-	memcpy(a.labels, first_pass.labels, sizeof(first_pass.labels));
-	memcpy(a.fixups, first_pass.fixups, sizeof(first_pass.fixups));
-
-	// DEUXIÈME PASSE : Traite les instructions
-	p = src;
-	while (*p)
-	{
-		const char *start = p;
-		while (*p && *p != '\n') p++;
-		llen = (int)(p - start);
-		if (*p == '\n') p++;
-		if (llen <= 0 || llen > 255) continue;
-		strncpy(line, start, (size_t)llen);
-		line[llen] = '\0';
-
-		memset(toks, 0, sizeof(toks));
-		n = tokenize(line, toks, 8);
-		if (n == 0) continue;
-
-		/* detection de label : dernier char du premier token == ':' */
-		tok0len = (int)strlen(toks[0]);
-		if (tok0len > 1 && toks[0][tok0len - 1] == ':')
-		{
-			if (n > 1)  // Si y a une instruction après le label
-			{
-				if (ainstr(&a, toks + 1, n - 1) < 0)
-				{
-					printf("asm: erreur dans l'instruction ");
-					for (int i = 1; i < n; i++) printf("'%s' ", toks[i]);
-					printf("\n");
-					return -1;
-				}
-			}
-			continue;
-		}
-		if (ainstr(&a, toks, n) < 0)
-		{
-			printf("asm: erreur dans l'instruction ");
-			for (int i = 0; i < n; i++) printf("'%s' ", toks[i]);
-			printf("\n");
-			return -1;
-		}
-	}
-
-	// Résolution des fixups
-	for (int i = 0; i < a.nfixups; i++)
-	{
-		target = sym(&a, a.fixups[i].name);
-		if (target < 0) { fprintf(stderr, "asm: non resolu '%s'\n", a.fixups[i].name); return -1; }
-		if (a.fixups[i].is_rel8)
-		{
-			int8_t d = (int8_t)(target - (int64_t)a.fixups[i].end);
-			a.out->e.buf[a.fixups[i].off] = (uint8_t)d;
-		}
-		else
-		{
-			int32_t d = (int32_t)(target - (int64_t)a.fixups[i].end);
-			patch_disp32_buf(a.out->e.buf, a.fixups[i].off, d);
-		}
-	}
-	return 0;
+    const char *p = src;
+    while (*p) {
+        const char *start = p;
+        while (*p && *p != '\n') p++;
+        llen = (int)(p - start);
+        if (*p == '\n') p++;
+        if (llen <= 0 || llen > 255) continue;
+        strncpy(line, start, (size_t)llen);
+        line[llen] = '\0';
+        memset(toks, 0, sizeof(toks));
+        n = tokenize(line, toks, 8);
+        if (n == 0) continue;
+        tok0len = (int)strlen(toks[0]);
+        if (tok0len > 1 && toks[0][tok0len - 1] == ':') {
+            toks[0][tok0len - 1] = '\0';
+            deflabel(&a, toks[0]);
+            if (ainstr(&a, toks + 1, n - 1) < 0) return -1;
+            continue;
+        }
+        if (ainstr(&a, toks, n) < 0) return -1;
+    }
+    /* resolution des fixups */
+    for (int i = 0; i < a.nfixups; i++) {
+        int64_t target = sym(&a, a.fixups[i].name);
+        if (target < 0) { fprintf(stderr, "asm: non resolu '%s'\n", a.fixups[i].name); return -1; }
+        if (a.fixups[i].is_rel8) {
+            int8_t d = (int8_t)(target - (int64_t)a.fixups[i].end);
+            a.out->e.buf[a.fixups[i].off] = (uint8_t)d;
+        } else {
+            int32_t d = (int32_t)(target - (int64_t)a.fixups[i].end);
+            patch_disp32_buf(a.out->e.buf, a.fixups[i].off, d);
+        }
+    }
+    return 0;
 }
