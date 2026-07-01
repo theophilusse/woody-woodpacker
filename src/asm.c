@@ -293,7 +293,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (lsb_value)
 			emit_and_r8_imm8(&a->out->e, r1, 0);
 		else
-			emit_xor_r32_r32(&a->out->e, 4, 4);
+			emit_xor_r32_r32(&a->out->e, r1, r1);
 		key_index++;
 		return 0;
 	}
