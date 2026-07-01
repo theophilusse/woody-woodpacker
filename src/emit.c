@@ -290,7 +290,8 @@ int emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm) {
 }
 
 /* ADD r32, imm32 : 83 /0 id    ex: add eax, 42 = 83 C0 2A */
-int emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm) {
+int emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm)
+{
     uint8_t bytes[6];
 
     bytes[0] = 0x83;
