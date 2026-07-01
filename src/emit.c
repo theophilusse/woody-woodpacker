@@ -493,3 +493,17 @@ int emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src)
     uint8_t bytes[3] = {0x48, 0x39, (3 << 6) | (src << 3) | dst};
     return emit_raw(e, bytes, 3);
 }
+
+/* MOVZX r32, [base] : 0F B6 mod=00 */
+int emit_movzx_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base)
+{
+    uint8_t bytes[3] = {0x0F, 0xB6, (0 << 6) | (dst << 3) | base};
+    return emit_raw(e, bytes, 3);
+}
+
+/* MOVZX r32, [base+disp8] : 0F B6 mod=01 disp8 */
+int emit_movzx_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
+{
+    uint8_t bytes[4] = {0x0F, 0xB6, (1 << 6) | (dst << 3) | base, (uint8_t)disp};
+    return emit_raw(e, bytes, 4);
+}

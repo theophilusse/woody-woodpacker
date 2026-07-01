@@ -112,27 +112,31 @@ static int	tokenize(const char *line, char toks[][64], int max)
 
 /* ── parse memoire [base+idx] ou [label] ──────────────────────── */
 /* retourne 1 = SIB, 2 = label RIP-relative, 0 = erreur */
-static int	pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl)
+static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *disp)
 {
-	char	inner[64];
-	char	*plus;
-	t_reg	r;
-	int		sz;
+    char    inner[64];
+    char    *plus;
+    t_reg   r;
+    int     sz;
 
-	if (tok[0] != '[') return 0;
-	strncpy(inner, tok + 1, 63);
-	int n = (int)strlen(inner);
-	if (n > 0 && inner[n - 1] == ']') inner[n - 1] = '\0';
-	plus = strchr(inner, '+');
-	if (plus)
-	{
-		*plus = '\0';
-		if (!preg(inner, base, &sz) || !preg(plus + 1, idx, &sz)) return 0;
-		return 1;
-	}
-	if (preg(inner, &r, &sz)) { *base = r; return 1; }
-	strncpy(lbl, inner, 63);
-	return 2;
+    if (tok[0] != '[') return 0;
+    strncpy(inner, tok + 1, 63);
+    int n = (int)strlen(inner);
+    if (n > 0 && inner[n - 1] == ']') inner[n - 1] = '\0';
+
+    plus = strchr(inner, '+');
+    if (plus)
+    {
+        *plus = '\0';
+        if (!preg(inner, base, &sz)) return 0;
+        /* essaie registre d'abord, sinon disp8 numerique */
+        if (preg(plus + 1, idx, &sz)) return 1;     /* [base+idx] SIB */
+        *disp = (int8_t)strtoll(plus + 1, NULL, 0);
+        return 4;                                     /* [base+disp8] */
+    }
+    if (preg(inner, &r, &sz)) { *base = r; return 3; } /* [base] seul */
+    strncpy(lbl, inner, 63);
+    return 2;                                         /* [label] RIP-relative */
 }
 
 /* ── lea avec label et fixup si necessaire ──────────────────────── */
@@ -251,10 +255,16 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "movzx") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
 	{
+		int8_t  d8 = 0;
 		if (toks[2][0] != '[' && preg(toks[2], &r2, &s2) && s2 == 8)
 			{ emit_movzx_r32_r8(&a->out->e, r1, r2); return 0; }
-		if (toks[2][0] == '[' && (mt = pmem(toks[2], &base, &idx, lbl)) == 1)
-			{ emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx); return 0; }
+		if (toks[2][0] == '[')
+		{
+			mt = pmem(toks[2], &base, &idx, lbl, &d8);
+			if (mt == 1) { emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx); return 0; }
+			if (mt == 3) { emit_movzx_r32_mem_reg(&a->out->e, r1, base);        return 0; }
+			if (mt == 4) { emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8); return 0; }
+		}
 	}
 	if (!strcmp(toks[0], "xchg") && n == 3 && toks[1][0] == '[')
 	{
