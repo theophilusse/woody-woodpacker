@@ -184,6 +184,48 @@ int	emit_sub_rsp_imm32(t_emitter *e, uint32_t imm)
 	return (emit_raw(e, bytes, 7));
 }
 
+/* DEC r/m8 : FE /1    ex: dec cl = FE C9 */
+int	emit_dec_r8(t_emitter *e, t_reg reg)
+{
+	uint8_t	bytes[2];
+
+	bytes[0] = 0xFE;
+	bytes[1] = (3 << 6) | (1 << 3) | reg;
+	return (emit_raw(e, bytes, 2));
+}
+
+/* DEC r/m32 : FF /1    ex: dec eax = FF C8 */
+int	emit_dec_r32(t_emitter *e, t_reg reg)
+{
+	uint8_t	bytes[2];
+
+	bytes[0] = 0xFF;
+	bytes[1] = (3 << 6) | (1 << 3) | reg;
+	return (emit_raw(e, bytes, 2));
+}
+
+/* DEC r/m64 : 48 FF /1    ex: dec rax = 48 FF C8 */
+int	emit_dec_r64(t_emitter *e, t_reg reg)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x48;
+	bytes[1] = 0xFF;
+	bytes[2] = (3 << 6) | (1 << 3) | reg;
+	return (emit_raw(e, bytes, 3));
+}
+
+/* SUB r/m32, imm8 : 83 /5 ib    ex: sub eax, 1 = 83 E8 01 */
+int	emit_sub_r32_imm8(t_emitter *e, t_reg reg, int8_t imm)
+{
+	uint8_t	bytes[3];
+
+	bytes[0] = 0x83;
+	bytes[1] = (3 << 6) | (5 << 3) | reg;
+	bytes[2] = (uint8_t)imm;
+	return (emit_raw(e, bytes, 3));
+}
+
 /* ADD rsp, imm32 : 48 81 C4 imm32 */
 int	emit_add_rsp_imm32(t_emitter *e, uint32_t imm)
 {

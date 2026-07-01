@@ -317,17 +317,15 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (lsb_value)
 			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 		else
-		{
 			emit_lea_abs(&a->out->e, r1, (int32_t)val);
-		}
 		key_index++;
 		return 0;
 	}
 	if (!strcmp(toks[0], "_inc") && n == 2)
 	{
-		if (!preg(toks[1], &r1, &s1))     // ← manquait
+		if (!preg(toks[1], &r1, &s1))
 			return (-1);
-		if (key_index % 2 == 0)           // variante 0 : INC
+		if (lsb_value)           // variante 0 : INC
 		{
 			if (s1 == 8)       emit_inc_r8(&a->out->e, r1);
 			else if (s1 == 32) emit_inc_r32(&a->out->e, r1);
@@ -335,6 +333,21 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		else                               // variante 1 : ADD reg, 1
 			emit_add_r32_imm8(&a->out->e, r1, 1);
+		key_index++;
+		return (0);
+	}
+	if (!strcmp(toks[0], "_dec") && n == 2)
+	{
+		if (!preg(toks[1], &r1, &s1))
+			return (-1);
+		if (lsb_value)           // variante 0 : DEC
+		{
+			if (s1 == 8)       emit_dec_r8(&a->out->e, r1);
+			else if (s1 == 32) emit_dec_r32(&a->out->e, r1);
+			else               emit_dec_r64(&a->out->e, r1);
+		}
+		else                               // variante 1 : SUB reg, 1
+			emit_sub_r32_imm8(&a->out->e, r1, 1);
 		key_index++;
 		return (0);
 	}
