@@ -156,7 +156,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	char	lbl[64];
 	int		mt;
 	int8_t d8 = 0;
-	size_t p;
 
 	if (DEBUG_MODE)
 	{
