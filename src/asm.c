@@ -286,7 +286,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], ".key"))
 		{ emit_raw(&a->out->e, a->crypto->key, a->crypto->key_len); return 0; }
 
-	if (!strcmp(toks[0], "ZERO"))
+	if (!strcmp(toks[0], "_zero"))
 	{
 		lsb_value = a->crypto->key[(key_index / 8) % a->crypto->key_len] & (0x01 << key_index);
 		if (lsb_value)
