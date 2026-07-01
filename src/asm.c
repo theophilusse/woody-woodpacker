@@ -1,7 +1,3 @@
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <stdio.h>
 #include "asm.h"
 
 #define MAX_LABELS 32
@@ -161,6 +157,8 @@ static void	lea_label(t_asm *a, t_reg dst, const char *label)
 /* ── assemblage d une instruction ──────────────────────────────── */
 static int	ainstr(t_asm *a, char toks[][64], int n)
 {
+	static size_t key_index = 0;
+	unsigned int		lsb_value;
 	t_reg	r1, r2, base, idx;
 	int		s1, s2;
 	int64_t	val;
@@ -288,6 +286,31 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], ".key"))
 		{ emit_raw(&a->out->e, a->crypto->key, a->crypto->key_len); return 0; }
 
+	if (!strcmp(toks[0], "ZERO"))
+	{
+		lsb_value = a->crypto->key[(key_index / 8) % a->crypto->key_len] & (0x01 << key_index);
+		if (lsb_value)
+			emit_and_r8_imm8(&a->out->e, r1, 0);
+		else
+			emit_xor_r32_r32(&a->out->e, r1, r1);
+		key_index++;
+		return 0;
+	}
+/*    
+SET,        // Met un registre à une valeur
+    INC,        // Incrémente un registre
+    DEC,        // Décrémente un registre
+    PUSH,       // Empile un registre
+    POP,        // Dépile un registre
+    XCHG,       // Échange deux registres
+    NOP,        // Instruction sans effet
+    JMP,        // Saut inconditionnel
+    CMP,        // Compare un registre à une valeur
+    LOAD,       // Charge depuis la mémoire
+    STORE,      // Stocke en mémoire
+    ADD,        // Ajoute une valeur à un registre
+    SUB         // Soustrait une valeur à un registre
+*/
 	fprintf(stderr, "asm: inconnu: '%s' (%d tokens)\n", toks[0], n);
 	return -1;
 }

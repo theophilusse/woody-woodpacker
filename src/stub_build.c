@@ -20,6 +20,15 @@ static const char STUB_SRC[] =
 	"push rdx\n"
 
 	/* write(1, MSG, 14) */
+	"ZERO eax\n"
+	"ZERO eax\n"
+	"ZERO eax\n"
+	"ZERO eax\n"
+	"ZERO eax\n"
+	"ZERO eax\n"
+	"ZERO eax\n"
+	"ZERO eax\n"
+	"ZERO eax\n"
 	"mov eax, 1\n"
 	"mov edi, 1\n"
 	"lea rsi, [msg]\n"

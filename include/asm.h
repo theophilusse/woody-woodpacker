@@ -1,6 +1,7 @@
 #ifndef ASM_H
 # define ASM_H
 
+# include <ctype.h>
 # include "emit.h"
 # include "woody.h"
 
