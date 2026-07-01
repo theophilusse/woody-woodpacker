@@ -36,7 +36,7 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 
 	/* --- patch OEP : impossible ici, load_vaddr pas encore connu ---
 	 * sera fait dans elf_patch() après injection du stub dans le segment */
-	(void)patch_jmp_oep;
+	patch_jmp_oep = 0xBBBBBBBB;
 
 	/* --- construction du t_stub --- */
 	stub = malloc(sizeof(t_stub));
