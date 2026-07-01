@@ -47,16 +47,16 @@ int	main(int argc, char **argv)
 		elf_free(ctx);
 		return (1);
 	}
-	/* remplir crypto.text_vaddr / crypto.text_len depuis ctx,
-	 * copier .text dans crypto.encrypted_text, puis rc4_apply() en place */
-	/* localiser .text dans le segment cible */
+	// remplir crypto.text_vaddr / crypto.text_len depuis ctx,
+	// copier .text dans crypto.encrypted_text, puis rc4_apply() en place
+	// localiser .text dans le segment cible
 	/*
 	Elf64_Phdr	*p = &ctx->phdrs[ctx->target_phdr_idx];
 	crypto.text_vaddr = p->p_vaddr;
 	crypto.text_len   = p->p_filesz;
 	crypto.encrypted_text = ctx->raw + p->p_offset;
 
-	/* chiffrer en place dans ctx->raw */
+	// chiffrer en place dans ctx->raw
 	rc4_apply(crypto.encrypted_text, crypto.text_len, crypto.key, crypto.key_len);
 	*/
 
