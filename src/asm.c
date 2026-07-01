@@ -170,9 +170,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	int8_t d8 = 0;
 	size_t	p;
 
-	for (int i = 0; i < n; i++) {
-		printf("%s ", i, toks[i]);
-	}
+	for (int i = 0; i < n; i++)
+		printf("%s ", toks[i]);
 	printf("\n");
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
