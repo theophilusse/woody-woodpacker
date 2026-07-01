@@ -116,6 +116,7 @@ static const char STUB_SRC[] =
 "jne @check_83_cmp\n"
 "movzx eax, [rsi+1]\n"
 "cmp eax, 0xff\n"
+"@check_83_cmp:" //////// remove
 "jne @check_83_cmp\n"
 
 "@check_incdec_modrm:\n"
