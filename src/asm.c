@@ -214,6 +214,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (*end == '\0' && imm >= 0 && imm <= 255) {
 					DEBUG //
 					emit_sar_r32_imm8(&a->out->e, r1, (uint8_t)imm);
+					DEBUG //
 					return 0;
 				}
 			}
