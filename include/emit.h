@@ -36,6 +36,7 @@ int		emit_add_rsp_imm32(t_emitter *e, uint32_t imm);
 
 /* rip-relative */
 int		emit_lea_rip(t_emitter *e, t_reg dst, size_t *patch_offset);
+int 	emit_lea_abs(t_emitter *e, t_reg dst, uint32_t addr);
 
 /* 32 bits */
 int		emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src);

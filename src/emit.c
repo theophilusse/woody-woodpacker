@@ -57,6 +57,18 @@ int	emit_lea_rip(t_emitter *e, t_reg dst, size_t *patch_offset)
 	return (emit_raw(e, bytes, 7));
 }
 
+int emit_lea_abs(t_emitter *e, t_reg dst, uint32_t addr)
+{
+    uint8_t bytes[8];
+
+    bytes[0] = 0x48;              // REX.W
+    bytes[1] = 0x8D;              // LEA
+    bytes[2] = (dst << 3) | 4;   // ModRM: mod=00, reg=dst, rm=100(SIB)
+    bytes[3] = 0x25;              // SIB: scale=00, index=100(none), base=101(disp32 only)
+    memcpy(bytes + 4, &addr, 4);
+    return (emit_raw(e, bytes, 8));
+}
+
 int	emit_mov_r64_r64(t_emitter *e, t_reg dst, t_reg src)
 {
 	uint8_t	bytes[3];

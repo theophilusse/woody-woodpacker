@@ -319,8 +319,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 		else
 		{
-			emit_lea_rip(&a->out->e, r1, &patch);
-			patch_disp32(&a->out->e, patch, (int32_t)val);
+			emit_lea_abs(&a->out->e, r1, (int32_t)val);
 		}
 		key_index++;
 		return 0;
