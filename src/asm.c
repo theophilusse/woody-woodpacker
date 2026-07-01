@@ -419,6 +419,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					!strcmp(toks[0],"jl")  ? 0x7C :
 					!strcmp(toks[0],"jge") ? 0x7D : 0x73; /* jae */
 		int64_t val = sym(a, toks[1]);
+		printf("val = %lld\n", val);//
 		if (val >= 0) {
 			int8_t d = (int8_t)(val - (int64_t)(a->out->e.len + 2));
 			emit_jcc_rel8_direct(&a->out->e, op, d);
