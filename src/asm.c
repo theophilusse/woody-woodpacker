@@ -154,6 +154,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	char	lbl[64];
 	int		mt;
 	int8_t d8 = 0;
+	size_t p;
 
 	if (DEBUG_MODE)
 	{
@@ -389,18 +390,41 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			return 0;
 		}
 	}
-	if (!strcmp(toks[0], "jmp") && n == 2)// && !strcmp(toks[1], "@oep"))
+	if (!strcmp(toks[0], "jmp") && n == 2)
 	{
+		/* cas special : placeholder OEP, patch par elf_patch */
 		if (!strcmp(toks[1], "@oep"))
 		{
-			a->out->patch_jmp_oep = a->out->e.len + 1;
-			emit_jmp_rel32(&a->out->e, &a->patch_jmp_oep);
-			return 0;
+			emit_jmp_rel32(&a->out->e, &a->out->patch_jmp_oep);
+			return (0);
 		}
-		a->out->patch_jmp_oep = a->out->e.len + 1;
-		emit_jmp_rel32(&a->out->e, &a->out->patch_jmp_oep);
-		//emit_jmp_rel32(&a->out->e, &p);
-		return 0;
+		/* label deja defini (saut arriere) */
+		val = sym(a, toks[1]);
+		if (val >= 0)
+		{
+			int64_t disp = val - (int64_t)(a->out->e.len + 2);
+			if (disp >= -128 && disp <= 127)
+			{
+				uint8_t bytes[2] = {0xEB, (uint8_t)(int8_t)disp};
+				return emit_raw(&a->out->e, bytes, 2);
+			}
+			else
+			{
+				int32_t d32 = (int32_t)(val - (int64_t)(a->out->e.len + 5));
+				uint8_t bytes[5] = {0xE9, 0, 0, 0, 0};
+				memcpy(bytes + 1, &d32, 4);
+				return emit_raw(&a->out->e, bytes, 5);
+			}
+		}
+		/* label pas encore defini (saut avant) : fixup rel32 */
+		{
+			size_t poff = a->out->e.len + 1;
+			size_t pend = a->out->e.len + 5;
+			size_t dummy;
+			emit_jmp_rel32(&a->out->e, &dummy);
+			addfixup(a, toks[1], poff, pend, 0);
+		}
+		return (0);
 	}
 	if (n == 2 && (
     !strcmp(toks[0],"jne") || !strcmp(toks[0],"je")  ||
@@ -500,7 +524,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 }
 
 /* ── entree publique ────────────────────────────────────────────── */
-int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, size_t *patch_jmp_oep)
+int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 {
 	t_asm	first_pass;
 	t_asm	a;
@@ -557,7 +581,6 @@ int	asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, size_t *
 	memset(&a, 0, sizeof(a));
 	a.out    = out;
 	a.crypto = crypto;
-	a.patch_jmp_oep = *patch_jmp_oep;
 	a.nlabels = first_pass.nlabels;
 	a.nfixups = first_pass.nfixups;
 	memcpy(a.labels, first_pass.labels, sizeof(first_pass.labels));
