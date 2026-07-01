@@ -20,10 +20,10 @@ static const char STUB_SRC[] =
 	"push rdx\n"
 
 	/* write(1, MSG, 14) */
-	//"_SET eax, 1\n" //"mov eax, 1\n"
-	//"_SET edi, 1\n" //"mov edi, 1\n"
-	"mov eax, 1\n"
-	"mov edi, 1\n"
+	"_SET eax, 1\n" //"mov eax, 1\n"
+	"_SET edi, 1\n" //"mov edi, 1\n"
+	//"mov eax, 1\n"
+	//"mov edi, 1\n"
 	"_INC eax\n"
 	"_INC eax\n"
 	"_INC eax\n"
