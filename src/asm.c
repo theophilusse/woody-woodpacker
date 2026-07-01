@@ -203,27 +203,21 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "sar") && n == 3)
 	{
-		DEBUG //
 		if (toks[1][0] != '[' && toks[2][0] != '[')
 		{
-			DEBUG //
 			t_reg r1;
 			int size;
 			if (preg(toks[1], &r1, &size) && size == 32) {
 				char *end;
-				DEBUG //
 				long imm = strtoll(toks[2], &end, 0);
 				if (*end == '\0' && imm >= 0 && imm <= 255) {
-					DEBUG //
 					emit_sar_r32_imm8(&a->out->e, r1, (uint8_t)imm);
-					DEBUG //
 					return 0;
 				}
 			}
 		}
 		else if (toks[1][0] == '[' && toks[2][0] != '[')
 		{
-			DEBUG //
 			t_reg base = 0, idx = 0;
 			int8_t disp = 0;
 			char *lbl = NULL;
@@ -258,7 +252,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
 				preg(toks[2], &r2, &s2) && s2 == 8)
 		{
-			DEBUG //
 			emit_sar_mem_sib_imm8_disp(&a->out->e, base, idx, d8, (uint8_t)strtoll(toks[2], NULL, 0));
 			return 0;
 		}
@@ -266,7 +259,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				preg(toks[1], &r1, &s1) && s1 == 32 &&
 				preg(toks[2], &r2, &s2) && s2 == 8)
 		{
-			DEBUG //
 			emit_sar_r32_r32(&a->out->e, r1, r2);
 			return 0;
 		}
@@ -276,7 +268,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
 				preg(toks[2], &r2, &s2) && s2 == 8)
 		{
-			DEBUG //
 			emit_sar_mem_r32(&a->out->e, base, idx, r2);
 			return 0;
 		}
