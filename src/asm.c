@@ -201,42 +201,47 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "sar") && n == 3)
 	{
+		// Cas 1: SAR r32, imm8 (ex: "sar eax, 3")
 		if (toks[1][0] != '[' && toks[2][0] != '[' &&
-			preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
+			preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2) && s2 == 8)
 		{
-			if (s2 == 8)  // Vérifie que l'immédiat est 8 bits
-			{
-				emit_sar_r32_imm8(&a->out->e, r1, (uint8_t)strtoll(toks[2], NULL, 0));
-				return 0;
-			}
+			emit_sar_r32_imm8(&a->out->e, r1, (uint8_t)strtoll(toks[2], NULL, 0));
+			return 0;
 		}
+
+		// Cas 2: SAR [mem], imm8 (ex: "sar [eax], 3")
 		else if (toks[1][0] == '[' && toks[2][0] != '[' &&
-				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
-				preg(toks[2], &r2, &s2) && s2 == 8)
+				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && s2 == 8)
 		{
 			emit_sar_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)strtoll(toks[2], NULL, 0));
 			return 0;
 		}
+
+		// Cas 3: SAR [mem + disp], imm8 (ex: "sar [eax + 4], 3")
 		else if (toks[1][0] == '[' && toks[2][0] != '[' &&
-				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
-				preg(toks[2], &r2, &s2) && s2 == 8)
+				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && s2 == 8)
 		{
 			emit_sar_mem_sib_imm8_disp(&a->out->e, base, idx, d8, (uint8_t)strtoll(toks[2], NULL, 0));
 			return 0;
 		}
+
+		// Cas 4: SAR r32, r32 (ex: "sar eax, cl")
 		else if (toks[1][0] != '[' && toks[2][0] != '[' &&
 				preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2) && s2 == 8)
 		{
 			emit_sar_r32_r32(&a->out->e, r1, r2);
 			return 0;
 		}
+
+		// Cas 5: SAR [mem], r32 (ex: "sar [eax], cl")
 		else if (toks[1][0] == '[' && toks[2][0] != '[' &&
-				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
-				preg(toks[2], &r2, &s2) && s2 == 8)
+				(mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && s2 == 8)
 		{
 			emit_sar_mem_r32(&a->out->e, base, idx, r2);
 			return 0;
 		}
+
+		// Aucun cas ne correspond
 		return -1;
 	}
 	if (!strcmp(toks[0], "and") && n == 3 && preg(toks[1], &r1, &s1))
