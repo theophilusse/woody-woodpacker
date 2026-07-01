@@ -217,23 +217,37 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 
 		else if (toks[1][0] == '[' && toks[2][0] != '[')
 		{
-			t_reg base, idx;
-			int8_t disp;
-			char *lbl = NULL;  // Initialisation explicite
-			int mt;
+			DEBUG //
+			t_reg base = 0, idx = 0;
+			int8_t disp = 0;
+			char *lbl = NULL;
+			int mt = 0;
 
-			if ((mt = pmem(toks[1], &base, &idx, lbl, &disp)) == 1) {
-				t_reg r2;
-				int size;
-				if (preg(toks[2], &r2, &size) && size == 8) {
-					char *end;
-					long imm = strtoll(toks[2], &end, 0);
-					if (*end == '\0' && imm >= 0 && imm <= 255) {
-						emit_sar_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)imm);
-						return 0;
-					}
-				}
+			// Vérification que toks[1] n'est pas NULL
+			if (toks[1] == NULL || strlen(toks[1]) < 3) {
+				return -1;  // Format invalide
 			}
+
+			mt = pmem(toks[1], &base, &idx, lbl, &disp);
+			if (mt != 1) {
+				return -1;  // Échec de pmem
+			}
+
+			t_reg r2;
+			int size = 0;
+			if (!preg(toks[2], &r2, &size) || size != 8) {
+				return -1;  // Registre invalide ou taille incorrecte
+			}
+
+			char *end = NULL;
+			errno = 0;
+			long imm = strtoll(toks[2], &end, 0);
+			if (errno != 0 || end == toks[2] || *end != '\0' || imm < 0 || imm > 255) {
+				return -1;  // Immédiat invalide
+			}
+
+			emit_sar_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)imm);
+			return 0;
 		}
 
 		// Cas 3: SAR [mem + disp], imm8 (ex: "sar [eax + 4], 3")
