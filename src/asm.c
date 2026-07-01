@@ -201,7 +201,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "sar") && n == 3)
 	{
-		// Cas 1: SAR r32, imm8 (ex: "sar eax, 3")
+		DEBUG //
 		if (toks[1][0] != '[' && toks[2][0] != '[') {
 			t_reg r1;
 			int size;
@@ -214,7 +214,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				}
 			}
 		}
-
 		else if (toks[1][0] == '[' && toks[2][0] != '[')
 		{
 			DEBUG //
