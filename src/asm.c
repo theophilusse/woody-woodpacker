@@ -174,7 +174,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
 	lsb_value = a->crypto->key[(key_index / 8) % a->crypto->key_len] & (0x01 << key_index);
-
+	DEBUG //
 	if (!strcmp(toks[0], "syscall"))
 		{ emit_syscall(&a->out->e); return 0; }
 
