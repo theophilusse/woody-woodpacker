@@ -110,8 +110,8 @@ int	emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm)
 
 int emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm)
 {
-    uint8_t b[7] = {0x48, 0x81, (uint8_t)((7 << 3) | dst), 0, 0, 0, 0};
-    memcpy(b + 3, &imm, 4);
+	uint8_t b[7] = {0x48, 0x81, (uint8_t)((3<<6) | (7 << 3) | dst), 0, 0, 0, 0};
+	memcpy(b + 3, &imm, 4);
     return emit_raw(e, b, 7);
 }
 
@@ -373,16 +373,11 @@ int emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm) {
 }
 
 /* ADD r32, imm32 : 83 /0 id    ex: add eax, 42 = 83 C0 2A */
-int emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm)
-{
+int emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm) {
     uint8_t bytes[6];
-
-    bytes[0] = 0x83;
-    bytes[1] = (3 << 6) | (0 << 3) | dst;  // ModR/M: dst, 0 (opcode extension)
-    bytes[2] = (uint8_t)imm;
-    bytes[3] = (uint8_t)(imm >> 8);
-    bytes[4] = (uint8_t)(imm >> 16);
-    bytes[5] = (uint8_t)(imm >> 24);
+    bytes[0] = 0x81;
+    bytes[1] = (3<<6)|(0<<3)|dst;
+    memcpy(bytes + 2, &imm, 4);
     return emit_raw(e, bytes, 6);
 }
 
@@ -634,11 +629,21 @@ int emit_xor_r8_r8(t_emitter *e, t_reg dst, t_reg src) {
 }
 
 int emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
-    uint8_t b[4] = {0x48, 0x83, (uint8_t)((4<<3)|dst), imm};
-    return emit_raw(e, b, 4);
+	uint8_t b[4] = {0x48, 0x83, (uint8_t)((3<<6)|(4<<3)|dst), imm};
+	return emit_raw(e, b, 4);
 }
 
 int emit_xor_r64_r64(t_emitter *e, t_reg dst, t_reg src) {
     uint8_t b[3] = {0x48, 0x31, (uint8_t)((3<<6)|(src<<3)|dst)};
     return emit_raw(e, b, 3);
+}
+
+/* ADD r/m32, imm32 : 81 /0 id */
+int emit_add_r32_imm32_long(t_emitter *e, t_reg dst, uint32_t imm)
+{
+    uint8_t b[6];
+    b[0] = 0x81;
+    b[1] = (3<<6) | (0<<3) | dst;
+    memcpy(b + 2, &imm, 4);
+    return emit_raw(e, b, 6);
 }

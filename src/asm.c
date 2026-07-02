@@ -550,8 +550,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (!preg(toks[1], &r1, &s1)) return -1;
 
 		if (s1 == 8) {
-			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);
-			else           emit_xor_r8_r8(&a->out->e, r1, r1);  // XOR r8, r8
+			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);   /* 0x24/0x80 ✓ */
+			else           emit_xor_r32_r32(&a->out->e, r1, r1);   /* 0x31 ✓ LDE reconnaît */
 		}
 		else if (s1 == 32) {
 			if (lsb_value)
@@ -629,8 +629,12 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else if (s1 == 32) emit_inc_r32(&a->out->e, r1);
 			else               emit_inc_r64(&a->out->e, r1);
 		}
-		else                               // variante 1 : ADD reg, 1
-			emit_add_r32_imm8(&a->out->e, r1, 1);
+		else {  /* lsb=0 */
+			if (s1 == 8)
+				emit_add_r8_imm8(&a->out->e, r1, 1);   /* 80 /0 01 ← LDE reconnaît */
+			else if (s1 == 32)
+				emit_add_r32_imm32_long(&a->out->e, r1, 1);
+		}
 		a->key_index++;
 		return (0);
 	}
