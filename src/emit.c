@@ -532,3 +532,9 @@ int emit_mov_r32_r32(t_emitter *e, t_reg dst, t_reg src) {
     uint8_t b[2] = {0x89, (uint8_t)((3<<6)|(src<<3)|dst)};
     return emit_raw(e, b, 2);
 }
+
+int emit_mov_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    uint8_t b[2] = {0xB0 + reg, imm};
+    return emit_raw(e, b, 2);
+}
