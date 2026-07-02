@@ -189,17 +189,6 @@ static const char STUB_SRC[] =
     "add rsi, 4\n" "jmp @lde_loop\n"   /* 8B ModRM SIB disp8 */
     /////////////
 
-
-    /* 0x0F 0xB6 : MOVZX r32, r8  (SET reg→reg lsb=0 / 3 octets) */
-    "@check_0f_b6:\n"
-    "cmp eax, 0x0f\n" "jne @check_inc_fe\n"
-    "_SET eax, [rsi+1]\n"
-    "cmp eax, 0xb6\n" "jne @check_inc_fe\n"
-    "_INC ecx\n"             /* push(0) */
-    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
-	"jge @lde_done\n"        /* buffer plein : skip stockage */
-	"add rsi, 3\n" "jmp @lde_loop\n"
-
     /* 48 89 : MOV r64,r64 → bit=1 */
     "@check_48_89:\n"
     "cmp eax, 0x48\n" "jne @check_inc_fe\n"
