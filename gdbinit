@@ -12,5 +12,5 @@ commands 2
 end
 break *0x401180
 commands 3
-	echo Running LDE
+	echo Running LDE\n
 end

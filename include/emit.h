@@ -7,7 +7,8 @@
 typedef enum e_reg
 {
 	REG_RAX, REG_RCX, REG_RDX, REG_RBX,
-	REG_RSP, REG_RBP, REG_RSI, REG_RDI
+	REG_RSP, REG_RBP, REG_RSI, REG_RDI,
+	REG_R8, REG_R9, REG_R10, REG_R11
 }	t_reg;
 
 typedef struct s_emitter
@@ -88,6 +89,7 @@ int		emit_jmp_rel32(t_emitter *e, size_t *patch_offset);
 
 /* syscall */
 int		emit_syscall(t_emitter *e);
+int		emit_rdtsc(t_emitter *e);
 
 int emit_movzx_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base);
 int emit_movzx_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp);

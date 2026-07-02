@@ -1,18 +1,18 @@
 #include "asm.h"
 
-static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi"};
-static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi"};
-static const char *R8[]  = {"al","cl","dl","bl"};
+static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi","r8","r9","r10","r11"};
+static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi","r8d","r9d","r10d","r11d"};
+static const char *R8[]  = {"al","cl","dl","bl","r8b","r9b","r10b","r11b"};
 
 static int	preg(const char *s, t_reg *r, int *sz)
 {
 	int	i;
 
-	for (i = 0; i < 8; i++) {
+	for (i = 0; i < 12; i++) {
 		if (!strcmp(s,R64[i])) { *r=(t_reg)i; *sz=64; return 1; }
 		if (!strcmp(s,R32[i])) { *r=(t_reg)i; *sz=32; return 1; }
 	}
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 8; i++)
 		if (!strcmp(s,R8[i])) { *r=(t_reg)i; *sz=8; return 1; }
 	return 0;
 }
@@ -182,6 +182,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	lsb_value = a->crypto->key[(a->key_index / 8) % a->crypto->key_len] & (0x01 << a->key_index);
 	if (!strcmp(toks[0], "syscall"))
 		{ emit_syscall(&a->out->e); return 0; }
+	if (!strcmp(toks[0], "rtdsc"))
+		{ emit_rdtsc(&a->out->e); return 0; }
 	if (n == 2 && (op = jcc_opcode(toks[0])))
 	{
 		int64_t lval = sym(a, toks[1]);
@@ -521,6 +523,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		return 0;
 	}
 	/* directives de donnees */
+	if (!strcmp(toks[0], ".evasion_msg"))
+		{ emit_raw(&a->out->e, (const uint8_t *)EVASION_MSG, EVASION_MSG_LEN); return 0; }
 	if (!strcmp(toks[0], ".msg"))
 		{ emit_raw(&a->out->e, (const uint8_t *)WOODY_MSG, WOODY_MSG_LEN); return 0; }
 	if (!strcmp(toks[0], ".key"))
@@ -532,13 +536,19 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 
 		if (s1 == 8) {
 			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);
-			else           emit_xor_r32_r32(&a->out->e, r1, r1);
+			else           emit_xor_r8_r8(&a->out->e, r1, r1);  // XOR r8, r8
 		}
-		else if (s1 == 32) {                              /* ← cas 32 bits séparé */
+		else if (s1 == 32) {
 			if (lsb_value)
-			emit_and_r32_imm8(&a->out->e, r1, 0);
-			//emit_and_r8_imm8(&a->out->e, r1, 0);   /* AND al, 0 = 24 00 */
-			else           emit_xor_r32_r32(&a->out->e, r1, r1);   /* XOR r32, r32 */
+				emit_and_r32_imm8(&a->out->e, r1, 0);
+			else
+				emit_xor_r32_r32(&a->out->e, r1, r1);  // XOR r32, r32
+		}
+		else if (s1 == 64) {
+			if (lsb_value)
+				emit_and_r64_imm8(&a->out->e, r1, 0);  // AND r64, 0
+			else
+				emit_xor_r64_r64(&a->out->e, r1, r1);  // XOR r64, r64
 		}
 		a->key_index++;
 		return 0;

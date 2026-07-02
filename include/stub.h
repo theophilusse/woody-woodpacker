@@ -7,6 +7,32 @@ static const char STUB_SRC[] =
 	"push rdx\n"
 	"push rbp\n"
 
+    //////////////////////////// ANTI_DEBUG ////////////////////////////
+    //; Appel syscall ptrace(PTRACE_TRACEME, 0, 1, 0)
+    "_SET rax, 101\n" //       ; sys_ptrace
+    "_SET rdi, 0\n" //         ; PTRACE_TRACEME
+    "_ZERO rsi\n" //       ; NULL (pid du parent)
+    "_SET rdx, 1\n" //         ; NULL (addr)
+    "_ZERO r10\n" //       ; NULL (data)
+    "syscall\n"
+    //; Si rax == -EPERM (-1), le processus est déjà traçé
+    "cmp rax, -1\n"
+    "je debugger_detected"
+
+    "jmp debugger_not_detected\n"
+
+    "debugger_detected:\n"
+    "_SET eax, 1\n"
+	"_SET edi, 1\n"
+	"lea rsi, [evasion_msg]\n"
+	"mov edx, 9\n"
+	"syscall\n"
+    "_SET rax, 60\n" //      ; sys_exit (numéro du syscall)
+    "_SET rdi, 0\n" //        ; code de sortie (0 = succès)
+    "syscall\n"
+    ////////////////////////////////////////////////////////////////////
+
+    "debugger_not_detected:\n"
 	"sub rsp, 16\n"
 	"_ZERO eax\n"//"xor eax, eax\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
@@ -291,6 +317,8 @@ static const char STUB_SRC[] =
 	"jmp @oep\n"
 
 	// donnees embarquees apres le code
+    "evasion_msg:\n"
+    ".evasion_msg\n"
 	"msg:\n"
 	".msg\n"
 	"key:\n"
