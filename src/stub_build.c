@@ -18,8 +18,14 @@
 static const char STUB_SRC[] =
 	// preserves _dl_fini que le kernel passe dans rdx
 	"scan_start:\n"
-	"push rdx\n"
+	"sub rsp, 16\n"
+	"xor eax, eax\n"
+	"xor ecx, ecx\n"
+	"@zero_key\n"
+	"jl @zero_key\n"
+	"mov r8, rsp\n"
 
+	"push rdx\n"
 	// write(1, MSG, 14)
 	"_SET eax, 1\n" //"mov eax, 1\n"
 	"_SET edi, 1\n" //"mov edi, 1\n"
@@ -51,7 +57,7 @@ static const char STUB_SRC[] =
     "push rcx\n"
     "mov edx, ecx\n" "sar edx, 3\n"
     "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-    "pop rcx\n" "or [rdi+rdx], al\n" "inc ecx\n"
+    "pop rcx\n" "or [r8+rdx], al\n" "inc ecx\n"
     "@adv2_24:\n"
     "add rsi, 2\n" "jmp @lde_loop\n"
 
@@ -66,7 +72,7 @@ static const char STUB_SRC[] =
     "push rcx\n"
     "mov edx, ecx\n" "sar edx, 3\n"
     "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-    "pop rcx\n" "or [rdi+rdx], al\n" "inc ecx\n"
+    "pop rcx\n" "or [r8+rdx], al\n" "inc ecx\n"
     "@adv3_80:\n"
     "add rsi, 3\n" "jmp @lde_loop\n"
 
@@ -94,7 +100,7 @@ static const char STUB_SRC[] =
     "push rcx\n"
     "mov edx, ecx\n" "sar edx, 3\n"
     "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-    "pop rcx\n" "or [rdi+rdx], al\n" "inc ecx\n"
+    "pop rcx\n" "or [r8+rdx], al\n" "inc ecx\n"
     "add rsi, 5\n" "jmp @lde_loop\n"
 
     /* ── 0x48 0x8D X4 0x25 : LEA r64,[abs]  (SET lsb=0 / 8) */
@@ -118,7 +124,7 @@ static const char STUB_SRC[] =
     "push rcx\n"
     "mov edx, ecx\n" "sar edx, 3\n"
     "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-    "pop rcx\n" "or [rdi+rdx], al\n" "inc ecx\n"
+    "pop rcx\n" "or [r8+rdx], al\n" "inc ecx\n"
     "add rsi, 2\n" "jmp @lde_loop\n"
 
     /* ── 0x83 (p[1]&0xF8)==0xF8 : CMP r32,imm8 (INC lsb=0 / 3) */
@@ -141,7 +147,7 @@ static const char STUB_SRC[] =
     "push rcx\n"
     "mov edx, ecx\n" "sar edx, 3\n"
     "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-    "pop rcx\n" "or [rdi+rdx], al\n" "inc ecx\n"
+    "pop rcx\n" "or [r8+rdx], al\n" "inc ecx\n"
     "add rsi, 2\n" "jmp @lde_loop\n"
 
     /* ── 0x83 (p[1]&0xF8)==0xE8 p[2]==1 : SUB r32,1 (DEC lsb=0 / 3) */
@@ -159,7 +165,7 @@ static const char STUB_SRC[] =
 
     "@lde_done:\n"
 
-	// Decrypt payload (RC4) et jump vers OEP
+	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
 
 	// mprotect(page_vaddr, page_size, PROT_RWX)
 	"mov rdi, prot_addr\n"
@@ -172,7 +178,7 @@ static const char STUB_SRC[] =
 	"sub rsp, 256\n"
 
 	// rsi = base de la cle (RIP-relative)
-	"lea rsi, [key]\n"
+	"lea rsi, r8\n"
 
 	// KSA init : S[i] = i, i = 0..255
 	"xor ecx, ecx\n"
