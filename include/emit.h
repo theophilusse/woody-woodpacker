@@ -27,6 +27,7 @@ int		emit_mov_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm);
 int		emit_mov_r64_imm64(t_emitter *e, t_reg dst, uint64_t imm);
 int		emit_mov_r64_r64(t_emitter *e, t_reg dst, t_reg src);
 int		emit_mov_r8_r8(t_emitter *e, t_reg dst, t_reg src);
+int 	emit_or_r8_r8(t_emitter *e, t_reg dst, t_reg src);
 
 /* pile */
 int		emit_push_r64(t_emitter *e, t_reg reg);
@@ -73,6 +74,7 @@ int		emit_movzx_r32_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
 int		emit_add_r8_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
 int		emit_xchg_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg);
 int		emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg);
+int		emit_or_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src);
 
 /* sauts */
 int		emit_jcc_rel8(t_emitter *e, uint8_t cc_opcode, size_t *patch_offset);

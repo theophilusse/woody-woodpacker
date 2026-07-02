@@ -553,3 +553,11 @@ int emit_or_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm)
 	memcpy(bytes + 2, &imm, 4);
 	return emit_raw(e, bytes, 6);
 }
+
+int emit_or_mem_sib_r8(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t bytes[2];
+	bytes[0] = 0x08; // Opcode for OR r/m8, r8
+	bytes[1] = (3 << 6) | (src << 3) | dst; // ModR/M byte
+	return emit_raw(e, bytes, 2);
+}
