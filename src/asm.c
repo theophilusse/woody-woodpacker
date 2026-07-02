@@ -526,11 +526,16 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], ".key"))
 		{ emit_raw(&a->out->e, a->crypto->key, a->crypto->key_len); return 0; }
 
-	if (!strcmp(toks[0], "_zero")) // Met a zero un registre
+	if (!strcmp(toks[0], "_zero") && n == 2)
 	{
-		if (s1 == 8) {
-			if (lsb_value) emit_inc_r8(&a->out->e, r1);
-			else           emit_add_r8_imm8(&a->out->e, r1, 1);  /* ADD r8, 1 = 80 /0 01 */
+		if (!preg(toks[1], &r1, &s1)) return -1;  /* ← manquait */
+
+		if (s1 == 8 || s1 == 32)
+		{
+			if (lsb_value)
+				emit_and_r8_imm8(&a->out->e, r1, 0);   /* AND al/cl, 0 → 0x24/0x80 */
+			else
+				emit_xor_r32_r32(&a->out->e, r1, r1);  /* XOR r32, r32 → 0x31 */
 		}
 		a->key_index++;
 		return 0;

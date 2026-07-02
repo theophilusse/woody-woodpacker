@@ -15,7 +15,7 @@ static const char STUB_SRC[] =
 	"_INC ecx\n"
 	"cmp ecx, 16\n"
 	"jl @zero_key\n"
-	"_set rbp, rsp\n"//"mov rbp, rsp\n"
+	"_SET rbp, rsp\n"//"mov rbp, rsp\n"
 	"jmp @do_write\n"
 
 	"@run_lde:\n"
