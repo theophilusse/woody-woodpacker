@@ -554,8 +554,27 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		else if (preg(toks[2], &r2, &s2))            /* source registre */
 		{
-			if (lsb_value) emit_mov_r32_r32(&a->out->e, r1, r2);
-			else           emit_movzx_r32_r8(&a->out->e, r1, r2);
+			/* r64 → r64 */
+			if (s1 == 64 && s2 == 64)
+			{
+				if (lsb_value)
+					emit_mov_r64_r64(&a->out->e, r1, r2);       /* 48 89 /r */
+				else
+					emit_lea_r64_reg0(&a->out->e, r1, r2);       /* 48 8D mod=01 disp8=0 */
+				a->key_index++;
+				return 0;
+			}
+
+			/* r8 imm */
+			if (s1 == 8)
+			{
+				if (lsb_value)
+					emit_mov_r8_imm8(&a->out->e, r1, (uint8_t)val);   /* B0+r ib */
+				else
+					emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val); /* B8+r id, zero-extend */
+				a->key_index++;
+				return 0;
+			}
 		}
 		else                                          /* source immédiate */
 		{

@@ -591,3 +591,12 @@ int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
     uint8_t b[3] = {0x80, (uint8_t)((3<<6)|(0<<3)|dst), imm};
     return emit_raw(e, b, 3);
 }
+
+/* LEA r64, [src+0] : 48 8D mod=01 disp8=0 */
+int emit_lea_r64_reg0(t_emitter *e, t_reg dst, t_reg src)
+{
+    uint8_t b[4] = {0x48, 0x8D,
+                    (uint8_t)((1<<6)|(dst<<3)|src),  /* mod=01 */
+                    0x00};                             /* disp8=0 */
+    return emit_raw(e, b, 4);
+}

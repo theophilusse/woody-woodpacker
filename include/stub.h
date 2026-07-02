@@ -200,6 +200,29 @@ static const char STUB_SRC[] =
 	"jge @lde_done\n"        /* buffer plein : skip stockage */
 	"add rsi, 3\n" "jmp @lde_loop\n"
 
+    /* 48 89 : MOV r64,r64 → bit=1 */
+    "@check_48_89:\n"
+    "cmp eax, 0x48\n" "jne @check_inc_fe\n"
+    "_SET eax, [rsi+1]\n"
+    "cmp eax, 0x89\n" "jne @check_48_8d\n"
+    "cmp ecx, 128\n" "jge @adv3_48_89\n"
+    "push rcx\n"
+    "mov edx, ecx\n" "sar edx, 3\n"
+    "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+    "pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+    "@adv3_48_89:\n"
+    "add rsi, 3\n" "jmp @lde_loop\n"
+
+    /* 48 8D mod=01 : LEA r64,[reg+0] → bit=0 */
+    "@check_48_8d:\n"
+    "cmp eax, 0x8d\n" "jne @check_48_b6\n"
+    "_SET eax, [rsi+2]\n"
+    "and eax, 0xc0\n"
+    "cmp eax, 0x40\n"          /* mod=01 */
+    "jne @check_inc_fe\n"
+    "_INC ecx\n"               /* push(0) */
+    "add rsi, 4\n" "jmp @lde_loop\n"
+
     /* ── 0xFE/0xFF (p[1]&0xF8)==0xC0 : INC r  (lsb=1 / 2) ─ */
     "@check_inc_fe:\n"
     "_SET eax, [rsi]\n"
