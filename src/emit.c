@@ -595,8 +595,16 @@ int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
 /* LEA r64, [src+0] : 48 8D mod=01 disp8=0 */
 int emit_lea_r64_reg0(t_emitter *e, t_reg dst, t_reg src)
 {
+    if (src == REG_RSP) {
+        /* RSP comme rm=4 impose SIB même en mod=01 */
+        uint8_t b[5] = {0x48, 0x8D,
+                        (uint8_t)((1<<6)|(dst<<3)|4),  /* rm=SIB */
+                        0x24,                            /* SIB: no idx, base=rsp */
+                        0x00};                           /* disp8=0 */
+        return emit_raw(e, b, 5);
+    }
     uint8_t b[4] = {0x48, 0x8D,
-                    (uint8_t)((1<<6)|(dst<<3)|src),  /* mod=01 */
-                    0x00};                             /* disp8=0 */
+                    (uint8_t)((1<<6)|(dst<<3)|src),
+                    0x00};
     return emit_raw(e, b, 4);
 }
