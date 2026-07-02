@@ -588,6 +588,6 @@ int emit_mov_r32_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx) {
     return emit_raw(e, b, 3); }
 
 int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
-    uint8_t b[3] = {0x80, (uint8_t)((3<<6)|(0<<3)|reg), imm};
+    uint8_t b[3] = {0x80, (uint8_t)((3<<6)|(0<<3)|dst), imm};
     return emit_raw(e, b, 3);
 }
