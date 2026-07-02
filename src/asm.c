@@ -218,6 +218,13 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
 			{ emit_xor_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
 	}
+	if (!strcmp(toks[0], "or") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
+	{
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		emit_or_r32_imm32(&a->out->e, r1, (uint32_t)val);
+		return 0;
+	}
 	if (!strcmp(toks[0], "shl") && n == 3
 		&& preg(toks[1], &r1, &s1) && s1 == 8
 		&& !strcmp(toks[2], "cl"))
