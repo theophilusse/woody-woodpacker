@@ -347,18 +347,6 @@ int emit_add_r32_imm8(t_emitter *e, t_reg dst, uint8_t imm)
     return emit_raw(e, bytes, 3);
 }
 
-/* ADD r8, imm8 : 80 /0 ib
- * ex: add al, 42 = 80 C0 2A */
-int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm)
-{
-    uint8_t bytes[3];
-
-    bytes[0] = 0x80;
-    bytes[1] = (0 << 6) | (0 << 3) | dst;  // ModR/M: dst, 0 (opcode extension)
-    bytes[2] = imm;
-    return emit_raw(e, bytes, 3);
-}
-
 /* ADD r16, imm16 : 83 /0 iw    ex: add ax, 42 = 66 83 C0 2A */
 int emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm) {
     uint8_t bytes[4];
@@ -598,3 +586,8 @@ int emit_mov_r32_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx) {
     uint8_t b[3] = {0x8B, (uint8_t)((0<<6)|(dst<<3)|4),
                           (uint8_t)((0<<6)|(idx<<3)|base)};
     return emit_raw(e, b, 3); }
+
+int emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
+    uint8_t b[3] = {0x80, (uint8_t)((3<<6)|(0<<3)|reg), imm};
+    return emit_raw(e, b, 3);
+}

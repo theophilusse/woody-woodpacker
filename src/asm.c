@@ -528,10 +528,10 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 
 	if (!strcmp(toks[0], "_zero")) // Met a zero un registre
 	{
-		if (lsb_value)
-			emit_and_r8_imm8(&a->out->e, r1, 0);
-		else
-			emit_xor_r32_r32(&a->out->e, r1, r1);
+		if (s1 == 8) {
+			if (lsb_value) emit_inc_r8(&a->out->e, r1);
+			else           emit_add_r8_imm8(&a->out->e, r1, 1);  /* ADD r8, 1 = 80 /0 01 */
+		}
 		a->key_index++;
 		return 0;
 	}
