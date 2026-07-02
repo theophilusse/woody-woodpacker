@@ -233,13 +233,13 @@ static const char STUB_SRC[] =
 	"pop rdx\n"
 	"pop rbp\n"
 	"jmp @oep\n"
-	"scan_end:\n"
 
 	// donnees embarquees apres le code
 	"msg:\n"
 	".msg\n"
 	"key:\n"
-	".key\n";
+	".key\n"
+	"scan_end:\n";
 /*
     "push rdx\n"
     "_SET eax, 1\n"
