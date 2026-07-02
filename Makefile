@@ -1,4 +1,5 @@
 NAME		= woody-woodpacker
+PACKED_ELF_NAME = woody
 
 CC		= gcc
 CFLAGS		= -Wall -Wextra -Werror
@@ -30,6 +31,8 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 
 # ── nettoyage ────────────────────────────────────────────────────────────────
 clean:
+	rm -f $(PACKED_ELF_NAME)
+	@echo "$(YELLOW)woody supprimé$(RESET)"
 	rm -rf $(OBJ_DIR)
 	@echo "$(YELLOW)obj/ supprimé$(RESET)"
 
