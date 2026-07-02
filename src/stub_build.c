@@ -21,7 +21,10 @@ static const char STUB_SRC[] =
 	"sub rsp, 16\n"
 	"xor eax, eax\n"
 	"xor ecx, ecx\n"
-	"@zero_key\n"
+	"@zero_key:\n"
+	"mov [rsp+rcx], al\n"
+	"inc ecx\n"
+	"cmp ecx, 16\n"
 	"jl @zero_key\n"
 	"mov r8, rsp\n"
 
