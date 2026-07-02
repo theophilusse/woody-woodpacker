@@ -582,3 +582,19 @@ int emit_or_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src, int
     bytes[3] = (uint8_t)disp;
     return emit_raw(e, bytes, 4);
 }
+
+/* MOV r32, [base]       : 8B /r mod=00 */
+int emit_mov_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base) {
+    uint8_t b[2] = {0x8B, (uint8_t)((0<<6)|(dst<<3)|base)};
+    return emit_raw(e, b, 2); }
+
+/* MOV r32, [base+disp8] : 8B /r mod=01 disp8 */
+int emit_mov_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp) {
+    uint8_t b[3] = {0x8B, (uint8_t)((1<<6)|(dst<<3)|base), (uint8_t)disp};
+    return emit_raw(e, b, 3); }
+
+/* MOV r32, [base+idx]   : 8B /r SIB mod=00 */
+int emit_mov_r32_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx) {
+    uint8_t b[3] = {0x8B, (uint8_t)((0<<6)|(dst<<3)|4),
+                          (uint8_t)((0<<6)|(idx<<3)|base)};
+    return emit_raw(e, b, 3); }

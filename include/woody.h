@@ -49,6 +49,7 @@ typedef struct s_stub
 
 # include "emit.h"
 # include "asm.h"
+# include "stub.h"
 
 /* elf_parser.c */
 t_elf_ctx	*elf_load(const char *path);

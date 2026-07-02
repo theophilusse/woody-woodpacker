@@ -76,6 +76,9 @@ int		emit_xchg_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg);
 int		emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg);
 int		emit_or_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src);
 int		emit_or_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src, int8_t disp);
+int		emit_mov_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base);
+int		emit_mov_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp);
+int		emit_mov_r32_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
 
 /* sauts */
 int		emit_jcc_rel8(t_emitter *e, uint8_t cc_opcode, size_t *patch_offset);

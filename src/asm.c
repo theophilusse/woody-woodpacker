@@ -537,18 +537,33 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "_set") && n == 3)
 	{
-		if (!preg(toks[1], &r1, &s1))   // ← manquait
-		{
-			fprintf(stderr, "asm: _set: registre invalide '%s'\n", toks[1]);
-			return -1;
-		}
-		val = sym(a, toks[2]);
-		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		if (!preg(toks[1], &r1, &s1)) return -1;
 
-		if (lsb_value)
-			emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
-		else
-			emit_lea_abs(&a->out->e, r1, (int32_t)val);
+		if (toks[2][0] == '[')                       /* source mémoire */
+		{
+			mt = pmem(toks[2], &base, &idx, lbl, &d8);
+			if (lsb_value) {
+				if (mt == 3) emit_mov_r32_mem_reg(&a->out->e, r1, base);
+				if (mt == 4) emit_mov_r32_mem_disp8(&a->out->e, r1, base, d8);
+				if (mt == 1) emit_mov_r32_mem_sib(&a->out->e, r1, base, idx);
+			} else {
+				if (mt == 3) emit_movzx_r32_mem_reg(&a->out->e, r1, base);
+				if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
+				if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
+			}
+		}
+		else if (preg(toks[2], &r2, &s2))            /* source registre */
+		{
+			if (lsb_value) emit_mov_r32_r32(&a->out->e, r1, r2);
+			else           emit_movzx_r32_r8(&a->out->e, r1, r2);
+		}
+		else                                          /* source immédiate */
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
+			else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
+		}
 		a->key_index++;
 		return 0;
 	}

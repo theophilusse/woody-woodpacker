@@ -1,38 +1,27 @@
-#include "woody.h"
+#ifndef STUB_H
+# define STUB_H
 
-/*
-** Registres utilises par le stub :
-**   cl/rcx  = i  (compteur KSA/PRGA, wrap 8 bits naturel)
-**   dl/rdx  = j  (idem)
-**   rbx     = k  (index payload, 64 bits)
-**   rax/al  = temporaire
-**   rsi     = base cle (KSA), libere ensuite
-**   rdi     = base payload (PRGA)
-**   rsp     = S-box 256 octets (sub rsp, 256)
-**   rdx preservé via push/pop autour du stub (_dl_fini du kernel)
-*/
-
-static const char STUB_SRC_NO_KEY[] =
+static const char STUB_SRC[] =
 	// preserves _dl_fini que le kernel passe dans rdx
 	"scan_start:\n"
 	"push rdx\n"
 	"push rbp\n"
 
 	"sub rsp, 16\n"
-	"xor eax, eax\n"
-	"xor ecx, ecx\n"
+	"_zero eax\n"//"xor eax, eax\n"
+	"_zero ecx\n"//"xor ecx, ecx\n"
 	"@zero_key:\n"
 	"mov [rsp+rcx], al\n"
-	"inc ecx\n"
+	"_inc ecx\n"
 	"cmp ecx, 16\n"
 	"jl @zero_key\n"
-	"mov rbp, rsp\n"
+	"_set rbp, rsp\n"//"mov rbp, rsp\n"
 	"jmp @do_write\n"
 
 	"@run_lde:\n"
 	// ── lecture du payload ───────────────────────────────────────
     /* ── setup ───────────────────────────────────────────── */
-    "xor ecx, ecx\n"          /* bit_index = 0 */
+    "_zero ecx\n"          /* bit_index = 0 */
     "lea rsi, [scan_start]\n"
     "lea rbx, [scan_end]\n"
 
@@ -89,6 +78,8 @@ static const char STUB_SRC_NO_KEY[] =
     "cmp eax, edx\n"
     "jne @adv2_31\n"
     "inc ecx\n"                /* push(0) */
+    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
+	"jge @lde_done\n"        /* buffer plein : skip stockage */
     "@adv2_31:\n"
     "add rsi, 2\n" "jmp @lde_loop\n"
 
@@ -114,7 +105,86 @@ static const char STUB_SRC_NO_KEY[] =
     "movzx eax, [rsi+2]\n" "and eax, 0x7\n" "cmp eax, 0x4\n" "jne @check_inc_fe\n"
     "movzx eax, [rsi+3]\n" "cmp eax, 0x25\n" "jne @check_inc_fe\n"
     "inc ecx\n"                /* push(0) */
+    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
+	"jge @lde_done\n"        /* buffer plein : skip stockage */
     "add rsi, 8\n" "jmp @lde_loop\n"
+
+    /* 0x89 : MOV r32, r32  (SET reg→reg lsb=1 / 2 octets) */
+    "@check_89:\n"
+    "cmp eax, 0x89\n" "jne @check_0f_b6\n"
+    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
+	"jge @lde_done\n"        /* buffer plein : skip stockage */
+	"push rcx\n"
+	"mov edx, ecx\n" "sar edx, 3\n"
+	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+	"pop rcx\n" "or [rbp+rdx], al\n" "inc ecx\n"
+    "add rsi, 5\n" "jmp @lde_loop\n"
+
+    ///////////
+    /* 8B : MOV r32, r/m → bit=1 */
+    "@check_8b:\n"
+    "cmp eax, 0x8b\n" "jne @check_0f_b6\n"
+    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
+	"jge @lde_done\n"        /* buffer plein : skip stockage */
+    "push rcx\n"
+    "mov edx, ecx\n" "sar edx, 3\n"
+    "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+    "pop rcx\n" "or [rbp+rdx], al\n" "inc ecx\n"
+    "jmp @advance_8b\n"
+
+    /* 0F B6 : MOVZX r32, r/m8 → bit=0 */
+    "@check_0f_b6:\n"
+    "cmp eax, 0x0f\n" "jne @check_inc_fe\n"
+    "movzx eax, [rsi+1]\n" "cmp eax, 0xb6\n" "jne @check_inc_fe\n"
+    "inc ecx\n"
+    /* taille identique a 8B mais +1 pour le 0F prefixe */
+    "movzx eax, [rsi+2]\n"   /* ModRM du MOVZX */
+    "mov edx, eax\n"
+    "and edx, 0xc0\n"    /* isole bits 7-6 = mod */
+    "sar edx, 6\n"       /* edx = 0, 1, 2, ou 3 */
+    "and eax, 7\n"
+    "cmp edx, 0\n" "jne @mod01_0fb6\n"
+    "cmp eax, 4\n" "je @sib_0fb6\n"
+    "add rsi, 3\n" "jmp @lde_loop\n"   /* 0F B6 ModRM */
+    "@sib_0fb6:\n"
+    "add rsi, 4\n" "jmp @lde_loop\n"   /* 0F B6 ModRM SIB */
+    "@mod01_0fb6:\n"
+    "cmp edx, 1\n" "jne @lde_fallback\n"
+    "cmp eax, 4\n" "je @sib_disp8_0fb6\n"
+    "add rsi, 4\n" "jmp @lde_loop\n"   /* 0F B6 ModRM disp8 */
+    "@sib_disp8_0fb6:\n"
+    "add rsi, 5\n" "jmp @lde_loop\n"   /* 0F B6 ModRM SIB disp8 */
+
+    /* calcul taille pour 8B depuis ModRM */
+    "@advance_8b:\n"
+    "movzx eax, [rsi+1]\n"
+    "mov edx, eax\n"
+    "and edx, 0xc0\n"    /* isole bits 7-6 = mod */
+    "sar edx, 6\n"       /* edx = 0, 1, 2, ou 3 */
+    "and eax, 7\n"
+    "cmp edx, 0\n" "jne @mod01_8b\n"
+    "cmp eax, 4\n" "je @sib_8b\n"
+    "add rsi, 2\n" "jmp @lde_loop\n"   /* 8B ModRM */
+    "@sib_8b:\n"
+    "add rsi, 3\n" "jmp @lde_loop\n"   /* 8B ModRM SIB */
+    "@mod01_8b:\n"
+    "cmp edx, 1\n" "jne @lde_fallback\n"
+    "cmp eax, 4\n" "je @sib_disp8_8b\n"
+    "add rsi, 3\n" "jmp @lde_loop\n"   /* 8B ModRM disp8 */
+    "@sib_disp8_8b:\n"
+    "add rsi, 4\n" "jmp @lde_loop\n"   /* 8B ModRM SIB disp8 */
+    /////////////
+
+
+    /* 0x0F 0xB6 : MOVZX r32, r8  (SET reg→reg lsb=0 / 3 octets) */
+    "@check_0f_b6:\n"
+    "cmp eax, 0x0f\n" "jne @check_inc_fe\n"
+    "movzx eax, [rsi+1]\n"
+    "cmp eax, 0xb6\n" "jne @check_inc_fe\n"
+    "inc ecx\n"             /* push(0) */
+    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
+	"jge @lde_done\n"        /* buffer plein : skip stockage */
+	"add rsi, 3\n" "jmp @lde_loop\n"
 
     /* ── 0xFE/0xFF (p[1]&0xF8)==0xC0 : INC r  (lsb=1 / 2) ─ */
     "@check_inc_fe:\n"
@@ -139,6 +209,8 @@ static const char STUB_SRC_NO_KEY[] =
     "movzx eax, [rsi+1]\n" "and eax, 0xf8\n"
     "cmp eax, 0xf8\n" "jne @check_dec_ff\n"
     "inc ecx\n"                /* push(0) */
+    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
+	"jge @lde_done\n"        /* buffer plein : skip stockage */
     "add rsi, 3\n" "jmp @lde_loop\n"
 
     /* ── 0xFE/0xFF (p[1]&0xF8)==0xC8 : DEC r  (lsb=1 / 2) ─ */
@@ -165,6 +237,8 @@ static const char STUB_SRC_NO_KEY[] =
     "cmp eax, 0xe8\n" "jne @lde_fallback\n"
     "movzx eax, [rsi+2]\n" "cmp eax, 0x1\n" "jne @lde_fallback\n"
     "inc ecx\n"                /* push(0) */
+    "cmp ecx, 128\n"        /* KEY_LEN * 8 = 128 bits max */
+	"jge @lde_done\n"        /* buffer plein : skip stockage */
     "add rsi, 3\n" "jmp @lde_loop\n"
 
     /* ── fallback : p++ ──────────────────────────────────── */
@@ -257,164 +331,5 @@ static const char STUB_SRC_NO_KEY[] =
 	"key:\n"
 	".key\n"
 	"scan_end:\n";
-/*
-    "push rdx\n"
-    "_SET eax, 1\n"
-    "_SET edi, 1\n"
-    "lea rsi, [msg]\n"
-    "mov edx, 14\n"
-    "syscall\n"
-    "mov rdi, prot_addr\n"
-    "mov esi, prot_size\n"
-    "mov edx, 7\n"
-    "mov eax, 10\n"
-    "syscall\n"
-    "sub rsp, 256\n"
-    "lea rsi, [key]\n"
-    "xor ecx, ecx\n"
-    "@ksa_init:\n"
-    "mov [rsp+rcx], cl\n"
-    "inc cl\n"
-    "jnz @ksa_init\n"
-    "xor ecx, ecx\n"
-    "xor edx, edx\n"
-    "@ksa_loop:\n"
-    "movzx eax, [rsp+rcx]\n"
-    "add dl, al\n"
-    "mov al, cl\n"
-    "and al, key_mask\n"
-    "movzx eax, al\n"
-    "movzx eax, [rsi+rax]\n"
-    "add dl, al\n"
-    "movzx eax, [rsp+rcx]\n"
-    "xchg [rsp+rdx], al\n"
-    "mov [rsp+rcx], al\n"
-    "inc cl\n"
-    "jnz @ksa_loop\n"
-    "mov rdi, text_vaddr\n"
-    "xor ecx, ecx\n"
-    "xor edx, edx\n"
-    "xor ebx, ebx\n"
-    "@prga_loop:\n"
-    "inc cl\n"
-    "movzx eax, [rsp+rcx]\n"
-    "add dl, al\n"
-    "xchg [rsp+rdx], al\n"
-    "mov [rsp+rcx], al\n"
-    "add al, [rsp+rdx]\n"
-    "movzx eax, al\n"
-    "movzx eax, [rsp+rax]\n"
-    "xor [rdi+rbx], al\n"
-    "inc rbx\n"
-    "cmp ebx, text_len\n"
-    "jl @prga_loop\n"
-    "add rsp, 256\n"
-    "pop rdx\n"
-    "jmp @oep\n"
-    "msg:\n"
-    ".msg\n"
-    "key:\n"
-    ".key\n"
-*/
 
-/*
-
-	////////??/////////////////////////////////
-    // ── setup ─────────────────────────────────────────────
-    "xor ecx, ecx\n"
-    "lea rsi, [scan_start]\n"
-    "lea rbx, [scan_end]\n"
- 
-    // ── boucle principale ─────────────────────────────────
-    "@lde_loop:\n"
-    "cmp rsi, rbx\n"
-    "jae @lde_done\n"
-    "movzx eax, [rsi]\n"
- 
-    // ── 0x24 : AND al, imm8  (ZERO lsb=1 / 2 octets) ────
-    "cmp eax, 0x24\n"
-    "jne @check_80\n"
-    "movzx eax, [rsi+1]\n"
-    "cmp eax, 0x0\n"
-    "jne @adv2_24\n"
-    // push(1)
-    "push rcx\n"
-    "mov edx, ecx\n" "sar edx, 3\n"
-    "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-    "pop rcx\n" "or [rdi+rdx], al\n" "inc ecx\n"
-    "@adv2_24:\n"
-    "add rsi, 2\n" "jmp @lde_loop\n"
- 
-    // ── 0x80 : AND r/m8, imm8  (ZERO alt / 3 octets) ─────
-    "@check_80:\n"
-    "cmp eax, 0x80\n"
-    "jne @check_31\n"
-    "movzx eax, [rsi+2]\n"
-    "cmp eax, 0x0\n"
-    "jne @adv3_80\n"
-    // push(1)
-    "push rcx\n"
-    "mov edx, ecx\n" "sar edx, 3\n"
-    "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-    "pop rcx\n" "or [rdi+rdx], al\n" "inc ecx\n"
-    "@adv3_80:\n"
-    "add rsi, 3\n" "jmp @lde_loop\n"
- 
-    // ── 0x31 : XOR r/r  (ZERO lsb=0 / 2 octets) ──────────
-    "@check_31:\n"
-    "cmp eax, 0x31\n"
-    "jne @check_b8\n"
-    "movzx eax, [rsi+1]\n"
-    "mov edx, eax\n"
-    "and eax, 0x18\n" "sar eax, 3\n"
-    "and edx, 0x3\n"
-    "cmp eax, edx\n"
-    "jne @adv2_31\n"
-    "inc ecx\n"                // push(0)
-    "@adv2_31:\n"
-    "add rsi, 2\n" "jmp @lde_loop\n"
- 
-    // ── 0xB8-0xBF : MOV r32, imm32  (SET lsb=1 / 5 octets)
-    "@check_b8:\n"
-    "cmp eax, 0xb8\n"
-    "jl @check_lea\n"
-    "cmp eax, 0xbf\n"
-    "jg @check_lea\n"
-    // push(1)
-    "push rcx\n"
-////////////////////////////////////////////
-
-	*/
-
-t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
-{
-	t_asm_result	res;
-	t_stub			*stub;
-
-	memset(&res, 0, sizeof(res));
-	if (asm_build(STUB_SRC, crypto, &res) < 0)
-	{
-		free(res.e.buf);
-		return (NULL);
-	}
-	stub = malloc(sizeof(t_stub));
-	if (!stub)
-	{
-		free(res.e.buf);
-		return (NULL);
-	}
-	stub->bytes         = res.e.buf;
-	stub->len           = res.e.len;
-	stub->load_vaddr    = 0;
-	stub->original_oep  = ctx->ehdr->e_entry;
-	stub->patch_jmp_oep = res.patch_jmp_oep;
-	return (stub);
-}
-
-void	stub_free(t_stub *stub)
-{
-	if (!stub)
-		return ;
-	free(stub->bytes);
-	free(stub);
-}
+#endif
