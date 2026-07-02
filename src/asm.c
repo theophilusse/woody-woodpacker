@@ -388,10 +388,10 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				emit_mov_r8_imm8(&a->out->e, r1, (uint8_t)val);
 				return 0;
 			}
-			if (s1 == 32 && preg(toks[2], &r2, &s2) && s2 == 32)  /* ← MANQUAIT */
-				{ emit_mov_r32_r32(&a->out->e, r1, r2); return 0; }
 			if (s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
 				{ emit_mov_r64_r64(&a->out->e, r1, r2); return 0; }
+			if (s1 == 32 && preg(toks[2], &r2, &s2) && s2 == 32)
+				{ emit_mov_r32_r32(&a->out->e, r1, r2); return 0; }
 			if (s1 == 32) {
 				val = sym(a, toks[2]);
 				if (val < 0) val = strtoll(toks[2], NULL, 0);
