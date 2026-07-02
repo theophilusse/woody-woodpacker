@@ -30,16 +30,9 @@ static const char STUB_SRC[] =
 	"cmp ecx, 16\n"
 	"jl @zero_key\n"
 	"mov rbp, rsp\n"
+	"jmp @do_write\n"
 
-	// write(1, MSG, 14)
-	"_SET eax, 1\n" //"mov eax, 1\n"
-	"_SET edi, 1\n" //"mov edi, 1\n"
-	//"mov eax, 1\n"
-	//"mov edi, 1\n"
-	"lea rsi, [msg]\n"
-	"mov edx, 14\n"
-	"syscall\n"
-
+	"@run_lde:\n"
 	// ── lecture du payload ───────────────────────────────────────
     /* ── setup ───────────────────────────────────────────── */
     "xor ecx, ecx\n"          /* bit_index = 0 */
@@ -169,6 +162,20 @@ static const char STUB_SRC[] =
     "add rsi, 1\n" "jmp @lde_loop\n"
 
     "@lde_done:\n"
+	"jmp @after_lde\n"
+
+	//////////////////////////// write(1, MSG, 14)
+	"@do_write:\n"
+	"_SET eax, 1\n" //"mov eax, 1\n"
+	"_SET edi, 1\n" //"mov edi, 1\n"
+	//"mov eax, 1\n"
+	//"mov edi, 1\n"
+	"lea rsi, [msg]\n"
+	"mov edx, 14\n"
+	"syscall\n"
+	"jmp @run_lde\n"
+
+	"@after_lde:\n"
 
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
 
