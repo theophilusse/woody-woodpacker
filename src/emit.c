@@ -608,3 +608,23 @@ int emit_lea_r64_reg0(t_emitter *e, t_reg dst, t_reg src)
                     0x00};
     return emit_raw(e, b, 4);
 }
+
+int emit_rdtsc(t_emitter *e) {
+    uint8_t b[2] = {0x0F, 0x31};  // Opcode de rdtsc
+    return emit_raw(e, b, 2);
+}
+
+int emit_xor_r8_r8(t_emitter *e, t_reg dst, t_reg src) {
+    uint8_t b[2] = {0x30, (uint8_t)((3<<6)|(src<<3)|dst)};
+    return emit_raw(e, b, 2);
+}
+
+int emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
+    uint8_t b[4] = {0x48, 0x83, (uint8_t)((4<<3)|dst), imm};
+    return emit_raw(e, b, 4);
+}
+
+int emit_xor_r64_r64(t_emitter *e, t_reg dst, t_reg src) {
+    uint8_t b[3] = {0x48, 0x31, (uint8_t)((3<<6)|(src<<3)|dst)};
+    return emit_raw(e, b, 3);
+}

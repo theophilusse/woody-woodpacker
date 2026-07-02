@@ -30,6 +30,8 @@ int		emit_mov_r64_r64(t_emitter *e, t_reg dst, t_reg src);
 int		emit_mov_r8_r8(t_emitter *e, t_reg dst, t_reg src);
 int 	emit_or_r8_r8(t_emitter *e, t_reg dst, t_reg src);
 int		emit_lea_r64_reg0(t_emitter *e, t_reg dst, t_reg src);
+int		emit_xor_r8_r8(t_emitter *e, t_reg dst, t_reg src);
+int emit_xor_r64_r64(t_emitter *e, t_reg dst, t_reg src);
 
 /* pile */
 int		emit_push_r64(t_emitter *e, t_reg reg);
@@ -43,6 +45,7 @@ int 	emit_lea_abs(t_emitter *e, t_reg dst, uint32_t addr);
 
 /* 64 bits */
 int		emit_dec_r64(t_emitter *e, t_reg reg);
+int		emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm);
 
 /* 32 bits */
 int		emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src);
