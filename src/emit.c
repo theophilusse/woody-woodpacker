@@ -538,3 +538,9 @@ int emit_mov_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
     uint8_t b[2] = {0xB0 + reg, imm};
     return emit_raw(e, b, 2);
 }
+
+int emit_shl_r8_cl(t_emitter *e, t_reg reg)
+{
+    uint8_t b[2] = {0xD2, (uint8_t)((3 << 6) | (4 << 3) | reg)};
+    return emit_raw(e, b, 2);
+}
