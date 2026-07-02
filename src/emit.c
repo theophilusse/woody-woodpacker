@@ -108,6 +108,20 @@ int	emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm)
 	return (emit_raw(e, bytes, 6));
 }
 
+int emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm)
+{
+    uint8_t b[7] = {0x48, 0x81, (uint8_t)((7 << 3) | dst), 0, 0, 0, 0};
+    memcpy(b + 3, &imm, 4);
+    return emit_raw(e, b, 7);
+}
+
+int emit_cmp_r64_imm64(t_emitter *e, t_reg dst, int64_t imm)
+{
+    uint8_t b[10] = {0x48, 0x81, (uint8_t)((7 << 3) | dst), 0, 0, 0, 0, 0, 0, 0};
+    memcpy(b + 3, &imm, 8);
+    return emit_raw(e, b, 10);
+}
+
 int	emit_jcc_rel8(t_emitter *e, uint8_t cc_opcode, size_t *patch_offset)
 {
 	uint8_t	bytes[2];

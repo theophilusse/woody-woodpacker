@@ -46,6 +46,8 @@ int 	emit_lea_abs(t_emitter *e, t_reg dst, uint32_t addr);
 /* 64 bits */
 int		emit_dec_r64(t_emitter *e, t_reg reg);
 int		emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm);
+int		emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm);
+int		emit_cmp_r64_imm64(t_emitter *e, t_reg dst, int64_t imm);
 
 /* 32 bits */
 int		emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src);

@@ -445,15 +445,30 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_raw(&a->out->e, bytes, 2);
 			return 0;
 		}
-		/* cmp r32, imm */
+		/* cmp r32, imm (avec support des immédiats signés) */
 		if (s1 == 32)
 		{
 			val = sym(a, toks[2]);
-			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);  // Convertir la chaîne en entier signé
+
+			// Vérifier si l'immédiat tient sur 8 bits signés (-128 à 127)
 			if (val >= -128 && val <= 127)
 				emit_cmp_r32_imm8(&a->out->e, r1, (int8_t)val);
 			else
 				emit_cmp_r32_imm32(&a->out->e, r1, (int32_t)val);
+			return 0;
+		}
+		/* cmp r64, imm (nouveau cas) */
+		if (s1 == 64)
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);  // Convertir la chaîne en entier signé
+
+			// Vérifier si l'immédiat tient sur 32 bits signés (-2^31 à 2^31-1)
+			if (val >= -2147483648LL && val <= 2147483647LL)
+				emit_cmp_r64_imm32(&a->out->e, r1, (int32_t)val);
+			else
+				emit_cmp_r64_imm64(&a->out->e, r1, val);  // Cas rare (immédiat 64 bits)
 			return 0;
 		}
 	}
