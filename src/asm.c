@@ -155,6 +155,7 @@ static uint8_t jcc_opcode(const char *m)
     if (!strcmp(m,"jge")||!strcmp(m,"jnl")) return 0x7D;
     if (!strcmp(m,"jae")||!strcmp(m,"jnb")) return 0x73;
     if (!strcmp(m,"jbe")||!strcmp(m,"jna")) return 0x76;
+	if (!strcmp(m,"jb") ||!strcmp(m,"jnae")||!strcmp(m,"jc")) return 0x72;
     return 0;
 }
 
