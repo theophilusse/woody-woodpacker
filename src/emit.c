@@ -549,7 +549,7 @@ int emit_or_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm)
 {
 	uint8_t bytes[6];
 	bytes[0] = 0x81;
-	bytes[1] = (3 << 6) | (1 << 3) | reg; // ModR/M: mod=11, reg=1 (OR), r/m=reg
+	bytes[1] = (3 << 6) | (1 << 3) | reg;
 	memcpy(bytes + 2, &imm, 4);
 	return emit_raw(e, bytes, 6);
 }
