@@ -572,3 +572,13 @@ int emit_or_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src)
     bytes[2] = (0 << 6) | (idx << 3) | base;        /* SIB */
     return emit_raw(e, bytes, 3);
 }
+
+int emit_or_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src, int8_t disp)
+{
+    uint8_t bytes[4];
+    bytes[0] = 0x08;
+    bytes[1] = (1 << 6) | (src << 3) | 4;       /* mod=01 reg=src rm=SIB */
+    bytes[2] = (0 << 6) | (idx << 3) | base;     /* SIB */
+    bytes[3] = (uint8_t)disp;
+    return emit_raw(e, bytes, 4);
+}

@@ -231,6 +231,14 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			{ emit_or_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
 		if (preg(toks[1], &r1, &s1) && s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
 			{ emit_or_r8_r8(&a->out->e, r1, r2); return 0; }
+		if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
+		{
+			if (base == REG_RBP)
+				emit_or_mem_sib_disp8_r8(&a->out->e, base, idx, r2, 0);
+			else
+				emit_or_mem_sib_r8(&a->out->e, base, idx, r2);
+			return 0;
+		}
 	}
 	if (!strcmp(toks[0], "shl") && n == 3
 		&& preg(toks[1], &r1, &s1) && s1 == 8

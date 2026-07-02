@@ -183,7 +183,7 @@ static const char STUB_SRC[] =
 	"sub rsp, 256\n"
 
 	// rsi = base de la cle (RIP-relative)
-	"lea rsi, rbp\n"
+	"mov rsi, rbp\n"
 
 	// KSA init : S[i] = i, i = 0..255
 	"xor ecx, ecx\n"
