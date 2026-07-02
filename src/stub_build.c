@@ -391,6 +391,7 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 	t_asm_result	res;
 	t_stub			*stub;
 
+	(void)STUB_SRC_NO_KEY;
 	memset(&res, 0, sizeof(res));
 	if (asm_build(STUB_SRC, crypto, &res) < 0)
 	{
