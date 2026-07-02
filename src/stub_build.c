@@ -289,10 +289,10 @@ static const char STUB_SRC[] =
 	"mov eax, 10\n"
 	"syscall\n"
 
-	// /* S-box sur la pile
+	// S-box sur la pile
 	"sub rsp, 256\n"
 
-	// /* rsi = base de la cle (RIP-relative)
+	// rsi = base de la cle (RIP-relative)
 	"lea rsi, [key]\n"
 
 	// KSA init : S[i] = i, i = 0..255
