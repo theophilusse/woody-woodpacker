@@ -535,7 +535,9 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else           emit_xor_r32_r32(&a->out->e, r1, r1);
 		}
 		else if (s1 == 32) {                              /* ← cas 32 bits séparé */
-			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);   /* AND al, 0 = 24 00 */
+			if (lsb_value)
+			emit_and_r32_imm8(&a->out->e, r1, 0);
+			//emit_and_r8_imm8(&a->out->e, r1, 0);   /* AND al, 0 = 24 00 */
 			else           emit_xor_r32_r32(&a->out->e, r1, r1);   /* XOR r32, r32 */
 		}
 		a->key_index++;
