@@ -40,9 +40,11 @@ static const char STUB_SRC[] =
     "lea rbx, [scan_end]\n"
 
     /* ── boucle principale ───────────────────────────────── */
-    "@lde_loop:\n"
-    "cmp rsi, rbx\n"
-    "jae @lde_done\n"
+	"@lde_loop:\n"
+	"cmp rsi, rbx\n"
+	"jb @lde_continue\n"    /* rel8 vers 5 octets plus loin, toujours dans range */
+	"jmp @lde_done\n"       /* rel32, atteint n'importe où */
+	"@lde_continue:\n"
     "movzx eax, [rsi]\n"
 
     /* ── 0x24 : AND al, imm8  (ZERO lsb=1 / 2 octets) ──── */
@@ -164,7 +166,7 @@ static const char STUB_SRC[] =
     "@lde_done:\n"
 	"jmp @after_lde\n"
 
-	//////////////////////////// write(1, MSG, 14)
+	/////////////////////////////////// write(1, MSG, 14)
 	"@do_write:\n"
 	"_SET eax, 1\n" //"mov eax, 1\n"
 	"_SET edi, 1\n" //"mov edi, 1\n"
