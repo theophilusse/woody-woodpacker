@@ -126,6 +126,96 @@ int	emit_mov_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 	return emit_raw(e, b, n);
 }
 
+int	emit_mov_r8_mem_sib(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int8_t disp)
+{
+	uint8_t b[7]; int n = 0;
+	uint8_t r = mk_rex(0, reg_dest >> 3, base >> 3);
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0x8A;  // mov r8, [base+idx+disp]
+
+	// ModR/M
+	if (disp == 0 && base != 5) {
+		b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx]
+	} else {
+		b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx+disp8]
+	}
+
+	// SIB
+	b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
+
+	// Displacement (si nécessaire)
+	if (disp != 0 || base == 5) {
+		b[n++] = (uint8_t)disp;
+	}
+
+	return emit_raw(e, b, n);
+}
+
+int	emit_mov_r32_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp)
+{
+	uint8_t b[7]; int n = 0;
+	uint8_t r = mk_rex(0, reg_dest >> 3, base >> 3);
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0x8B;  // mov r32, [base+idx+disp]
+
+	// ModR/M
+	if (disp == 0 && base != 5) {
+		b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx]
+	} else {
+		b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx+disp8]
+	}
+
+	// SIB
+	b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
+
+	// Displacement (si nécessaire)
+	if (disp != 0 || base == 5) {
+		if (disp >= -128 && disp <= 127) {
+			b[n++] = (uint8_t)disp;  // disp8
+		} else {
+			b[n++] = 0x24;  // SIB avec disp32
+			*(int32_t*)&b[n] = disp;
+			n += 4;
+		}
+	}
+
+	return emit_raw(e, b, n);
+}
+
+int	emit_mov_r64_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp)
+{
+	uint8_t b[10]; int n = 0;
+	uint8_t r = mk_rex(1, reg_dest >> 3, base >> 3);
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0x8B;  // mov r64, [base+idx+disp]
+
+	// ModR/M
+	if (disp == 0 && base != 5) {
+		b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx]
+	} else {
+		b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx+disp8]
+	}
+
+	// SIB
+	b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
+
+	// Displacement (si nécessaire)
+	if (disp != 0 || base == 5) {
+		if (disp >= -128 && disp <= 127) {
+			b[n++] = (uint8_t)disp;  // disp8
+		} else {
+			b[n++] = 0x24;  // SIB avec disp32
+			*(int32_t*)&b[n] = disp;
+			n += 4;
+		}
+	}
+
+	return emit_raw(e, b, n);
+}
+
 int	emit_mov_r32_r32(t_emitter *e, t_reg dst, t_reg src)
 {
 	uint8_t b[3]; int n = 0;

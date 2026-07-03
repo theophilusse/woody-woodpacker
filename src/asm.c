@@ -382,6 +382,32 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
 				{ emit_mov_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
 		}
+		if (toks[1][0] != '[' && toks[2][0] == '[')
+		{
+			if (preg(toks[1], &r1, &s1)) // Vérifie si "bl" est un registre 8-bit
+			{
+				mt = pmem(toks[2], &base, &idx, lbl, &d8);
+				if (mt != 1)
+					return 1;
+
+				if (s1 == 8)
+				{
+					emit_mov_r8_mem_sib(&a->out->e, r1, base, idx); // mov r8, [base+idx]
+					return 0;
+				}
+				else if (s1 == 32)
+				{
+					emit_mov_r32_mem_sib(&a->out->e, r1, base, idx); // mov r32, [base+idx]
+					return 0;
+				}
+				else if (s1 == 64)
+				{
+					emit_mov_r64_mem_sib(&a->out->e, r1, base, idx); // mov r64, [base+idx]
+					return 0;
+				}
+			}
+			return 1; // Si le registre n'est pas reconnu
+		}
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1))
 		{
 			if (s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
