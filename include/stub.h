@@ -460,7 +460,7 @@ static const char STUB_SRC[] =
 ".digit_low:\n"
     "add rcx, 48\n"         //; Convertir en chiffre (0-9)
 ".store_low:\n"
-    "mov [r9 + r11], cl\n" //; Stocker le nibble bas
+    "mov [r9+r11], cl\n" //; Stocker le nibble bas
     "inc r11\n"              //; Incrémenter l'index du buffer
 
     //; Passer à l'octet suivant

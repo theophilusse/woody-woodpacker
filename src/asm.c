@@ -399,7 +399,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		if (toks[1][0] == '[' && toks[2][0] != '[')
 		{
-			DEBUG //
 			mt = pmem(toks[1], &base, &idx, lbl, &d8);
 			if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
 				{ emit_mov_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
