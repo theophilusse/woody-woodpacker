@@ -57,6 +57,7 @@ int		emit_dec_r64(t_emitter *e, t_reg reg);
 int		emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm);
 int		emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm);
 int		emit_shr_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm);
+int		emit_test_r64_r64(t_emitter *e, t_reg reg1, t_reg reg2);
 
 /* 32 bits */
 int		emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src);
@@ -67,6 +68,7 @@ int		emit_sub_r32_imm8(t_emitter *e, t_reg reg, int8_t imm);
 int		emit_dec_r32(t_emitter *e, t_reg reg);
 int 	emit_or_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm);
 int		emit_shr_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm);
+int		emit_test_r32_r32(t_emitter *e, t_reg reg1, t_reg reg2);
 
 /* 16 bits */
 int		emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm);
@@ -83,6 +85,7 @@ int		emit_movzx_r32_r8(t_emitter *e, t_reg dst, t_reg src);
 int		emit_mov_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 int		emit_shl_r8_cl(t_emitter *e, t_reg reg);
 int		emit_shr_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm);
+int		emit_test_r8_r8(t_emitter *e, t_reg reg1, t_reg reg2);
 
 /* SIB [base+idx] */
 int		emit_mov_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src);

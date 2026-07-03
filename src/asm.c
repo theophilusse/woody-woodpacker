@@ -487,6 +487,25 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
 			{ emit_xchg_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
 	}
+	if (!strcmp(toks[0], "test") && n == 3 && preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
+	{
+		if (s1 == 8)
+		{
+			emit_test_r8_r8(&a->out->e, s1, s2);
+			return 0;
+		}
+		if (s1 == 32)
+		{
+			emit_test_r32_r32(&a->out->e, s1, s2);
+			return 0;
+		}
+		if (s1 == 64)
+		{
+			emit_test_r64_r64(&a->out->e, s1, s2);
+			return 0;
+		}
+		return 1;
+	}
 	if (!strcmp(toks[0], "cmp") && n == 3 && preg(toks[1], &r1, &s1))
 	{
 		/* cmp r64, r64 : 48 39 /r */
