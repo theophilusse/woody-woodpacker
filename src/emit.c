@@ -26,12 +26,14 @@ static uint8_t mk_rex_sib(int w, t_reg reg, t_reg idx, t_reg base)
 }
 
 /* emet le REX seulement s'il est utile (evite le byte superflu 0x40) */
+/*
 static int emit_rex(t_emitter *e, uint8_t r)
 {
 	if (r != 0x40)
 		return emit_raw(e, &r, 1);
 	return 0;
 }
+*/
 
 /* ── fondamentales ───────────────────────────────────────────── */
 int	emit_raw(t_emitter *e, const uint8_t *bytes, size_t n)

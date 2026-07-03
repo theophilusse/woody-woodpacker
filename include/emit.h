@@ -3,6 +3,8 @@
 
 # include <stdint.h>
 # include <stddef.h>
+# include <stdlib.h>
+# include <string.h>
 
 /* ModRM : mod(2) | reg(3) | rm(3) */
 #define MODRM(mod, reg, rm)  ((uint8_t)(((mod)<<6)|((( reg)&7)<<3)|((rm)&7)))
