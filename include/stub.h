@@ -448,7 +448,7 @@ static const char STUB_SRC[] =
     "add rcx, 48\n"         //; Convertir en chiffre (0-9)
 ".store_high:\n"
     "mov [r9+r11], cl\n" //; Stocker le nibble haut
-    "inc rcx\n"              //; Incrémenter l'index du buffer
+    "_INC rcx\n"              //; Incrémenter l'index du buffer
 
     //; Extraire le nibble bas (4 bits de poids faible)
     "mov rcx, r13\n"
@@ -461,11 +461,11 @@ static const char STUB_SRC[] =
     "add rcx, 48\n"         //; Convertir en chiffre (0-9)
 ".store_low:\n"
     "mov [r9+r11], cl\n" //; Stocker le nibble bas
-    "inc r11\n"              //; Incrémenter l'index du buffer
+    "_INC r11\n"              //; Incrémenter l'index du buffer
 
     //; Passer à l'octet suivant
-    "inc r10\n"
-    "dec rax\n"              //; Décrémenter le compteur d'octets
+    "_INC r10\n"
+    "_DEC rax\n"              //; Décrémenter le compteur d'octets
 
 ".loop_start:\n"
     "test rax, rax\n"        //; Vérifier si r12 == 0
@@ -480,7 +480,7 @@ static const char STUB_SRC[] =
 
     //; === Terminer le programme ===
     "mov rax, 60\n"          //; sys_exit
-    "xor rdi, rdi\n"         //; code de sortie 0
+    "_ZERO rdi\n"         //; code de sortie 0
     "syscall\n"
 
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
