@@ -265,6 +265,20 @@ int	emit_mov_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 	return emit_raw(e, b, n);
 }
 
+int emit_mov_r8_mem_reg(t_emitter *e, t_reg reg_dest, t_reg base)
+{
+    uint8_t b[3]; int n = 0;
+    uint8_t r = mk_rex(0, reg_dest >> 3, base >> 3);
+    if (r != 0x40) b[n++] = r;
+
+    b[n++] = 0x8A;  // mov r8, [base]
+
+    // ModR/M: [base] (mod=00, r/m=base)
+    b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | (base & 0x07);
+
+    return emit_raw(e, b, n);
+}
+
 /* MOV r32, [base] : 8B /r mod=00 */
 int	emit_mov_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base)
 {
@@ -275,6 +289,21 @@ int	emit_mov_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base)
 	b[n++] = MODRM00(dst, base);
 	return emit_raw(e, b, n);
 }
+
+int emit_mov_r64_mem_reg(t_emitter *e, t_reg reg_dest, t_reg base)
+{
+    uint8_t b[3]; int n = 0;
+    uint8_t r = mk_rex(1, reg_dest >> 3, base >> 3);
+    if (r != 0x40) b[n++] = r;
+
+    b[n++] = 0x8B;  // mov r64, [base]
+
+    // ModR/M: [base] (mod=00, r/m=base)
+    b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | (base & 0x07);
+
+    return emit_raw(e, b, n);
+}
+
 
 /* MOV r32, [base+disp8] : 8B /r mod=01 */
 int	emit_mov_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
