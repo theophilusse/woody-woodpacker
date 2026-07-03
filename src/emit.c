@@ -406,6 +406,42 @@ int	emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg)
 	return emit_raw(e, b, n);
 }
 
+/* XOR [base+idx], r32 */
+int emit_xor_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src)
+{
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(0, src >> 3, base >> 3);
+    if (r != 0x40) b[n++] = r;
+
+    b[n++] = 0x31;  // xor [base+idx], r32
+
+    // ModR/M
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;  // [base+idx]
+
+    // SIB
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
+
+    return emit_raw(e, b, n);
+}
+
+/* XOR [base+idx], r64 */
+int emit_xor_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg src)
+{
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(1, src >> 3, base >> 3);
+    if (r != 0x40) b[n++] = r;
+
+    b[n++] = 0x31;  // xor [base+idx], r64
+
+    // ModR/M
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;  // [base+idx]
+
+    // SIB
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
+
+    return emit_raw(e, b, n);
+}
+
 /* ── and ─────────────────────────────────────────────────────── */
 int	emit_and_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 {

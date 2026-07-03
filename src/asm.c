@@ -235,10 +235,31 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 
 	if (!strcmp(toks[0], "xor") && n == 3)
 	{
-		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
-			{ emit_xor_r32_r32(&a->out->e, r1, r2); return 0; }
-		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
-			{ emit_xor_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
+		/* Cas 1: xor reg, reg */
+		if (toks[1][0] != '[' && toks[2][0] != '[' &&
+			preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
+		{
+			if (s1 == 8 && s2 == 8) { emit_xor_r8_r8(&a->out->e, r1, r2); return 0; }
+			if (s1 == 32 && s2 == 32) { emit_xor_r32_r32(&a->out->e, r1, r2); return 0; }
+			if (s1 == 64 && s2 == 64) { emit_xor_r64_r64(&a->out->e, r1, r2); return 0; }
+		}
+
+		/* Cas 2: xor [mem], reg */
+		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
+			preg(toks[2], &r2, &s2))
+		{
+			if (s2 == 8) { emit_xor_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
+			if (s2 == 32) { emit_xor_mem_sib_r32(&a->out->e, base, idx, r2); return 0; }
+			if (s2 == 64) { emit_xor_mem_sib_r64(&a->out->e, base, idx, r2); return 0; }
+		}
+
+		/* Cas 3: xor reg, [mem] */
+		if (toks[1][0] != '[' && toks[2][0] == '[' &&
+			preg(toks[1], &r1, &s1) && s1 == 8)
+		{
+			mt = pmem(toks[2], &base, &idx, lbl, &d8);
+			if (mt == 1) { emit_xor_r8_mem_sib(&a->out->e, r1, base, idx); return 0; }
+		}
 	}
 	if (!strcmp(toks[0], "or") && n == 3)
 	{
