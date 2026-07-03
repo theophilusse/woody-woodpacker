@@ -56,18 +56,15 @@ int 	emit_lea_abs(t_emitter *e, t_reg dst, int32_t addr);
 int		emit_dec_r64(t_emitter *e, t_reg reg);
 int		emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm);
 int		emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm);
-int		emit_cmp_r64_imm64(t_emitter *e, t_reg dst, int64_t imm);
 
 /* 32 bits */
 int		emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src);
 int		emit_cmp_r32_imm8(t_emitter *e, t_reg reg, int8_t imm);
 int		emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm);
-int		emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm);
 int		emit_add_r32_imm8(t_emitter *e, t_reg dst, int8_t imm);
 int		emit_sub_r32_imm8(t_emitter *e, t_reg reg, int8_t imm);
 int		emit_dec_r32(t_emitter *e, t_reg reg);
 int 	emit_or_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm);
-int		emit_add_r32_imm32_long(t_emitter *e, t_reg dst, uint32_t imm);
 
 /* 16 bits */
 int		emit_add_r16_imm16(t_emitter *e, t_reg dst, uint16_t imm);
@@ -80,7 +77,6 @@ int		emit_inc_r64(t_emitter *e, t_reg reg);
 int		emit_and_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 int		emit_add_r8_imm8(t_emitter *e, t_reg dst, uint8_t imm);
 int		emit_add_r8_r8(t_emitter *e, t_reg dst, t_reg src);
-int		emit_add_r8_mem_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src);
 int		emit_movzx_r32_r8(t_emitter *e, t_reg dst, t_reg src);
 int		emit_mov_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 int		emit_shl_r8_cl(t_emitter *e, t_reg reg);
@@ -115,11 +111,21 @@ int emit_sar_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 int emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src);
 int emit_movzx_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base);
 int emit_movzx_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp);
-int emit_sar_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm);
-int emit_sar_r32_r32(t_emitter *e, t_reg reg_dest, t_reg reg_src);
-int emit_sar_mem_r32(t_emitter *e, t_reg base, t_reg idx, t_reg reg_src);
-int emit_sar_mem_sib_imm8_disp(t_emitter *e, t_reg base, t_reg idx, int8_t disp, uint8_t imm);
 int emit_mov_r32_r32(t_emitter *e, t_reg dst, t_reg src);
+
+/* sar */
+int  emit_sar_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm);
+int  emit_sar_mem_sib_imm8_disp(t_emitter *e, t_reg base, t_reg idx, int8_t disp, uint8_t imm);
+int  emit_sar_r32_r32(t_emitter *e, t_reg dst, t_reg src);
+int  emit_sar_mem_r32(t_emitter *e, t_reg base);
+
+/* add */
+int  emit_add_r8_mem_r8(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
+int  emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm);
+int  emit_add_r32_imm32_long(t_emitter *e, t_reg dst, uint32_t imm);
+
+/* cmp */
+int  emit_cmp_r64_imm64(t_emitter *e, t_reg dst, int64_t imm);
 
 /* opcodes jcc utiles */
 # define JL   0x7C

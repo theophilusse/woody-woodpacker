@@ -626,3 +626,89 @@ int	emit_lea_r64_reg0(t_emitter *e, t_reg dst, t_reg src)
 	}
 	return emit_raw(e, b, n);
 }
+
+
+/* ── sar supplementaires ─────────────────────────────────────── */
+
+/* SAR [base+idx], imm8 : C1 /7 SIB ib */
+int	emit_sar_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm)
+{
+	uint8_t b[5]; int n = 0;
+	uint8_t r = mk_rex_sib(0, 0, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0xC1;
+	b[n++] = MODRM00(7, 4);
+	b[n++] = SIB(0, idx, base);
+	b[n++] = imm;
+	return emit_raw(e, b, n);
+}
+
+/* SAR [base+idx+disp8], imm8 : C1 /7 SIB disp8 ib */
+int	emit_sar_mem_sib_imm8_disp(t_emitter *e, t_reg base, t_reg idx,
+		int8_t disp, uint8_t imm)
+{
+	uint8_t b[6]; int n = 0;
+	uint8_t r = mk_rex_sib(0, 0, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0xC1;
+	b[n++] = MODRM01(7, 4);
+	b[n++] = SIB(0, idx, base);
+	b[n++] = (uint8_t)disp;
+	b[n++] = imm;
+	return emit_raw(e, b, n);
+}
+
+/* SAR r32, CL : D3 /7 */
+int	emit_sar_r32_r32(t_emitter *e, t_reg dst, t_reg src)
+{
+	/* x86 : seul CL peut etre registre de decalage — src doit etre RCX */
+	(void)src;   /* src ignore, toujours CL */
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, 0, dst);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0xD3;
+	b[n++] = MODRM11(7, dst);
+	return emit_raw(e, b, n);
+}
+
+/* SAR [base], CL : D3 /7 mod=00 */
+int	emit_sar_mem_r32(t_emitter *e, t_reg base)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, 0, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0xD3;
+	b[n++] = MODRM00(7, base);
+	return emit_raw(e, b, n);
+}
+
+/* ── add supplementaires ─────────────────────────────────────── */
+
+/* ADD r8, [base+idx] : 02 /r SIB (alias lisible d'emit_add_r8_mem_sib8) */
+int	emit_add_r8_mem_r8(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
+{
+	return emit_add_r8_mem_sib8(e, dst, base, idx);
+}
+
+/* ADD r32, imm32 : 81 /0 id (3 octets opcode+modrm+imm32) */
+int	emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm)
+{
+	return emit_add_r32_imm32_long(e, dst, imm);
+}
+
+/* ── cmp r64, imm64 ──────────────────────────────────────────── */
+/* x86_64 ne supporte pas CMP r64, imm64 directement.
+** Strategy : charger imm64 dans un registre scratch et comparer.
+** Ici on utilise une sequence : MOV rax, imm64 ; CMP dst, rax
+** Si dst == rax, utiliser rcx comme scratch. */
+int	emit_cmp_r64_imm64(t_emitter *e, t_reg dst, int64_t imm)
+{
+	t_reg scratch = (dst == REG_RAX) ? REG_RCX : REG_RAX;
+
+	/* push scratch pour ne pas le corrompre */
+	if (emit_push_r64(e, scratch) < 0) return -1;
+	if (emit_mov_r64_imm64(e, scratch, (uint64_t)imm) < 0) return -1;
+	if (emit_cmp_r64_r64(e, dst, scratch) < 0) return -1;
+	if (emit_pop_r64(e, scratch) < 0) return -1;
+	return 0;
+}
