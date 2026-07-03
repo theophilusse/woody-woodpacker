@@ -447,7 +447,7 @@ static const char STUB_SRC[] =
 ".digit_high:\n"
     "add rcx, 48\n"         //; Convertir en chiffre (0-9)
 ".store_high:\n"
-    "mov [r9 + r11], cl\n" //; Stocker le nibble haut
+    "mov [r9+r11], cl\n" //; Stocker le nibble haut
     "inc rcx\n"              //; Incrémenter l'index du buffer
 
     //; Extraire le nibble bas (4 bits de poids faible)
