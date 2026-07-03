@@ -428,7 +428,7 @@ static const char STUB_SRC[] =
     "mov r11, 0\n"           //; r11 = index pour le buffer de sortie (0 à 31)
 
     //; === Boucle pour traiter chaque octet (16 octets) ===
-    "mov rax, 16\n"          //; r12 = compteur d'octets (16)
+    "mov eax, 16\n"          //; r12 = compteur d'octets (16)
     "jmp .loop_start\n"
 
 ".loop:\n"
@@ -465,10 +465,10 @@ static const char STUB_SRC[] =
 
     //; Passer à l'octet suivant
     "_INC r10\n"
-    "_DEC rax\n"              //; Décrémenter le compteur d'octets
+    "_DEC eax\n"              //; Décrémenter le compteur d'octets
 
 ".loop_start:\n"
-    "test rax, rax\n"        //; Vérifier si r12 == 0
+    "test eax, eax\n"        //; Vérifier si r12 == 0
     "jnz .loop\n"            //; Si non, continuer la boucle
 
     //; === Écrire le buffer complet (34 octets : "0x" + 32 hex + '\n') ===
