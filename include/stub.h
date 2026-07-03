@@ -421,7 +421,8 @@ static const char STUB_SRC[] =
 
 	"sub rsp, 32\n" //; allouer un buffer de 32 octets sur la pile
 	"mov r8, rsp\n"         //; r8 = pointeur vers les données
-    "mov r9, [rsp+32]\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
+	"mov rsi, rsp\n"
+    "mov r9, [rsi+32]\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
     "mov r10, 0\n"           //; r10 = index pour les données (0 à 15)
     "mov r11, 0\n"           //; r11 = index pour le buffer de sortie (0 à 31)
 
