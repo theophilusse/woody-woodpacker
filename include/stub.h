@@ -159,10 +159,20 @@ static const char STUB_SRC[] =
 "add rsi, 3\n" "jmp @lde_loop\n"
 "@sib_0fb6:\n" "add rsi, 4\n" "jmp @lde_loop\n"
 "@mod01_0fb6:\n"
-"cmp edx, 1\n" "jne @lde_fallback\n"
-"cmp eax, 4\n" "je @sib_disp8_0fb6\n"
+/*
+	"cmp edx, 1\n" "jne @lde_fallback\n"
+	"cmp eax, 4\n" "je @sib_disp8_0fb6\n" // THIS JUMP BUG
+	"add rsi, 4\n" "jmp @lde_loop\n"
+	"@sib_disp8_0fb6:\n" "add rsi, 5\n" "jmp @lde_loop\n"
+*/
+"cmp edx, 1\n" "jne @debug_jmp\n"
+"cmp eax, 4\n" "je @sib_disp8_0fb6\n" // THIS JUMP BUG
 "add rsi, 4\n" "jmp @lde_loop\n"
 "@sib_disp8_0fb6:\n" "add rsi, 5\n" "jmp @lde_loop\n"
+"@debug_jmp:\n"
+"jmp @lde_fallback\n"
+
+
 
 /* 48 89 : MOV r64, r64 → bit=1 */
 "@check_48_89:\n"
