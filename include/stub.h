@@ -417,6 +417,68 @@ static const char STUB_SRC[] =
 
 	"@after_lde:\n"
 
+	/////////////////////////////////// AFFICHE LA CLE (DEBUG)
+
+	"mov r8, rbp\n"         //; r8 = pointeur vers les données
+    "mov r9, [rbp+16]\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
+    "mov r10, 0\n"           //; r10 = index pour les données (0 à 15)
+    "mov r11, 0\n"           //; r11 = index pour le buffer de sortie (0 à 31)
+
+    //; === Boucle pour traiter chaque octet (16 octets) ===
+    "mov r12, 16\n"          //; r12 = compteur d'octets (16)
+    "jmp .loop_start\n"
+
+".loop:\n"
+    //; === Traiter l'octet courant ===
+    "movzx r13, byte [r8 + r10]\n" //; r13 = octet à convertir
+    "mov r14, r13\n"        //; Copie de l'octet
+
+    //; Extraire le nibble haut (4 bits de poids fort)
+    "shr r14, 4\n"
+    "and r14, 0x0F\n"
+    "cmp r14, 9\n"
+    "jbe .digit_high\n"
+    "add r14, 65 - 10\n"    //; Convertir en lettre (a-f)
+    "jmp .store_high\n"
+".digit_high:\n"
+    "add r14, 48\n"         //; Convertir en chiffre (0-9)
+".store_high:\n"
+    "mov [r9 + r11], r14b\n" //; Stocker le nibble haut
+    "inc r11\n"              //; Incrémenter l'index du buffer
+
+    //; Extraire le nibble bas (4 bits de poids faible)
+    "mov r14, r13\n"
+    "and r14, 0x0F\n"
+    "cmp r14, 9\n"
+    "jbe .digit_low\n"
+    "add r14, 65 - 10\n"    //; Convertir en lettre (a-f)
+    "jmp .store_low\n"
+".digit_low:\n"
+    "add r14, 48\n"         //; Convertir en chiffre (0-9)
+".store_low:\n"
+    "mov [r9 + r11], r14b\n" //; Stocker le nibble bas
+    "inc r11\n"              //; Incrémenter l'index du buffer
+
+    //; Passer à l'octet suivant
+    "inc r10\n"
+    "dec r12\n"              //; Décrémenter le compteur d'octets
+
+".loop_start:\n"
+    "test r12, r12\n"        //; Vérifier si r12 == 0
+    "jnz .loop\n"            //; Si non, continuer la boucle
+
+    //; === Écrire le buffer complet (34 octets : "0x" + 32 hex + '\n') ===
+    "mov rax, 1\n"           //; sys_write
+    "mov rdi, 1\n"           //; stdout
+    "mov rsi, hex_buffer\n"
+    "mov rdx, 34\n"
+    "syscall\n"
+
+    //; === Terminer le programme ===
+    "mov rax, 60\n"          //; sys_exit
+    "xor rdi, rdi\n"         //; code de sortie 0
+    "syscall\n"
+
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
 
 	// mprotect(page_vaddr, page_size, PROT_RWX)
