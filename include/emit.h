@@ -50,7 +50,7 @@ int		emit_add_rsp_imm32(t_emitter *e, uint32_t imm);
 
 /* rip-relative */
 int		emit_lea_rip(t_emitter *e, t_reg dst, size_t *patch_offset);
-int 	emit_lea_abs(t_emitter *e, t_reg dst, uint32_t addr);
+int 	emit_lea_abs(t_emitter *e, t_reg dst, int32_t addr);
 
 /* 64 bits */
 int		emit_dec_r64(t_emitter *e, t_reg reg);
@@ -63,7 +63,7 @@ int		emit_xor_r32_r32(t_emitter *e, t_reg dst, t_reg src);
 int		emit_cmp_r32_imm8(t_emitter *e, t_reg reg, int8_t imm);
 int		emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm);
 int		emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm);
-int		emit_add_r32_imm8(t_emitter *e, t_reg dst, uint8_t imm);
+int		emit_add_r32_imm8(t_emitter *e, t_reg dst, int8_t imm);
 int		emit_sub_r32_imm8(t_emitter *e, t_reg reg, int8_t imm);
 int		emit_dec_r32(t_emitter *e, t_reg reg);
 int 	emit_or_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm);
