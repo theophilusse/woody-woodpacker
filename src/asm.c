@@ -217,7 +217,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			return (-1);
 		if (s1 == 8)       emit_dec_r8(&a->out->e, r1);
 		else if (s1 == 32) emit_dec_r32(&a->out->e, r1);
-		else               emit_dec_r64(&a->out->e, r1)
+		else               emit_dec_r64(&a->out->e, r1);
 	}
 	if (!strcmp(toks[0], "sub") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
 		{ emit_sub_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
