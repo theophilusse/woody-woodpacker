@@ -442,7 +442,7 @@ static const char STUB_SRC[] =
     "and rcx, 0x0F\n"
     "cmp rcx, 9\n"
     "jbe .digit_high\n"
-    "add rcx, 65 - 10\n"    //; Convertir en lettre (a-f)
+    "add rcx, 55\n"    //; Convertir en lettre (a-f)
     "jmp .store_high\n"
 ".digit_high:\n"
     "add rcx, 48\n"         //; Convertir en chiffre (0-9)
@@ -455,7 +455,7 @@ static const char STUB_SRC[] =
     "and rcx, 0x0F\n"
     "cmp rcx, 9\n"
     "jbe .digit_low\n"
-    "add rcx, 65 - 10\n"    //; Convertir en lettre (a-f)
+    "add rcx, 55\n"    //; Convertir en lettre (a-f)
     "jmp .store_low\n"
 ".digit_low:\n"
     "add rcx, 48\n"         //; Convertir en chiffre (0-9)
