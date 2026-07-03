@@ -660,19 +660,18 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					!strcmp(toks[0],"jge") ? 0x7D : 0x73; /* jae */
 		int64_t val = sym(a, toks[1]);
 		if (val >= 0) {
+			/* backward : REL8 si possible */
 			int8_t d = (int8_t)(val - (int64_t)(a->out->e.len + 2));
 			emit_jcc_rel8_direct(&a->out->e, op, d);
 		} else {
-			uint8_t bytes[2] = {op, 0};
-			size_t foff = a->out->e.len + 1;
-			size_t fend = a->out->e.len + 2;
+			/* forward : TOUJOURS REL32 via je+jmp trampoline */
+			size_t poff = a->out->e.len + 1;
+			size_t pend = a->out->e.len + 2;
+			uint8_t bytes[2] = {op ^ 1, 5};  /* inverse la condition, saute le jmp */
 			emit_raw(&a->out->e, bytes, 2);
-			// fixup REL8
-			a->fixups[a->nfixups].off = foff;
-			a->fixups[a->nfixups].end = fend;
-			a->fixups[a->nfixups].is_rel8 = 1;
-			strncpy(a->fixups[a->nfixups].name, toks[1], 63);
-			a->nfixups++;
+			size_t dummy;
+			emit_jmp_rel32(&a->out->e, &dummy);
+			addfixup(a, toks[1], dummy, dummy + 4, 0);
 		}
 		return 0;
 	}
