@@ -711,4 +711,16 @@ int	emit_cmp_r64_imm64(t_emitter *e, t_reg dst, int64_t imm)
 	if (emit_cmp_r64_r64(e, dst, scratch) < 0) return -1;
 	if (emit_pop_r64(e, scratch) < 0) return -1;
 	return 0;
+}	
+
+/* SAR [base+idx], CL : D3 /7 SIB mod=00 */
+int emit_sar_mem_sib_cl(t_emitter *e, t_reg base, t_reg idx)
+{
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex_sib(0, 0, idx, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0xD3;
+    b[n++] = MODRM00(7, 4);
+    b[n++] = SIB(0, idx, base);
+    return emit_raw(e, b, n);
 }

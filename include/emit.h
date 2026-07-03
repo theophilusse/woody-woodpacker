@@ -127,6 +127,8 @@ int  emit_add_r32_imm32_long(t_emitter *e, t_reg dst, uint32_t imm);
 /* cmp */
 int  emit_cmp_r64_imm64(t_emitter *e, t_reg dst, int64_t imm);
 
+int emit_sar_mem_sib_cl(t_emitter *e, t_reg base, t_reg idx);
+
 /* opcodes jcc utiles */
 # define JL   0x7C
 # define JNZ  0x75
