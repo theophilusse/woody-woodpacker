@@ -630,9 +630,12 @@ int emit_xor_r8_r8(t_emitter *e, t_reg dst, t_reg src) {
 }
 
 int emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
-    uint8_t b[4] = {0x48, 0x83,
-                    (uint8_t)((3<<6)|(4<<3)|dst),
-                    imm};
+    uint8_t b[4] = {
+        0x48,               // Préfixe REX (64 bits)
+        0x83,               // Opcode pour ALU r/m64, imm8
+        (uint8_t)(0xE0 | dst), // ModR/M : 11 100 reg (dst)
+        imm                 // Valeur immédiate
+    };
     return emit_raw(e, b, 4);
 }
 
