@@ -100,7 +100,7 @@ static int	tokenize(const char *line, char toks[][64], int max)
 
 /* ── parse memoire [base+idx] ou [label] ──────────────────────── */
 /* retourne 1 = SIB, 2 = label RIP-relative, 0 = erreur */
-static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *disp)
+static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl)//, int8_t *disp)
 {
     char inner[64];
     char *plus;
