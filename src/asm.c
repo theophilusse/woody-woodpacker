@@ -392,21 +392,21 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 
 				if (s1 == 8)
 				{
-					emit_mov_r8_mem_sib(&a->out->e, r1, base, idx); // mov r8, [base+idx]
+					emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r8, [base+idx+d8]
 					return 0;
 				}
 				else if (s1 == 32)
 				{
-					emit_mov_r32_mem_sib(&a->out->e, r1, base, idx); // mov r32, [base+idx]
+					emit_mov_r32_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r32, [base+idx+d8]
 					return 0;
 				}
 				else if (s1 == 64)
 				{
-					emit_mov_r64_mem_sib(&a->out->e, r1, base, idx); // mov r64, [base+idx]
+					emit_mov_r64_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r64, [base+idx+d8]
 					return 0;
 				}
 			}
-			return 1; // Si le registre n'est pas reconnu
+			return 1;
 		}
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1))
 		{
