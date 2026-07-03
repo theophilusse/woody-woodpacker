@@ -19,7 +19,7 @@
 # define EVASION_MSG "F*ck you\n"
 # define EVASION_MSG_LEN 9
 
-# define DEBUG_MODE 1
+# define DEBUG_MODE 0
 # define DEBUG printf("DEBUG: %s:%d\n", __FILE__, __LINE__);
 
 typedef struct s_elf_ctx
