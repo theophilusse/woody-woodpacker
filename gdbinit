@@ -1,6 +1,9 @@
+set disassembly-flavor intel
 define si
 	stepi
-	x/18i $rip
+	i r
+	x/8bx $rip
+	x/15i $rip
 end
 break *0x401161
 commands 1

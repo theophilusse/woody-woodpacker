@@ -550,6 +550,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		if (!preg(toks[1], &r1, &s1)) return -1;
 
+		printf("register: %d, size: %d, lsb_value: %d\n", r1, s1, lsb_value);
+
 		if (s1 == 8) {
 			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);   /* 0x24/0x80 ✓ */
 			else           emit_xor_r32_r32(&a->out->e, r1, r1);   /* 0x31 ✓ LDE reconnaît */
