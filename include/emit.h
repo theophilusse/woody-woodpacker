@@ -4,6 +4,13 @@
 # include <stdint.h>
 # include <stddef.h>
 
+/* ModRM : mod(2) | reg(3) | rm(3) */
+#define MODRM(mod, reg, rm)  ((uint8_t)(((mod)<<6)|((( reg)&7)<<3)|((rm)&7)))
+#define MODRM11(reg, rm)     MODRM(3, reg, rm)
+#define MODRM00(reg, rm)     MODRM(0, reg, rm)
+#define MODRM01(reg, rm)     MODRM(1, reg, rm)
+#define SIB(sc, idx, base)   ((uint8_t)(((sc)<<6)|(((idx)&7)<<3)|((base)&7)))
+
 typedef enum e_reg
 {
 	REG_RAX, REG_RCX, REG_RDX, REG_RBX,
