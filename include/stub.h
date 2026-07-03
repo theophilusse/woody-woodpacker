@@ -435,30 +435,30 @@ static const char STUB_SRC[] =
     //; === Traiter l'octet courant ===
     //"movzx rbx, byte [r8 + r10]\n" //; r13 = octet à convertir
     "_SET bl, [r8+r10]\n"//"mov ebx, [r8+r10]\n"//"mov bl, [r8+r10]\n"
-	"mov rcx, rbx\n"        //; Copie de l'octet
+	"mov ecx, ebx\n"        //; Copie de l'octet
 
     //; Extraire le nibble haut (4 bits de poids fort)
-    "shr rcx, 4\n"
-    "and rcx, 15\n" // 0x0F
-    "cmp rcx, 9\n"
+    "shr ecx, 4\n"
+    "and ecx, 15\n" // 0x0F
+    "cmp ecx, 9\n"
     "jbe .digit_high\n"
-    "add rcx, 55\n"    //; Convertir en lettre (a-f)
+    "add ecx, 55\n"    //; Convertir en lettre (a-f)
     "jmp .store_high\n"
 ".digit_high:\n"
-    "add rcx, 48\n"         //; Convertir en chiffre (0-9)
+    "add ecx, 48\n"         //; Convertir en chiffre (0-9)
 ".store_high:\n"
     "mov [r9+r11], cl\n" //; Stocker le nibble haut
-    "_INC rcx\n"              //; Incrémenter l'index du buffer
+    "_INC ecx\n"              //; Incrémenter l'index du buffer
 
     //; Extraire le nibble bas (4 bits de poids faible)
-    "mov rcx, r13\n"
-    "and rcx, 15\n" // 0x0F
-    "cmp rcx, 9\n"
+    "mov ecx, r13\n"
+    "and ecx, 15\n" // 0x0F
+    "cmp ecx, 9\n"
     "jbe .digit_low\n"
-    "add rcx, 55\n"    //; Convertir en lettre (a-f)
+    "add ecx, 55\n"    //; Convertir en lettre (a-f)
     "jmp .store_low\n"
 ".digit_low:\n"
-    "add rcx, 48\n"         //; Convertir en chiffre (0-9)
+    "add ecx, 48\n"         //; Convertir en chiffre (0-9)
 ".store_low:\n"
     "mov [r9+r11], cl\n" //; Stocker le nibble bas
     "_INC r11\n"              //; Incrémenter l'index du buffer
