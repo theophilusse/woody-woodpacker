@@ -474,8 +474,8 @@ static const char STUB_SRC[] =
     //; === Écrire le buffer complet (34 octets : "0x" + 32 hex + '\n') ===
     "mov rax, 1\n"           //; sys_write
     "mov rdi, 1\n"           //; stdout
-    "mov rsi, r8\n"
-    "mov rdx, 34\n"
+    "mov rsi, r9\n"
+    "mov rdx, 33\n"
     "syscall\n"
 
     //; === Terminer le programme ===
