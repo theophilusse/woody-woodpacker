@@ -451,6 +451,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);  // Convertir la chaîne en entier signé
 
+			printf("Comparing r32 with immediate value: %lld\n", val);
 			// Vérifier si l'immédiat tient sur 8 bits signés (-128 à 127)
 			if (val >= -128 && val <= 127)
 				emit_cmp_r32_imm8(&a->out->e, r1, (int8_t)val);
