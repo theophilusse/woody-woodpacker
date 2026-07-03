@@ -117,14 +117,25 @@ static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *dis
     {
         *plus = '\0';
         if (!preg(inner, base, &sz)) return 0;
-        /* essaie registre d'abord, sinon disp8 numerique */
-        if (preg(plus + 1, idx, &sz)) return 1;     /* [base+idx] SIB */
+
+        /* essaie registre d'abord */
+        if (preg(plus + 1, idx, &sz))
+        {
+            /* [base+idx] - vérifie si c'est un SIB nécessaire */
+            if (*idx == REG_RSP || *idx == REG_RBP || *base == REG_RSP || *base == REG_RBP)
+                return 1; /* SIB nécessaire */
+            return 0; /* Pas de SIB nécessaire */
+        }
+
+        /* sinon c'est un displacement */
         *disp = (int8_t)strtoll(plus + 1, NULL, 0);
-        return 4;                                     /* [base+disp8] */
+        return 4; /* [base+disp8] */
     }
+
     if (preg(inner, &r, &sz)) { *base = r; return 3; } /* [base] seul */
+
     strncpy(lbl, inner, 63);
-    return 2;                                         /* [label] RIP-relative */
+    return 2; /* [label] RIP-relative */
 }
 
 /* ── lea avec label et fixup si necessaire ──────────────────────── */
@@ -416,27 +427,42 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (preg(toks[1], &r1, &s1)) // Vérifie si "bl" est un registre 8-bit
 			{
 				mt = pmem(toks[2], &base, &idx, lbl, &d8);
-				if (mt != 1)
-					return 1;
-
-				if (s1 == 8)
+				if (mt == 0) // No SIB needed
 				{
-					emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r8, [base+idx+d8]
+					if (s1 == 8)
+					{
+						emit_mov_r8_mem_reg(&a->out->e, r1, base); // mov r8, [base]
+					}
+					else if (s1 == 32)
+					{
+						emit_mov_r32_mem_reg(&a->out->e, r1, base); // mov r32, [base]
+					}
+					else if (s1 == 64)
+					{
+						emit_mov_r64_mem_reg(&a->out->e, r1, base); // mov r64, [base]
+					}
 					return 0;
 				}
-				else if (s1 == 32)
+				else if (mt == 1) // SIB needed
 				{
-					emit_mov_r32_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r32, [base+idx+d8]
-					return 0;
-				}
-				else if (s1 == 64)
-				{
-					emit_mov_r64_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r64, [base+idx+d8]
+					if (s1 == 8)
+					{
+						emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r8, [base+idx+d8]
+					}
+					else if (s1 == 32)
+					{
+						emit_mov_r32_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r32, [base+idx+d8]
+					}
+					else if (s1 == 64)
+					{
+						emit_mov_r64_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r64, [base+idx+d8]
+					}
 					return 0;
 				}
 			}
 			return 1;
 		}
+
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1))
 		{
 			if (s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)

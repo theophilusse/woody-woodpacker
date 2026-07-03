@@ -439,7 +439,7 @@ static const char STUB_SRC[] =
 
     //; Extraire le nibble haut (4 bits de poids fort)
     "shr rcx, 4\n"
-    "and rcx, 0x0F\n"
+    "and rcx, 15\n" // 0x0F
     "cmp rcx, 9\n"
     "jbe .digit_high\n"
     "add rcx, 55\n"    //; Convertir en lettre (a-f)
@@ -452,7 +452,7 @@ static const char STUB_SRC[] =
 
     //; Extraire le nibble bas (4 bits de poids faible)
     "mov rcx, r13\n"
-    "and rcx, 0x0F\n"
+    "and rcx, 15\n" // 0x0F
     "cmp rcx, 9\n"
     "jbe .digit_low\n"
     "add rcx, 55\n"    //; Convertir en lettre (a-f)
