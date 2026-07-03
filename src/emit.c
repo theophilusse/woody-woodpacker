@@ -108,10 +108,11 @@ int	emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm)
 	return (emit_raw(e, bytes, 6));
 }
 
-int emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm)
-{
-	uint8_t b[7] = {0x48, 0x81, (uint8_t)((3<<6) | (7 << 3) | dst), 0, 0, 0, 0};
-	memcpy(b + 3, &imm, 4);
+int emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm) {
+    uint8_t b[7] = {0x48, 0x81,
+                    (uint8_t)((3<<6)|(7<<3)|dst),
+                    0, 0, 0, 0};
+    memcpy(b + 3, &imm, 4);
     return emit_raw(e, b, 7);
 }
 
@@ -629,12 +630,15 @@ int emit_xor_r8_r8(t_emitter *e, t_reg dst, t_reg src) {
 }
 
 int emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm) {
-	uint8_t b[4] = {0x48, 0x83, (uint8_t)((3<<6)|(4<<3)|dst), imm};
-	return emit_raw(e, b, 4);
+    uint8_t b[4] = {0x48, 0x83,
+                    (uint8_t)((3<<6)|(4<<3)|dst),
+                    imm};
+    return emit_raw(e, b, 4);
 }
 
 int emit_xor_r64_r64(t_emitter *e, t_reg dst, t_reg src) {
-    uint8_t b[3] = {0x48, 0x31, (uint8_t)((3<<6)|(src<<3)|dst)};
+    uint8_t b[3] = {0x48, 0x31,
+                    (uint8_t)((3<<6)|(src<<3)|dst)};
     return emit_raw(e, b, 3);
 }
 
