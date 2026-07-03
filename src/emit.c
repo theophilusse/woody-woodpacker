@@ -724,3 +724,8 @@ int emit_sar_mem_sib_cl(t_emitter *e, t_reg base, t_reg idx)
     b[n++] = SIB(0, idx, base);
     return emit_raw(e, b, n);
 }
+
+int emit_rdtsc(t_emitter *e) {
+    uint8_t b[2] = {0x0F, 0x31};  // Opcode de rdtsc
+    return emit_raw(e, b, 2);
+}
