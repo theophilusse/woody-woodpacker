@@ -433,8 +433,9 @@ static const char STUB_SRC[] =
 
 ".loop:\n"
     //; === Traiter l'octet courant ===
-    "movzx rbx, byte [r8 + r10]\n" //; r13 = octet à convertir
-    "mov rcx, rbx\n"        //; Copie de l'octet
+    //"movzx rbx, byte [r8 + r10]\n" //; r13 = octet à convertir
+    "mov bl, [r8+r10]\n"
+	"mov rcx, rbx\n"        //; Copie de l'octet
 
     //; Extraire le nibble haut (4 bits de poids fort)
     "shr rcx, 4\n"
