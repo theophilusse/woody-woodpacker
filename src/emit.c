@@ -126,7 +126,7 @@ int	emit_mov_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 	return emit_raw(e, b, n);
 }
 
-int	emit_mov_r8_mem_sib(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int8_t disp)
+int	emit_mov_r8_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int8_t disp)
 {
 	uint8_t b[7]; int n = 0;
 	uint8_t r = mk_rex(0, reg_dest >> 3, base >> 3);

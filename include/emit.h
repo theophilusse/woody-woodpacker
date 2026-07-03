@@ -131,7 +131,7 @@ int emit_sar_mem_sib_cl(t_emitter *e, t_reg base, t_reg idx);
 
 int	emit_mov_r64_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp);
 int	emit_mov_r32_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp);
-int	emit_mov_r8_mem_sib(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int8_t disp);
+int	emit_mov_r8_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int8_t disp);
 
 /* opcodes jcc utiles */
 # define JL   0x7C
