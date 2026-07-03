@@ -419,7 +419,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (toks[2][0] != '[' && preg(toks[2], &r2, &s2) && s2 == 8)
 			{ emit_movzx_r32_r8(&a->out->e, r1, r2); return 0; }
 		if (toks[2][0] == '[')
-		{
+		{ // gamma
 			mt = pmem(toks[2], &base, &idx, lbl, &d8);
 			if (mt == 1) { emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx); return 0; }
 			if (mt == 3) { emit_movzx_r32_mem_reg(&a->out->e, r1, base);        return 0; }
@@ -589,6 +589,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
 				if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 			}
+			a->key_index++;
+			return 0;
 		}
 		else if (preg(toks[2], &r2, &s2))            /* source registre */
 		{
@@ -637,7 +639,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		else {  /* lsb=0 */
 			if (s1 == 8)
 				emit_add_r8_imm8(&a->out->e, r1, 1);   /* 80 /0 01 ← LDE reconnaît */
-			else if (s1 == 32)
+			else if (s1 == 32 || s1 == 64)
 				emit_add_r32_imm32_long(&a->out->e, r1, 1);
 		}
 		a->key_index++;
