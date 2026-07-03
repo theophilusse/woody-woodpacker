@@ -189,7 +189,7 @@ static const char STUB_SRC[] =
 	"jmp @do_write\n"
 
 	"@run_lde:\n"
-	"jmp @after_lde\n" // PATCH BATMAN
+	//"jmp @after_lde\n" // PATCH BATMAN
 	// ── lecture du payload ───────────────────────────────────────
     /* ── setup ───────────────────────────────────────────── */
     "_ZERO ecx\n"          /* bit_index = 0 */
