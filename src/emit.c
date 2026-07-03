@@ -688,6 +688,46 @@ int	emit_shl_r8_cl(t_emitter *e, t_reg reg)
 	return emit_raw(e, b, n);
 }
 
+/* ── shr ─────────────────────────────────────────────────────── */
+int	emit_shr_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+	uint8_t b[4]; int n = 0;
+	uint8_t r = mk_rex(1, 0, reg >> 3);  // REX.W (1), REX.B (reg)
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0xC1;  // Opcode pour SHR r64, imm8
+	b[n++] = 0xE8 | (reg & 0x07);  // ModR/M : 11 101 reg
+	b[n++] = imm;  // Immédiat (4 dans notre cas)
+
+	return emit_raw(e, b, n);
+}
+
+int	emit_shr_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, 0, reg >> 3);  // Pas de REX.W
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0xC1;  // Opcode pour SHR r32, imm8
+	b[n++] = 0xE8 | (reg & 0x07);  // ModR/M
+	b[n++] = imm;  // Immédiat
+
+	return emit_raw(e, b, n);
+}
+
+int	emit_shr_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, 0, reg >> 3);  // Pas de REX.W, REX.B pour reg8
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0xC0;  // Opcode pour SHR r8, imm8
+	b[n++] = 0xE8 | (reg & 0x07);  // ModR/M : 11 101 reg
+	b[n++] = imm;  // Immédiat (4 dans notre cas)
+
+	return emit_raw(e, b, n);
+}
+
 /* ── lea abs ─────────────────────────────────────────────────── */
 int	emit_lea_abs(t_emitter *e, t_reg dst, int32_t addr)
 {

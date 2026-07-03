@@ -249,6 +249,27 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		emit_shl_r8_cl(&a->out->e, r1);
 		return 0;
 	}
+	if (!strcmp(toks[0], "shr") && n == 3 && preg(toks[1], &r1, &s1))
+	{
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		if (s1 == 8)
+		{
+			emit_shr_r8_imm8(&a->out->e, s1, (uint8_t)val);
+			return 0;
+		}
+		if (s1 == 32)
+		{
+			emit_shr_r32_imm8(&a->out->e, s1, (uint8_t)val);
+			return 0;
+		}
+		if (s1 == 64)
+		{
+			emit_shr_r64_imm8(&a->out->e, s1, (uint8_t)val);
+			return 0;
+		}
+		return 1;
+	}
 	if (!strcmp(toks[0], "sar") && n == 3)
 	{
 		if (toks[1][0] != '[' && toks[2][0] != '[')
