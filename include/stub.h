@@ -419,8 +419,9 @@ static const char STUB_SRC[] =
 
 	/////////////////////////////////// AFFICHE LA CLE (DEBUG)
 
-	"mov r8, rbp\n"         //; r8 = pointeur vers les données
-    "mov r9, [rbp+16]\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
+	"sub rsp, 32\n" //; allouer un buffer de 32 octets sur la pile
+	"mov r8, rsp\n"         //; r8 = pointeur vers les données
+    "mov r9, [rsp+32]\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
     "mov r10, 0\n"           //; r10 = index pour les données (0 à 15)
     "mov r11, 0\n"           //; r11 = index pour le buffer de sortie (0 à 31)
 
@@ -470,7 +471,7 @@ static const char STUB_SRC[] =
     //; === Écrire le buffer complet (34 octets : "0x" + 32 hex + '\n') ===
     "mov rax, 1\n"           //; sys_write
     "mov rdi, 1\n"           //; stdout
-    "mov rsi, hex_buffer\n"
+    "mov rsi, rsp\n"
     "mov rdx, 34\n"
     "syscall\n"
 
