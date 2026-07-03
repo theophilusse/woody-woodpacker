@@ -728,6 +728,43 @@ int	emit_shr_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 	return emit_raw(e, b, n);
 }
 
+/* test ------- */
+int	emit_test_r8_r8(t_emitter *e, t_reg reg1, t_reg reg2)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, reg1 >> 3, reg2 >> 3);  // REX.R (reg1), REX.B (reg2)
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0x84;  // Opcode pour TEST r8, r8
+	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);  // ModR/M
+
+	return emit_raw(e, b, n);
+}
+
+int	emit_test_r32_r32(t_emitter *e, t_reg reg1, t_reg reg2)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, reg1 >> 3, reg2 >> 3);  // Pas de REX.W
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0x85;  // Opcode pour TEST r32, r32
+	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);  // ModR/M
+
+	return emit_raw(e, b, n);
+}
+
+int	emit_test_r64_r64(t_emitter *e, t_reg reg1, t_reg reg2)
+{
+	uint8_t b[4]; int n = 0;
+	uint8_t r = mk_rex(1, reg1 >> 3, reg2 >> 3);  // REX.W (1), REX.R (reg1), REX.B (reg2)
+	if (r != 0x40) b[n++] = r;
+
+	b[n++] = 0x85;  // Opcode pour TEST r64, r64
+	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);  // ModR/M
+
+	return emit_raw(e, b, n);
+}
+
 /* ── lea abs ─────────────────────────────────────────────────── */
 int	emit_lea_abs(t_emitter *e, t_reg dst, int32_t addr)
 {
