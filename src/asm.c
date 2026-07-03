@@ -102,40 +102,41 @@ static int	tokenize(const char *line, char toks[][64], int max)
 /* retourne 1 = SIB, 2 = label RIP-relative, 0 = erreur */
 static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *disp)
 {
-    char    inner[64];
-    char    *plus;
-    t_reg   r;
-    int     sz;
+    char inner[64];
+    char *plus;
+    t_reg r;
+    int sz;
 
     if (tok[0] != '[') return 0;
     strncpy(inner, tok + 1, 63);
     int n = (int)strlen(inner);
     if (n > 0 && inner[n - 1] == ']') inner[n - 1] = '\0';
 
+    // Supprimer les espaces
+    char *dst = inner;
+    for (char *src = inner; *src; src++) {
+        if (*src != ' ') *dst++ = *src;
+    }
+    *dst = '\0';
+
     plus = strchr(inner, '+');
     if (plus)
     {
         *plus = '\0';
         if (!preg(inner, base, &sz)) return 0;
-
-        /* essaie registre d'abord */
         if (preg(plus + 1, idx, &sz))
         {
-            /* [base+idx] - vérifie si c'est un SIB nécessaire */
             if (*idx == REG_RSP || *idx == REG_RBP || *base == REG_RSP || *base == REG_RBP)
-                return 1; /* SIB nécessaire */
-            return 0; /* Pas de SIB nécessaire */
+                return 1; // SIB nécessaire
+            return 1; // SIB (même si pas nécessaire)
         }
-
-        /* sinon c'est un displacement */
         *disp = (int8_t)strtoll(plus + 1, NULL, 0);
-        return 4; /* [base+disp8] */
+        return 4; // [base+disp8]
     }
 
-    if (preg(inner, &r, &sz)) { *base = r; return 3; } /* [base] seul */
-
+    if (preg(inner, &r, &sz)) { *base = r; return 3; } // [base] seul
     strncpy(lbl, inner, 63);
-    return 2; /* [label] RIP-relative */
+    return 2; // [label] RIP-relative
 }
 
 /* ── lea avec label et fixup si necessaire ──────────────────────── */
@@ -234,7 +235,15 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{ emit_sub_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
 	if (!strcmp(toks[0], "xor") && n == 3)
 	{
-		/* Cas 1: xor reg, reg */
+		/* Cas 1: xor [mem], reg8 (nouveau cas) */
+		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
+			toks[2][0] != '[' && preg(toks[2], &r2, &s2) && s2 == 8)
+		{
+			emit_xor_mem_sib_r8(&a->out->e, base, idx, r2);
+			return 0;
+		}
+
+		/* Cas 2: xor reg, reg */
 		if (toks[1][0] != '[' && toks[2][0] != '[' &&
 			preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
 		{
@@ -243,7 +252,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (s1 == 64 && s2 == 64) { emit_xor_r64_r64(&a->out->e, r1, r2); return 0; }
 		}
 
-		/* Cas 2: xor [mem], reg */
+		/* Cas 3: xor [mem], reg */
 		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
 			preg(toks[2], &r2, &s2))
 		{
@@ -252,20 +261,12 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (s2 == 64) { emit_xor_mem_sib_r64(&a->out->e, base, idx, r2); return 0; }
 		}
 
-		/* Cas 3: xor reg, [mem] */
+		/* Cas 4: xor reg, [mem] */
 		if (toks[1][0] != '[' && toks[2][0] == '[' &&
 			preg(toks[1], &r1, &s1) && s1 == 8)
 		{
 			mt = pmem(toks[2], &base, &idx, lbl, &d8);
 			if (mt == 1) { emit_xor_r8_mem_sib(&a->out->e, r1, base, idx); return 0; }
-		}
-
-		/* Cas 4: xor [mem], reg8 (nouveau cas) */
-		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 &&
-			toks[2][0] != '[' && preg(toks[2], &r2, &s2) && s2 == 8)
-		{
-			emit_xor_mem_sib_r8(&a->out->e, base, idx, r2);
-			return 0;
 		}
 	}
 
