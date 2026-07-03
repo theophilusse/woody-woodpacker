@@ -665,8 +665,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_jcc_rel8_direct(&a->out->e, op, d);
 		} else {
 			/* forward : TOUJOURS REL32 via je+jmp trampoline */
-			size_t poff = a->out->e.len + 1;
-			size_t pend = a->out->e.len + 2;
+			//size_t poff = a->out->e.len + 1;
+			//size_t pend = a->out->e.len + 2;
 			uint8_t bytes[2] = {op ^ 1, 5};  /* inverse la condition, saute le jmp */
 			emit_raw(&a->out->e, bytes, 2);
 			size_t dummy;
