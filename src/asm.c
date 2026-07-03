@@ -1,8 +1,8 @@
 #include "asm.h"
 
-static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi","r8","r9","r10","r11"};
-static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi","r8d","r9d","r10d","r11d"};
-static const char *R8[]  = {"al","cl","dl","bl","r8b","r9b","r10b","r11b"};
+static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi","r8","r9","r10","r11","r12"};
+static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi","r8d","r9d","r10d","r11d","r12d"};
+static const char *R8[]  = {"al","cl","dl","bl","r8b","r9b","r10b","r11b","r12b"};
 
 static int	preg(const char *s, t_reg *r, int *sz)
 {
