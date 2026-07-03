@@ -123,21 +123,19 @@ static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *dis
     if (plus)
     {
         *plus = '\0';
-        if (!preg(inner, base, &sz)) return 0;
-        if (preg(plus + 1, idx, &sz))
-        {
-            if (*idx == REG_RSP || *idx == REG_RBP || *base == REG_RSP || *base == REG_RBP)
-                return 1; // SIB nécessaire
-            return 1; // SIB (même si pas nécessaire)
-        }
-        *disp = (int8_t)strtoll(plus + 1, NULL, 0);
-        return 4; // [base+disp8]
+        if (!preg(inner, base, &sz)) return 0;  // Vérification ajoutée
+        if (!preg(plus + 1, idx, &sz)) return 0;  // Vérification ajoutée
+
+        if (*idx == REG_RSP || *idx == REG_RBP || *base == REG_RSP || *base == REG_RBP)
+            return 1; // SIB nécessaire
+        return 1; // SIB (même si pas nécessaire)
     }
 
     if (preg(inner, &r, &sz)) { *base = r; return 3; } // [base] seul
     strncpy(lbl, inner, 63);
     return 2; // [label] RIP-relative
 }
+
 
 /* ── lea avec label et fixup si necessaire ──────────────────────── */
 static void	lea_label(t_asm *a, t_reg dst, const char *label)
