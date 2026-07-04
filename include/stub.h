@@ -151,11 +151,6 @@ static const char STUB_SRC[] =
 	"_ZERO rax\n"
 	"_ZERO rax\n"
 
-	"end_debug:\n"
-	"_SET eax, 60\n"
-	"_SET edi, 1\n"
-	"syscall\n"             // exit(1) si mal branché (ne devrait jamais arriver)
-
     //////////////////////////// ANTI_DEBUG ////////////////////////////
     //; Appel syscall ptrace(PTRACE_TRACEME, 0, 1, 0)
     "_SET rax, 101\n" //       ; sys_ptrace
