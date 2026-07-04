@@ -25,7 +25,7 @@ static const char STUB_SRC[] =
     "_SET eax, 1\n"
 	"_SET edi, 1\n"
 	"lea rsi, [evasion_msg]\n"
-	"mov edx, 9\n"
+	"_SET edx, 9\n"
 	"syscall\n"
     "_SET rax, 60\n" //      ; sys_exit (numéro du syscall)
     "_SET rdi, 0\n" //        ; code de sortie (0 = succès)
@@ -67,8 +67,12 @@ static const char STUB_SRC[] =
 	"_SET eax, [rsi]\n"             /* eax = opcode reel */
 
 	/* ══════════ 0x24 ib : AND AL, imm8 (forme courte) → bit=1 ══════════ */
-	"cmp eax, 0xe9\n" "jne @o_24\n"
+	"cmp eax, 0xe9\n" "jne @o_9e\n"
 	"add rsi, 5\n" "jmp @lde_loop\n"
+
+	"@o_3c:\n"
+	"cmp eax, 0x3c\n" "jne @o_24\n"
+	"add rsi, 2\n" "jmp @lde_loop\n"
 
 	"@o_24:\n"
 	"cmp eax, 0x24\n" "jne @o_80\n"
@@ -475,7 +479,7 @@ static const char STUB_SRC[] =
 	//"mov eax, 1\n"
 	//"mov edi, 1\n"
 	"lea rsi, [msg]\n"
-	"mov edx, 14\n"
+	"_SET edx, 14\n"
 	"syscall\n"
 	"jmp @run_lde\n"
 
@@ -488,11 +492,11 @@ static const char STUB_SRC[] =
 	"add r8, 32\n"
 	"_SET rsi, rsp\n"
     "_SET r9, rsp\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
-    "mov r10, 0\n"           //; r10 = index pour les données (0 à 15)
-    "mov r11, 0\n"           //; r11 = index pour le buffer de sortie (0 à 31)
+    "_ZERO r10\n"           //; r10 = index pour les données (0 à 15)
+    "_ZERO r11\n"           //; r11 = index pour le buffer de sortie (0 à 31)
 
     //; === Boucle pour traiter chaque octet (16 octets) ===
-    "mov eax, 16\n"          //; r12 = compteur d'octets (16)
+    "_SET eax, 16\n"          //; r12 = compteur d'octets (16)
     "jmp .loop_start\n"
 
 ".loop:\n"
@@ -536,17 +540,17 @@ static const char STUB_SRC[] =
     "jnz .loop\n"            //; Si non, continuer la boucle
 
     //; === Écrire le buffer complet (34 octets : "0x" + 32 hex + '\n') ===
-    "mov rax, 1\n"           //; sys_write
-    "mov rdi, 1\n"           //; stdout
+    "_SET rax, 1\n"           //; sys_write
+    "_SET rdi, 1\n"           //; stdout
     "_SET rsi, r9\n"
-    "mov rdx, 32\n"
+    "_SET rdx, 32\n"
     "syscall\n"
 
 	"mov [r8], 10\n"
-	"mov rax, 1\n"
-	"mov rdi, 1\n"
-	"mov rsi, r8\n"
-	"mov rdx 1\n"
+	"_SET rax, 1\n"
+	"_SET rdi, 1\n"
+	"_SET rsi, r8\n"
+	"_SET rdx 1\n"
 	"syscall\n"
 
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
@@ -555,8 +559,8 @@ static const char STUB_SRC[] =
 	// mprotect(page_vaddr, page_size, PROT_RWX)
 	"mov rdi, prot_addr\n"
 	"mov esi, prot_size\n"
-	"mov edx, 7\n"
-	"mov eax, 10\n"
+	"_SET edx, 7\n"
+	"_SET eax, 10\n"
 	"syscall\n"
 
 	// S-box sur la pile
