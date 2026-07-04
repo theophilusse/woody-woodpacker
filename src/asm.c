@@ -875,17 +875,27 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
     {
         int64_t ss = sym(&a, "scan_start");
         int64_t se = sym(&a, "scan_end");
+        uint8_t simulated[16];
+        int bits;
+
         if (ss < 0 || se < 0)
         {
             fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
             return (-1);
         }
-        if (lde_verify(a.out->e.buf, (size_t)ss, (size_t)se,
-                crypto->key, crypto->key_len) < 0)
+        bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1);
+        if (bits < 128)
         {
-            fprintf(stderr,
-                "asm: ECHEC lde_verify — le stub genere ne permettra pas "
-                "une extraction correcte de la cle par le LDE runtime\n");
+            fprintf(stderr, "asm: LDE simule n'a extrait que %d/128 bits\n", bits);
+            return (-1);
+        }
+        if (memcmp(simulated, crypto->key, 16) != 0)
+        {
+            fprintf(stderr, "asm: MISMATCH cle simulee vs cle reelle\n  reelle  : ");
+            for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", crypto->key[i]);
+            fprintf(stderr, "\n  simulee : ");
+            for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", simulated[i]);
+            fprintf(stderr, "\n");
             return (-1);
         }
     }
