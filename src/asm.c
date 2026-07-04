@@ -1,7 +1,8 @@
 #include "asm.h"
 
-static int g_bit_log[512];
-static int g_bit_log_len = 0;
+static int  g_bit_log[512];
+static char g_bit_log_name[512][32];
+static int  g_bit_log_len = 0;
 
 static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi",
                              "r8","r9","r10","r11","r12","r13","r14","r15"};
@@ -696,6 +697,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else
 				emit_xor_r64_r64(&a->out->e, r1, r1);  // XOR r64, r64
 		}
+		snprintf(g_bit_log_name[g_bit_log_len], 32, "_ZERO %s", toks[1]);
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return 0;
@@ -722,6 +724,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
 					if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 				}
+				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
@@ -736,6 +739,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
 				if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 			}
+			snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 			g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 			a->key_index++;
 			return 0;
@@ -749,6 +753,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_mov_r64_r64(&a->out->e, r1, r2);       /* 48 89 /r */
 				else
 					emit_lea_r64_reg0(&a->out->e, r1, r2);       /* 48 8D mod=01 disp8=0 */
+				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
@@ -761,6 +766,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_mov_r32_r32(&a->out->e, r1, r2);       /* 89 /r, déjà géré par @check_89 */
 				else
 					emit_lea_r32_reg0(&a->out->e, r1, r2);      /* 8D mod=01 disp8=0, nouvelle fonction */
+				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
@@ -772,6 +778,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_movzx_r32_r8(&a->out->e, r1, r2);
 				else
 					emit_and_r32_imm32(&a->out->e, r1, 0xff);
+				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
@@ -784,6 +791,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_mov_r8_imm8(&a->out->e, r1, (uint8_t)val);   /* B0+r ib */
 				else
 					emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val); /* B8+r id, zero-extend */
+				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
@@ -798,6 +806,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 			else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
 		}
+		snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return 0;
@@ -818,6 +827,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else if (s1 == 32 || s1 == 64)
 				emit_add_r32_imm32_long(&a->out->e, r1, 1);
 		}
+		snprintf(g_bit_log_name[g_bit_log_len], 32, "_INC %s", toks[1]);
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return (0);
@@ -838,6 +848,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else if (s1 == 32) emit_sub_r32_imm8(&a->out->e, r1, 1);
 			else               emit_sub_r64_imm8(&a->out->e, r1, 1);
 		}
+		snprintf(g_bit_log_name[g_bit_log_len], 32, "_DEC %s", toks[1]);
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return (0);
@@ -926,9 +937,9 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
                 }
             }
             if (mismatch_at >= 0)
-                fprintf(stderr, "PREMIER DESACCORD au call #%d : asm a choisi %d, LDE a lu %d\n",
-                        mismatch_at, g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
-            else if (g_bit_log_len != lde_bit_log_len)
+				fprintf(stderr, "PREMIER DESACCORD au call #%d (%s) : asm a choisi %d, LDE a lu %d\n",
+						mismatch_at, g_bit_log_name[mismatch_at],
+						g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
                 fprintf(stderr, "Nombre d'appels different (asm=%d, lde=%d) mais tous les bits communs concordent\n",
                         g_bit_log_len, lde_bit_log_len);
         }
