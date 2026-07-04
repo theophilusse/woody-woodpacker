@@ -267,7 +267,10 @@ static const char STUB_SRC[] =
 	"@adv6_81add:\n" "add rsi, 6\n" "jmp @lde_loop\n"
 
 	"@o81_and:\n"
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x0\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp eax, 0xff\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+3]\n" "cmp eax, 0x0\n"  "jne @lde_fallback\n"
+	"_SET eax, [rsi+4]\n" "cmp eax, 0x0\n"  "jne @lde_fallback\n"
+	"_SET eax, [rsi+5]\n" "cmp eax, 0x0\n"  "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv6_81and\n"
 	"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"

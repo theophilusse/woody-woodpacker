@@ -47,25 +47,33 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 
 	/* 0x81 /r id : ADD r32,1 long(bit0) / AND r32,imm32(bit0) / CMP(skip) */
 	if (op == 0x81)
-	{
-		modrm = fetch(buf, len, pos, rex_len + 1);
-		if (modrm < 0) goto fallback;
-		mod = (modrm >> 6) & 3; reg = (modrm >> 3) & 7;
-		if (mod == 3)
-		{
-			if (reg == 0)
-			{
-				int i0 = fetch(buf, len, pos, rex_len+2);
-				int i1 = fetch(buf, len, pos, rex_len+3);
-				int i2 = fetch(buf, len, pos, rex_len+4);
-				int i3 = fetch(buf, len, pos, rex_len+5);
-				if (i0==1 && i1==0 && i2==0 && i3==0)
-					{ *ilen = rex_len + 6; return (1); }
-			}
-			if (reg == 4) { *ilen = rex_len + 6; return (1); }
-			if (reg == 7) { *ilen = rex_len + 6; return (0); }
-		}
-	}
+    {
+        modrm = fetch(buf, len, pos, rex_len + 1);
+        if (modrm < 0) goto fallback;
+        mod = (modrm >> 6) & 3; reg = (modrm >> 3) & 7;
+        if (mod == 3)
+        {
+            if (reg == 0)
+            {
+                int i0 = fetch(buf, len, pos, rex_len+2);
+                int i1 = fetch(buf, len, pos, rex_len+3);
+                int i2 = fetch(buf, len, pos, rex_len+4);
+                int i3 = fetch(buf, len, pos, rex_len+5);
+                if (i0==1 && i1==0 && i2==0 && i3==0)
+                    { *ilen = rex_len + 6; return (1); }
+            }
+            if (reg == 4)
+            {
+                int i0 = fetch(buf, len, pos, rex_len+2);
+                int i1 = fetch(buf, len, pos, rex_len+3);
+                int i2 = fetch(buf, len, pos, rex_len+4);
+                int i3 = fetch(buf, len, pos, rex_len+5);
+                if (i0==0xff && i1==0 && i2==0 && i3==0)   /* NOUVEAU : vérifie imm==0xFF */
+                    { *ilen = rex_len + 6; return (1); }
+            }
+            if (reg == 7) { *ilen = rex_len + 6; return (0); }
+        }
+    }
 
 	/* 0x83 /r ib : AND r32/64,0(bit1) / SUB r32/64,1(bit0) / CMP(skip) */
 	if (op == 0x83)
