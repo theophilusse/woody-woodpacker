@@ -152,6 +152,18 @@ static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *dis
         return 4; // [base+disp8]
     }
 
+	minus = strchr(inner, '-');
+    if (minus && minus != inner)   /* minus != inner exclut un registre nommé genre "-something" */
+    {
+        *minus = '\0';
+        if (preg(inner, base, &sz))
+        {
+            *disp = (int8_t)(-strtoll(minus + 1, NULL, 0));
+            return 4;   /* [base+disp8], disp negatif */
+        }
+        *minus = '-';   /* restaure si ce n'etait pas un registre valide */
+    }
+
     if (preg(inner, &r, &sz)) { *base = r; return 3; } // [base] seul
     strncpy(lbl, inner, 63);
     return 2; // [label] RIP-relative
