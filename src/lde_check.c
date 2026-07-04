@@ -217,6 +217,8 @@ fallback:
 	return (-1);
 }
 
+int lde_bit_by_pos[8192];   /* -1 = pas de bit ici (fallback/structurel) */
+
 int lde_bit_at_pos(size_t pos)
 {
     if (pos >= 8192)
@@ -228,8 +230,6 @@ int lde_bit_at_pos(size_t pos)
 ** Simule le LDE sur buf[start..end), extrait 128 bits, remplit key_out[16].
 ** Retourne le nombre de bits extraits (128 = succès complet).
 */
-int lde_bit_by_pos[8192];   /* -1 = pas de bit ici (fallback/structurel) */
-
 int lde_run_c(const uint8_t *buf, size_t start, size_t end,
               uint8_t key_out[16], int verbose,
               int lde_bit_log[512], int *lde_bit_log_len)
