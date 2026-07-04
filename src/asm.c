@@ -997,6 +997,11 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
                   lde_bit_log, &lde_bit_log_len);
 
         fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
+		
+		// debug
+		for (int i = 14; i <= 22 && i < g_bit_log_len; i++)
+			fprintf(stderr, "  call#%d (%s) recorded_off=%zu\n",
+					i, g_bit_log_name[i], g_bit_log_off[i]);
         {
 			int mismatch_at = -1;
 			for (int i = 0; i < g_bit_log_len; i++)
