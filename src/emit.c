@@ -825,8 +825,8 @@ int	emit_lea_abs(t_emitter *e, t_reg dst, int32_t addr)
 	uint8_t b[8];
 	b[0] = mk_rex(1, dst, 0);
 	b[1] = 0x8D;
-	b[2] = MODRM00(dst, 4);   /* rm=4 = SIB suit */
-	b[3] = 0x25;               /* SIB: no idx, disp32 */
+	b[2] = MODRM00(dst, 4);
+	b[3] = 0x25;
 	memcpy(b + 4, &addr, 4);
 	return emit_raw(e, b, 8);
 }
