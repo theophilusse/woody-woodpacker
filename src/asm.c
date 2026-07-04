@@ -803,8 +803,16 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
-			else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
+			if (s1 == 64)
+			{
+				if (lsb_value) emit_mov_r64_imm64(&a->out->e, r1, (uint64_t)val);
+				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);  /* déjà 64 bits par construction */
+			}
+			else
+			{
+				if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
+				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
+			}
 		}
 		snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
