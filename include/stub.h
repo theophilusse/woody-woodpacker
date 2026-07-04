@@ -7,6 +7,17 @@ static const char STUB_SRC[] =
 	"push rdx\n"
 	"push rbp\n"
 
+		//////////////// DEBUG JUMP
+
+		"start:\n"
+	"_ZERO eax\n"
+	"cmp eax, 1\n"
+	"jne far_forward\n"     // ne doit jamais être pris ici, mais teste l'encodage
+	"_SET eax, 42\n"        // ne doit jamais s'exécuter si le jump est bon
+	"jmp end\n"
+
+	"padding_start:\n"
+
 	"_ZERO rax\n"
 	"_ZERO rax\n"
 	"_ZERO rax\n"
@@ -150,6 +161,18 @@ static const char STUB_SRC[] =
 	"_ZERO rax\n"
 	"_ZERO rax\n"
 	"_ZERO rax\n"
+
+	// répète ~40 fois une instruction de 5-6 octets (ex: "_SET eax, 1\n") pour dépasser 200 octets
+
+	"far_forward:\n"
+	"_SET eax, 60\n"
+	"_SET edi, 0\n"
+	"syscall\n"             // exit(0) si le forward jump est correct
+
+	"end:\n"
+	"_SET eax, 60\n"
+	"_SET edi, 1\n"
+	"syscall\n"             // exit(1) si mal branché (ne devrait jamais arriver)
 
     //////////////////////////// ANTI_DEBUG ////////////////////////////
     //; Appel syscall ptrace(PTRACE_TRACEME, 0, 1, 0)
