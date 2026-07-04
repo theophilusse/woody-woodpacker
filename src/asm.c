@@ -994,7 +994,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
             return (-1);
         }
         bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
-                          lde_bit_log, &lde_bit_log_len);
+                  lde_bit_log, &lde_bit_log_len);
 
         fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
         {
@@ -1005,9 +1005,9 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 				int lde_bit_here = lde_bit_at_pos(off);   /* MODIFIÉ : appel de fonction */
 				if (lde_bit_here == -1)
 				{
-					fprintf(stderr, "asm: call #%d (%s, off=%zu) : LDE N'A DECODE AUCUN BIT a cette position exacte "
-							"(fallback ou instruction jamais reconnue ici)\n",
-							i, g_bit_log_name[i], off);
+					fprintf(stderr, "asm: call #%d (%s, off=%zu, bloc=%s) : LDE N'A DECODE AUCUN BIT "
+							"a cette position exacte (fallback ou instruction jamais reconnue ici)\n",
+							i, g_bit_log_name[i], off, nearest_label(&a, off));
 					mismatch_at = i;
 					break;
 				}
