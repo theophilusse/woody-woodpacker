@@ -185,6 +185,13 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 		}
 	}
 
+    /* 0xE9 : JMP rel32 -> structurel, aucun bit, 5 octets (opcode + rel32) */
+    if (op == 0xe9)
+    {
+        *ilen = rex_len + 5;
+        return (0);
+    }
+
 	/* 0xB8-0xBF : MOV r32,imm32 -> bit=1 */
 	if (op >= 0xb8 && op <= 0xbf)
     {

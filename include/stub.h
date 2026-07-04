@@ -67,6 +67,10 @@ static const char STUB_SRC[] =
 	"_SET eax, [rsi]\n"             /* eax = opcode reel */
 
 	/* ══════════ 0x24 ib : AND AL, imm8 (forme courte) → bit=1 ══════════ */
+	"cmp eax, 0xe9\n" "jne @o_24\n"
+	"add rsi, 5\n" "jmp @lde_loop\n"
+
+	"@o_24:\n"
 	"cmp eax, 0x24\n" "jne @o_80\n"
 	"_SET eax, [rsi+1]\n" "cmp eax, 0x0\n" "jne @adv2_24\n"
 	"cmp ecx, 128\n" "jge @adv2_24\n"
