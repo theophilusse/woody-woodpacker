@@ -205,11 +205,9 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 	}
 
 fallback:
-    /*
 	if (verbose)
 		fprintf(stderr, "  fallback @ %zu (op0=0x%02x rex_len=%d)\n", pos, op0, rex_len);
-	*/
-    *ilen = 1;
+	*ilen = 1;
 	return (-1);
 }
 
@@ -238,11 +236,9 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
         if (fallback_streak > 0 && verbose)
             fprintf(stderr, "  (resync apres %d fallback(s) @ %zu)\n", fallback_streak, pos);
         fallback_streak = 0;
-        /*
         if (verbose)
             fprintf(stderr, "  step @ %zu: op0=0x%02x r=%d ilen=%d bitcount=%d\n",
                     pos, buf[pos], r, ilen, bitcount);
-        */
         /* ── DUMP CIBLÉ : place-le ici, avant l'incrémentation ── */
         if (bitcount == 96)
         {

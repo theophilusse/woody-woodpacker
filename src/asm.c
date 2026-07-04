@@ -954,7 +954,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
             fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
             return (-1);
         }
-        bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
+        bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 0,
                           lde_bit_log, &lde_bit_log_len);
 
         fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
