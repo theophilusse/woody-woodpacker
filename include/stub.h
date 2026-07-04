@@ -252,13 +252,26 @@ static const char STUB_SRC[] =
 
 /* 0x48 0x8D 0x25 : LEA abs → bit=0 */
 "@check_lea:\n"
-"cmp eax, 0x48\n" "jne @check_89\n"
+"cmp eax, 0x48\n" "jne @check_8d_32\n"
 "_SET eax, [rsi+1]\n" "cmp eax, 0x8d\n" "jne @check_48_89\n"
 "_SET eax, [rsi+2]\n" "and eax, 0x7\n" "cmp eax, 0x4\n" "jne @check_48_8d\n"
 "_SET eax, [rsi+3]\n" "cmp eax, 0x25\n" "jne @check_48_8d\n"
 "cmp ecx, 128\n" "jge @adv8_lea\n"
 "_INC ecx\n"
 "@adv8_lea:\n" "add rsi, 8\n" "jmp @lde_loop\n"
+
+/* 0x8D mod=01 (sans REX) : LEA r32,[reg+0] → bit=0 */
+"@check_8d_32:\n"
+"cmp eax, 0x8d\n" "jne @check_89\n"
+"_SET eax, [rsi+1]\n" "and eax, 0xc0\n" "cmp eax, 0x40\n"
+"jne @check_89\n"
+"cmp ecx, 128\n" "jge @adv_8d32\n"
+"_INC ecx\n"
+"@adv_8d32:\n"
+"_SET eax, [rsi+1]\n" "and eax, 0x7\n" "cmp eax, 0x4\n"
+"je @adv_8d32_sib\n"
+"add rsi, 3\n" "jmp @lde_loop\n"
+"@adv_8d32_sib:\n" "add rsi, 4\n" "jmp @lde_loop\n"
 
 /* 0x89 : MOV r32, r32 → bit=1 */
 "@check_89:\n"
