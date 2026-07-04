@@ -914,11 +914,12 @@ static const char *nearest_label(t_asm *a, size_t off)
 void dump_all_blocks(t_asm *a)
 {
     const char *blocks[] = {
-        "@o80_and", "@o80_add", "@o80_sub", "@o81_add", "@o81_and",
-        "@o83_and", "@o83_sub", "@o_31", "@o_89", "@o_8a", "@o_8b",
-        "@o8d_absSIB", "@o8d_ripRel", "@o8d_m01", "@o_0f", "@o_b8",
-        "@o_inc", "@o_dec", NULL
-    };
+		"@o_80", "@o_81", "@o_83", "@o_8d",
+		"@o80_and", "@o80_add", "@o80_sub", "@o81_add", "@o81_and",
+		"@o83_and_checkimm", "@o83_sub", "@o_31", "@o_89", "@o_8a", "@o_8b",
+		"@o8d_absSIB", "@o8d_ripRel", "@o8d_m01", "@o_0f", "@o_b8",
+		"@o_inc", "@o_dec", NULL
+	};
     for (int i = 0; blocks[i]; i++)
     {
         int64_t off = sym(a, blocks[i]);
