@@ -1002,7 +1002,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			for (int i = 0; i < g_bit_log_len; i++)
 			{
 				size_t off = g_bit_log_off[i];
-				int lde_bit_here = (off < 8192) ? lde_bit_by_pos[off] : -1;
+				int lde_bit_here = lde_bit_at_pos(off);   /* MODIFIÉ : appel de fonction */
 				if (lde_bit_here == -1)
 				{
 					fprintf(stderr, "asm: call #%d (%s, off=%zu) : LDE N'A DECODE AUCUN BIT a cette position exacte "

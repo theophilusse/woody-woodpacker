@@ -220,7 +220,7 @@ fallback:
 ** Simule le LDE sur buf[start..end), extrait 128 bits, remplit key_out[16].
 ** Retourne le nombre de bits extraits (128 = succès complet).
 */
-static int lde_bit_by_pos[8192];   /* -1 = pas de bit ici (fallback/structurel) */
+int lde_bit_by_pos[8192];   /* -1 = pas de bit ici (fallback/structurel) */
 
 int lde_run_c(const uint8_t *buf, size_t start, size_t end,
               uint8_t key_out[16], int verbose,
