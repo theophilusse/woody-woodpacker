@@ -399,7 +399,7 @@ static const char STUB_SRC[] =
 "pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
 "@adv2_inc:\n" "add rsi, 2\n" "jmp @lde_loop\n"
 
-/"@check_cmp83:\n"
+"@check_cmp83:\n"
 "_SET eax, [rsi]\n" "cmp eax, 0x83\n" "jne @check_dec_ff\n"
 "_SET eax, [rsi+1]\n" "and eax, 0xf8\n" "cmp eax, 0xf8\n"
 "jne @check_and83\n"
