@@ -154,6 +154,8 @@ int emit_sub_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 int emit_mov_r32_imm32_c7(t_emitter *e, t_reg reg, uint32_t imm);
 int emit_mov_r64_imm32_sx_c7(t_emitter *e, t_reg reg, int32_t imm);
 int emit_mov_r64_r64_safe(t_emitter *e, t_reg dst, t_reg src);
+int emit_cmp_al_imm8(t_emitter *e, uint8_t imm);
+int emit_cmp_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 
 /* opcodes jcc utiles */
 # define JL   0x7C

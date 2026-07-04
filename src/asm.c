@@ -598,6 +598,14 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "cmp") && n == 3 && preg(toks[1], &r1, &s1))
 	{
+		if (s1 == 8)
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			emit_cmp_r8_imm8(&a->out->e, r1, (uint8_t)val);
+			return 0;
+		}
+
 		/* cmp r64, r64 : 48 39 /r */
 		if (s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
 		{

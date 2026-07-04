@@ -77,7 +77,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x80 /r ib : AND r8,0 (bit1) / ADD r8,1 (bit0) / SUB r8,1 (bit0) ══════════ */
 	"@o_80:\n"
-	"cmp eax, 0x80\n" "jne @o_81\n"
+	"cmp al, 0x80\n" "jne @o_81\n"
 	"_SET eax, [rsi+1]\n" "_SET edx, eax\n" "and edx, 0x38\n"
 	"cmp edx, 0x20\n" "je @o80_and\n"
 	"cmp edx, 0x0\n"  "je @o80_add\n"
@@ -106,7 +106,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x81 /r id : ADD r32,1 long (bit0) / AND r32,imm32 (bit0) / CMP (skip) ══════════ */
 	"@o_81:\n"
-	"cmp eax, 0x81\n" "jne @o_83\n"
+	"cmp al, 0x81\n" "jne @o_83\n"
 	"_SET eax, [rsi+1]\n" "_SET edx, eax\n" "and edx, 0x38\n"
 	"cmp edx, 0x0\n"  "je @o81_add\n"
 	"cmp edx, 0x20\n" "je @o81_and\n"
@@ -138,9 +138,9 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x83 /r ib : AND r32/64,0 (bit1) / SUB r32/64,1 (bit0) / CMP (skip) ══════════ */
 	"@o_83:\n"
-	"cmp eax, 0x83\n" "jne @o_31\n"
+	"cmp al, 0x83\n" "jne @o_31\n"
 	"_SET eax, [rsi+1]\n" "and eax, 0xf8\n"
-	"cmp eax, 0xe0\n" "je @o83_and_checkimm\n"
+	"mp al, 0xe0\n" "je @o83_and_checkimm\n"
 	"cmp eax, 0xe8\n" "je @o83_sub\n"
 	"cmp eax, 0xf8\n" "je @o83_cmp\n"
 	"jmp @lde_fallback\n"
@@ -165,7 +165,7 @@ static const char STUB_SRC[] =
 	"@o_31:\n"
 	"cmp eax, 0x31\n" "jne @o_89\n"
 	"_SET eax, [rsi+1]\n"
-	"_SET edx, eax\n" "and edx, 0xc0\n" "cmp edx, 0xc0\n" "jne @adv2_31\n"
+	"_SET edx, eax\n" "and edx, 0xc0\n" "cmp dl, 0xc0\n" "jne @adv2_31\n"
 	"_SET edx, eax\n" "and edx, 0x38\n" "sar edx, 3\n"
 	"and eax, 0x7\n"
 	"cmp eax, edx\n" "jne @adv2_31\n"
@@ -175,7 +175,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x89 /r mod=11 : MOV r32/64,r32/64 → bit=1 ══════════ */
 	"@o_89:\n"
-	"cmp eax, 0x89\n" "jne @o_8a\n"
+	"cmp al, 0x89\n" "jne @o_8a\n"
 	"_SET eax, [rsi+1]\n" "and eax, 0xc0\n" "cmp eax, 0xc0\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv2_89\n"
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
@@ -185,7 +185,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x8A /r : MOV r8, r/m8 → bit=1 (mod00/01, +SIB) ══════════ */
 	"@o_8a:\n"
-	"cmp eax, 0x8a\n" "jne @o_8b_and_pair\n"
+	"cmp al, 0x8a\n" "jne @o_8b_and_pair\n"
 	"_SET eax, [rsi+1]\n"
 	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0x0\n" "je @o8a_m00\n"
@@ -218,7 +218,7 @@ static const char STUB_SRC[] =
 ** ne lit qu'1 octet). Detection PUREMENT structurelle (masque
 ** mod+reg comme @o_83), aucun registre precis n'est teste. */
 "@o_8b_and_pair:\n"
-"cmp eax, 0x8b\n" "jne @o_8b\n"
+"cmp al, 0x8b\n" "jne @o_8b\n"
 "_SET edi, [rsi+1]\n"                       /* edi = modrm du 8B */
 "_SET r8d, edi\n" "and r8d, 0xc0\n"          /* r8d = mod */
 "and edi, 0x7\n"                            /* edi = rm */
@@ -319,7 +319,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x8B /r : MOV r32/64, r/m → bit=1 (mod00/01, +SIB) ══════════ */
 	"@o_8b:\n"
-	"cmp eax, 0x8b\n" "jne @o_8d\n"
+	"cmp al, 0x8b\n" "jne @o_8d\n"
 	"_SET eax, [rsi+1]\n"
 	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0x0\n" "je @o8b_m00\n"
@@ -348,7 +348,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x8D /r : LEA reg,[reg+0] mod01 (bit0) / LEA abs mod00+SIB=0x25 (bit0) ══════════ */
 	"@o_8d:\n"
-	"cmp eax, 0x8d\n" "jne @o_0f\n"
+	"cmp al, 0x8d\n" "jne @o_0f\n"
 	"_SET eax, [rsi+1]\n"
 	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0x40\n" "je @o8d_m01\n"
@@ -385,7 +385,7 @@ static const char STUB_SRC[] =
 	"_SET eax, [rsi+1]\n" "cmp eax, 0xb6\n" "jne @lde_fallback\n"
 	"_SET eax, [rsi+2]\n"
 	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
-	"cmp edx, 0xc0\n" "je @o0f_reg\n"
+	"cmp dl, 0xc0\n" "je @o0f_reg\n"
 	"cmp edx, 0x0\n"  "je @o0f_m00\n"
 	"cmp edx, 0x40\n" "je @o0f_m01\n"
 	"jmp @lde_fallback\n"

@@ -1036,3 +1036,22 @@ int emit_mov_r64_r64_safe(t_emitter *e, t_reg dst, t_reg src)
     if (emit_push_r64(e, src) < 0) return -1;   /* 50+r, jamais checké */
     return emit_pop_r64(e, dst);                /* 58+r, jamais checké */
 }
+
+/* CMP AL, imm8 : forme courte speciale 3C ib */
+int emit_cmp_al_imm8(t_emitter *e, uint8_t imm)
+{
+    uint8_t b[2] = {0x3C, imm};
+    return emit_raw(e, b, 2);
+}
+
+/* CMP r8, imm8 : 80 /7 ib (general, ou 3C pour AL) */
+int emit_cmp_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    if (reg == REG_RAX)
+        return emit_cmp_al_imm8(e, imm);
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40 || reg >= 4) b[n++] = r;
+    b[n++] = 0x80; b[n++] = MODRM11(7, reg); b[n++] = imm;
+    return emit_raw(e, b, n);
+}
