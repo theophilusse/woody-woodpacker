@@ -211,26 +211,38 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
 
 	memset(key_out, 0, 16);
 	while (pos < end && bitcount < 128)
-	{
-		int ilen;
-		int r = lde_step_c(buf, end, pos, &ilen, verbose);
-		if (r == -1)
-		{
-			fallback_streak++;
-			pos += (size_t)ilen;
-			continue;
-		}
-		if (fallback_streak > 0 && verbose)
+    {
+        int ilen;
+        int r = lde_step_c(buf, end, pos, &ilen, verbose);
+        if (r == -1)
+        {
+            fallback_streak++;
+            pos += (size_t)ilen;
+            continue;
+        }
+        if (fallback_streak > 0 && verbose)
             fprintf(stderr, "  (resync apres %d fallback(s) @ %zu)\n", fallback_streak, pos);
         fallback_streak = 0;
-        fprintf(stderr, "  step @ %zu: r=%d ilen=%d bitcount=%d\n", pos, r, ilen, bitcount);
+        if (verbose)
+            fprintf(stderr, "  step @ %zu: op0=0x%02x r=%d ilen=%d bitcount=%d\n",
+                    pos, buf[pos], r, ilen, bitcount);
+
+        /* ── DUMP CIBLÉ : place-le ici, avant l'incrémentation ── */
+        if (bitcount == 96)
+        {
+            fprintf(stderr, "  >>> DUMP autour du bit 96 (pos=%zu, ilen=%d):\n      ", pos, ilen);
+            for (int i = -4; i < 16; i++)
+                fprintf(stderr, "%02x ", buf[pos + i]);
+            fprintf(stderr, "\n");
+        }
+
         if (r == 1 || r == 2)
         {
             if (r == 2)
                 key_out[bitcount/8] |= (uint8_t)(1 << (bitcount % 8));
             bitcount++;
         }
-		pos += (size_t)ilen;
-	}
+        pos += (size_t)ilen;
+    }
 	return (bitcount);
 }
