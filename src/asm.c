@@ -1132,10 +1132,11 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
         }
         if (memcmp(simulated, crypto->key, 16) != 0)
         {
-            fprintf(stderr, "asm: MISMATCH cle simulee vs cle reelle\n  reelle  : ");
-            for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", crypto->key[i]);
-			fprintf(stderr, "\n");
+            fprintf(stderr, "asm: MISMATCH cle simulee vs cle reelle\n");
 		}
+		fprintf(stderr, "  reelle  : ");
+        for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", crypto->key[i]);
+		fprintf(stderr, "\n");
 		fprintf(stderr, "  simulee : ");
 		for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", simulated[i]);
 		fprintf(stderr, "\n");
