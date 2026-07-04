@@ -140,7 +140,7 @@ static const char STUB_SRC[] =
 	"@o_83:\n"
 	"cmp al, 0x83\n" "jne @o_31\n"
 	"_SET eax, [rsi+1]\n" "and eax, 0xf8\n"
-	"mp al, 0xe0\n" "je @o83_and_checkimm\n"
+	"cmp al, 0xe0\n" "je @o83_and_checkimm\n"
 	"cmp eax, 0xe8\n" "je @o83_sub\n"
 	"cmp eax, 0xf8\n" "je @o83_cmp\n"
 	"jmp @lde_fallback\n"
