@@ -220,15 +220,20 @@ fallback:
 ** Simule le LDE sur buf[start..end), extrait 128 bits, remplit key_out[16].
 ** Retourne le nombre de bits extraits (128 = succès complet).
 */
-int lde_run_c(const uint8_t *buf, size_t start, size_t end,
-              uint8_t key_out[16], int verbose, int lde_bit_log[512], int *lde_bit_log_len)
-{
-	size_t pos = start;
-	int bitcount = 0;
-	int fallback_streak = 0;
+static int lde_bit_by_pos[8192];   /* -1 = pas de bit ici (fallback/structurel) */
 
-	memset(key_out, 0, 16);
-	while (pos < end && bitcount < 128)
+int lde_run_c(const uint8_t *buf, size_t start, size_t end,
+              uint8_t key_out[16], int verbose,
+              int lde_bit_log[512], int *lde_bit_log_len)
+{
+    size_t pos = start;
+    int bitcount = 0;
+    int fallback_streak = 0;
+
+    memset(key_out, 0, 16);
+    memset(lde_bit_by_pos, -1, sizeof(lde_bit_by_pos));   /* AJOUT */
+
+    while (pos < end && bitcount < 128)
     {
         int ilen;
         int r = lde_step_c(buf, end, pos, &ilen, verbose);
@@ -238,21 +243,19 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
             pos += (size_t)ilen;
             continue;
         }
-        if (fallback_streak > 0 && verbose)
-            fprintf(stderr, "  (resync apres %d fallback(s) @ %zu)\n", fallback_streak, pos);
         fallback_streak = 0;
-        if (verbose)
-            fprintf(stderr, "  step @ %zu: op0=0x%02x r=%d ilen=%d bitcount=%d\n",
-                    pos, buf[pos], r, ilen, bitcount);
-
         if (r == 1 || r == 2)
         {
-            lde_bit_log[*lde_bit_log_len] = (r == 2) ? 1 : 0;   /* AJOUT */
+            int bit = (r == 2) ? 1 : 0;
+            if (pos < 8192)
+                lde_bit_by_pos[pos] = bit;             /* AJOUT : enregistre au POSITION exacte */
+            if (bit)
+                key_out[bitcount/8] |= (uint8_t)(1 << (bitcount % 8));
+            lde_bit_log[*lde_bit_log_len] = bit;
             (*lde_bit_log_len)++;
-            if (r == 2) key_out[bitcount/8] |= (1 << (bitcount%8));
             bitcount++;
         }
         pos += (size_t)ilen;
     }
-	return (bitcount);
+    return bitcount;
 }

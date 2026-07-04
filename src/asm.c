@@ -999,31 +999,31 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
         fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
         {
 			int mismatch_at = -1;
-			int n_compare = (g_bit_log_len < lde_bit_log_len) ? g_bit_log_len : lde_bit_log_len;
-			for (int i = 0; i < n_compare; i++)
+			for (int i = 0; i < g_bit_log_len; i++)
 			{
-				if (g_bit_log[i] != lde_bit_log[i])
+				size_t off = g_bit_log_off[i];
+				int lde_bit_here = (off < 8192) ? lde_bit_by_pos[off] : -1;
+				if (lde_bit_here == -1)
 				{
+					fprintf(stderr, "asm: call #%d (%s, off=%zu) : LDE N'A DECODE AUCUN BIT a cette position exacte "
+							"(fallback ou instruction jamais reconnue ici)\n",
+							i, g_bit_log_name[i], off);
+					mismatch_at = i;
+					break;
+				}
+				if (lde_bit_here != g_bit_log[i])
+				{
+					fprintf(stderr, "asm: call #%d (%s, off=%zu, bloc=%s) : asm a choisi %d, "
+							"LDE a decode %d A LA MEME POSITION\n",
+							i, g_bit_log_name[i], off, nearest_label(&a, off),
+							g_bit_log[i], lde_bit_here);
 					mismatch_at = i;
 					break;
 				}
 			}
-			if (mismatch_at >= 0)
-			{
-				fprintf(stderr, "PREMIER DESACCORD au call #%d (%s, off=%zu, bloc=%s) : asm a choisi %d, LDE a lu %d\n",
-					mismatch_at, g_bit_log_name[mismatch_at], g_bit_log_off[mismatch_at],
-					nearest_label(&a, g_bit_log_off[mismatch_at]),
-					g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
-				fprintf(stderr, "  octets a cet offset: ");
-				for (int k = -2; k < 8; k++)
-					fprintf(stderr, "%02x ", a.out->e.buf[g_bit_log_off[mismatch_at] + k]);
-				fprintf(stderr, "\n");
-			}
-			else if (g_bit_log_len != lde_bit_log_len)
-			{
-				fprintf(stderr, "Nombre d'appels different (asm=%d, lde=%d) mais tous les bits communs concordent\n",
-						g_bit_log_len, lde_bit_log_len);
-			}
+			if (mismatch_at < 0)
+				fprintf(stderr, "asm: alignement parfait position-a-position sur les %d premiers appels\n",
+						g_bit_log_len);
 		}
 
         if (bits < 128)
