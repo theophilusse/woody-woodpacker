@@ -3,13 +3,7 @@
 
 # include "woody.h"
 
-typedef struct {
-	const uint8_t *buf;
-	size_t         pos;
-	size_t         end;
-} t_lde_dec;
-
-int lde_verify(const uint8_t *buf, size_t start, size_t end,
-		const uint8_t *expected_key, size_t key_len);
+int lde_run_c(const uint8_t *buf, size_t start, size_t end,
+              uint8_t key_out[16], int verbose);
 
 #endif
