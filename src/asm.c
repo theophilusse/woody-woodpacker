@@ -563,17 +563,17 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		if (s1 == 8)
 		{
-			emit_test_r8_r8(&a->out->e, s1, s2);
+			emit_test_r8_r8(&a->out->e, r1, r2);
 			return 0;
 		}
 		if (s1 == 32)
 		{
-			emit_test_r32_r32(&a->out->e, s1, s2);
+			emit_test_r32_r32(&a->out->e, r1, r2);
 			return 0;
 		}
 		if (s1 == 64)
 		{
-			emit_test_r64_r64(&a->out->e, s1, s2);
+			emit_test_r64_r64(&a->out->e, r1, r2);
 			return 0;
 		}
 		return 1;
