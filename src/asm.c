@@ -925,9 +925,10 @@ void dump_all_blocks(t_asm *a)
         int64_t off = sym(a, blocks[i]);
         if (off < 0) { fprintf(stderr, "%s: NON TROUVE\n", blocks[i]); continue; }
         fprintf(stderr, "%-16s @%-5ld : ", blocks[i], (long)off);
-        for (int k = 0; k < 16; k++)
-            fprintf(stderr, "%02x ", a->out->e.buf[off + k]);
-        fprintf(stderr, "\n");
+        fprintf(stderr, "  octets a cet offset (large): ");
+		for (int k = -12; k < 12; k++)
+			fprintf(stderr, "%02x ", a.out->e.buf[g_bit_log_off[mismatch_at] + k]);
+		fprintf(stderr, "\n");
     }
 }
 
