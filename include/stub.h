@@ -559,8 +559,7 @@ static const char STUB_SRC[] =
 
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
 
-	"add rsp, 32\n"     // annule le "sub rsp, 32" du buffer hex
-	"add rsp, 16\n"     // annule le "sub rsp, 16" du buffer key
+	"add rsp, 32\n"
 	// mprotect(page_vaddr, page_size, PROT_RWX)
 	"mov rdi, prot_addr\n"
 	"mov esi, prot_size\n"
@@ -570,6 +569,7 @@ static const char STUB_SRC[] =
 
 	// S-box sur la pile
 	"sub rsp, 256\n"
+	"mov rsi, rbp\n"
 
 	// rsi = base de la cle (RIP-relative)
 	"mov rsi, rbp\n"
@@ -617,8 +617,8 @@ static const char STUB_SRC[] =
 	"cmp ebx, text_len\n"
 	"jl @prga_loop\n"
 
-	// restauration et saut vers OEP
-	"add rsp, 256\n"
+	"add rsp, 256\n"     // libère le S-box
+	"add rsp, 16\n"      // ← DÉPLACÉ ICI : libère le buffer clé, seulement maintenant qu'on n'en a plus besoin
 	"pop rdx\n"
 	"pop rbp\n"
 	"jmp @oep\n"
