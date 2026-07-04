@@ -150,61 +150,55 @@ int emit_mov_r8_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx
 
 int emit_mov_r32_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp)
 {
-    uint8_t b[7]; int n = 0;
+    uint8_t b[9]; int n = 0;                 // marge de sécurité (8 max + 1)
+    int need_disp   = (disp != 0) || ((base & 0x07) == 5);
+    int use_disp32  = need_disp && !(disp >= -128 && disp <= 127);
+    uint8_t modrm_mod;
+
     uint8_t r = mk_rex_sib(0, reg_dest, idx, base);
     if (r != 0x40) b[n++] = r;
 
     b[n++] = 0x8B;
 
-    if (disp == 0 && (base & 0x07) != 5)
-        b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;
-    else
-        b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;
+    if (!need_disp)      modrm_mod = 0x00;
+    else if (use_disp32) modrm_mod = 0x80;
+    else                 modrm_mod = 0x40;
 
+    b[n++] = modrm_mod | ((reg_dest & 0x07) << 3) | 0x04;
     b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
 
-    if (disp != 0 || (base & 0x07) == 5)
+    if (need_disp)
     {
-        if (disp >= -128 && disp <= 127)
-            b[n++] = (uint8_t)disp;
-        else
-        {
-            /* nécessite mod=10 (disp32), à corriger si ce cas se présente */
-            b[n-1] = 0x80 | ((reg_dest & 0x07) << 3) | 0x04; /* repatch mod=10 */
-            memcpy(b + n, &disp, 4);
-            n += 4;
-        }
+        if (use_disp32) { memcpy(b + n, &disp, 4); n += 4; }
+        else             b[n++] = (uint8_t)disp;
     }
-	return emit_raw(e, b, n);
+    return emit_raw(e, b, n);
 }
 
 int emit_mov_r64_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp)
 {
-    uint8_t b[10]; int n = 0;
+    uint8_t b[9]; int n = 0;
+    int need_disp   = (disp != 0) || ((base & 0x07) == 5);
+    int use_disp32  = need_disp && !(disp >= -128 && disp <= 127);
+    uint8_t modrm_mod;
+
     uint8_t r = mk_rex_sib(1, reg_dest, idx, base);
     if (r != 0x40) b[n++] = r;
 
     b[n++] = 0x8B;
 
-    if (disp == 0 && (base & 0x07) != 5)
-        b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;
-    else
-        b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;
+    if (!need_disp)      modrm_mod = 0x00;
+    else if (use_disp32) modrm_mod = 0x80;
+    else                 modrm_mod = 0x40;
 
+    b[n++] = modrm_mod | ((reg_dest & 0x07) << 3) | 0x04;
     b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
 
-    if (disp != 0 || (base & 0x07) == 5)
+    if (need_disp)
     {
-        if (disp >= -128 && disp <= 127)
-            b[n++] = (uint8_t)disp;
-        else
-        {
-            b[n-1] = 0x80 | ((reg_dest & 0x07) << 3) | 0x04;
-            memcpy(b + n, &disp, 4);
-            n += 4;
-        }
+        if (use_disp32) { memcpy(b + n, &disp, 4); n += 4; }
+        else             b[n++] = (uint8_t)disp;
     }
-
     return emit_raw(e, b, n);
 }
 
@@ -775,7 +769,7 @@ int	emit_shr_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 
 int	emit_shr_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 {
-	uint8_t b[3]; int n = 0;
+	uint8_t b[4]; int n = 0;
 	uint8_t r = mk_rex(0, 0, reg);
 	if (r != 0x40) b[n++] = r;
 	b[n++] = 0xC1;
@@ -786,7 +780,7 @@ int	emit_shr_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 
 int	emit_shr_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 {
-	uint8_t b[3]; int n = 0;
+	uint8_t b[4]; int n = 0;
 	uint8_t r = mk_rex(0, 0, reg);
 	if (r != 0x40) b[n++] = r;
 	b[n++] = 0xC0;
