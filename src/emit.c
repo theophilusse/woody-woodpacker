@@ -1006,3 +1006,33 @@ int emit_sub_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 	b[1] = 0x83; b[2] = MODRM11(5, reg); b[3] = imm;
 	return emit_raw(e, b, 4);
 }
+
+/* MOV r32, imm32 via C7 /0 — encodage distinct de B8-BF, invisible pour le LDE */
+int emit_mov_r32_imm32_c7(t_emitter *e, t_reg reg, uint32_t imm)
+{
+    uint8_t b[7]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0xC7;
+    b[n++] = MODRM11(0, reg);
+    memcpy(b + n, &imm, 4); n += 4;
+    return emit_raw(e, b, n);
+}
+
+/* MOV r64, imm32 sign-extended via REX.W C7 /0 — pour les adresses (< 2^31) */
+int emit_mov_r64_imm32_sx_c7(t_emitter *e, t_reg reg, int32_t imm)
+{
+    uint8_t b[7]; int n = 0;
+    b[n++] = mk_rex(1, 0, reg);
+    b[n++] = 0xC7;
+    b[n++] = MODRM11(0, reg);
+    memcpy(b + n, &imm, 4); n += 4;
+    return emit_raw(e, b, n);
+}
+
+/* MOV r64,r64 littéral, sans risque de collision avec @o_89 */
+int emit_mov_r64_r64_safe(t_emitter *e, t_reg dst, t_reg src)
+{
+    if (emit_push_r64(e, src) < 0) return -1;   /* 50+r, jamais checké */
+    return emit_pop_r64(e, dst);                /* 58+r, jamais checké */
+}
