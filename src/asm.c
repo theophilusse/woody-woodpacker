@@ -669,8 +669,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		if (!preg(toks[1], &r1, &s1)) return -1;
 
-		printf("register: %d, size: %d, lsb_value: %d\n", r1, s1, lsb_value);
-
 		if (s1 == 8) {
 			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);   /* 0x24/0x80 ✓ */
 			else           emit_xor_r32_r32(&a->out->e, r1, r1);   /* 0x31 ✓ LDE reconnaît */
@@ -740,6 +738,16 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				return 0;
 			}
 
+			if (s1 == 32 && s2 == 8)
+			{
+				if (lsb_value)
+					emit_movzx_r32_r8(&a->out->e, r1, r2);   /* 0F B6 /r, forme registre */
+				else
+					emit_and_r32_imm32(&a->out->e, r1, 0xff); /* AND r32, 0xFF (81 /4 id) — zero-extend équivalent */
+				a->key_index++;
+				return 0;
+			}
+
 			/* r8 imm */
 			if (s1 == 8)
 			{
@@ -750,6 +758,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				a->key_index++;
 				return 0;
 			}
+			fprintf(stderr, "asm: _SET %s,%s (s1=%d,s2=%d) non gere\n", toks[1], toks[2], s1, s2);
+    		return -1;
 		}
 		else                                          /* source immédiate */
 		{

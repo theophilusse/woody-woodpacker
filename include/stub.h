@@ -352,7 +352,7 @@ static const char STUB_SRC[] =
 
 /* 48 8D mod=01 : LEA r64,[reg+0] → bit=0 */
 "@check_48_8d:\n"
-"cmp eax, 0x8d\n" "jne @check_81_add\n"
+"cmp eax, 0x8d\n" "jne @check_48_83\n"
 "_SET eax, [rsi+2]\n" "and eax, 0xc0\n" "cmp eax, 0x40\n"
 "jne @check_81_add\n"
 "cmp ecx, 128\n" "jge @adv4_48_8d\n"
@@ -362,6 +362,17 @@ static const char STUB_SRC[] =
 "je @adv5_48_8d\n"
 "add rsi, 4\n" "jmp @lde_loop\n"
 "@adv5_48_8d:\n" "add rsi, 5\n" "jmp @lde_loop\n"
+
+/* 48 83 /4 : AND r64, imm8 → bit=1 (NOUVEAU, manquait) */
+"@check_48_83:\n"
+"cmp eax, 0x83\n" "jne @check_81_add\n"
+"_SET eax, [rsi+2]\n" "and eax, 0xf8\n" "cmp eax, 0xe0\n"
+"jne @check_81_add\n"
+"cmp ecx, 128\n" "jge @adv4_and64\n"
+"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
+"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+"@adv4_and64:\n" "add rsi, 4\n" "jmp @lde_loop\n"
 
 "@check_81_add:\n"
 "cmp eax, 0x81\n" "jne @check_inc_fe\n"
@@ -388,14 +399,23 @@ static const char STUB_SRC[] =
 "pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
 "@adv2_inc:\n" "add rsi, 2\n" "jmp @lde_loop\n"
 
-/* 0x83 /7 : CMP → INC bit=0 */
-"@check_cmp83:\n"
+/"@check_cmp83:\n"
 "_SET eax, [rsi]\n" "cmp eax, 0x83\n" "jne @check_dec_ff\n"
 "_SET eax, [rsi+1]\n" "and eax, 0xf8\n" "cmp eax, 0xf8\n"
-"jne @check_dec_ff\n"
+"jne @check_and83\n"
 "cmp ecx, 128\n" "jge @adv3_cmp\n"
 "_INC ecx\n"
 "@adv3_cmp:\n" "add rsi, 3\n" "jmp @lde_loop\n"
+
+/* 0x83 /4 : AND r32, imm8 → bit=1 */
+"@check_and83:\n"
+"_SET eax, [rsi+1]\n" "and eax, 0xf8\n" "cmp eax, 0xe0\n"   /* mod=11, reg=100 (AND) */
+"jne @check_dec_ff\n"
+"cmp ecx, 128\n" "jge @adv3_and83\n"
+"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
+"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+"@adv3_and83:\n" "add rsi, 3\n" "jmp @lde_loop\n"
 
 /* 0xFE/0xFF DEC → bit=1 */
 "@check_dec_ff:\n"
