@@ -751,9 +751,9 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (s1 == 32 && s2 == 8)
 			{
 				if (lsb_value)
-					emit_movzx_r32_r8(&a->out->e, r1, r2);   /* 0F B6 /r, forme registre */
+					emit_movzx_r32_r8(&a->out->e, r1, r2);
 				else
-					emit_and_r32_imm32(&a->out->e, r1, 0xff); /* AND r32, 0xFF (81 /4 id) — zero-extend équivalent */
+					emit_and_r32_imm32(&a->out->e, r1, 0xff);
 				a->key_index++;
 				return 0;
 			}
@@ -811,7 +811,11 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else               emit_dec_r64(&a->out->e, r1);
 		}
 		else                               // variante 1 : SUB reg, 1
-			emit_sub_r32_imm8(&a->out->e, r1, 1);
+		{
+			if (s1 == 8)       emit_sub_r8_imm8(&a->out->e, r1, 1);
+			else if (s1 == 32) emit_sub_r32_imm8(&a->out->e, r1, 1);
+			else               emit_sub_r64_imm8(&a->out->e, r1, 1);
+		}
 		a->key_index++;
 		return (0);
 	}

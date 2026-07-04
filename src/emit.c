@@ -988,3 +988,22 @@ int	emit_lea_r32_reg0(t_emitter *e, t_reg dst, t_reg src)
 	}
 	return emit_raw(e, b, n);
 }
+
+/* SUB r8, imm8 : 80 /5 ib */
+int emit_sub_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+	uint8_t b[4]; int n = 0;
+	uint8_t r = mk_rex(0, 0, reg);
+	if (r != 0x40 || reg >= 4) b[n++] = r;   /* REX requis aussi pour bl/dl/etc si registres >=4 low-byte ambigus */
+	b[n++] = 0x80; b[n++] = MODRM11(5, reg); b[n++] = imm;
+	return emit_raw(e, b, n);
+}
+
+/* SUB r64, imm8 : REX.W 83 /5 ib */
+int emit_sub_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+	uint8_t b[4];
+	b[0] = mk_rex(1, 0, reg);
+	b[1] = 0x83; b[2] = MODRM11(5, reg); b[3] = imm;
+	return emit_raw(e, b, 4);
+}
