@@ -121,7 +121,7 @@ static int	tokenize(const char *line, char toks[][64], int max)
 static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *disp)
 {
     char inner[64];
-    char *plus;
+    char *plus, *minus;
     t_reg r;
     int sz;
 
