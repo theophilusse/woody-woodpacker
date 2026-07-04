@@ -6,12 +6,6 @@
 ** extraction correcte de la clé. Bloque la génération sinon.
 ** ══════════════════════════════════════════════════════════════ */
 
-typedef struct {
-	const uint8_t *buf;
-	size_t         pos;
-	size_t         end;
-} t_lde_dec;
-
 static int lde_fetch(t_lde_dec *d, int off)
 {
 	if (d->pos + (size_t)off >= d->end)
@@ -192,7 +186,7 @@ static int lde_step(t_lde_dec *d, int *ilen)
 ** Simule le LDE complet sur [start,end), compare a expected_key.
 ** Retourne 0 si ca matche, -1 sinon (diagnostic sur stderr).
 */
-static int lde_verify(const uint8_t *buf, size_t start, size_t end,
+int lde_verify(const uint8_t *buf, size_t start, size_t end,
 		const uint8_t *expected_key, size_t key_len)
 {
 	t_lde_dec d = { buf, start, end };
