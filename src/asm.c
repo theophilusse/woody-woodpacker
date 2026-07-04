@@ -199,15 +199,30 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (n == 2 && (op = jcc_opcode(toks[0])))
 	{
 		int64_t lval = sym(a, toks[1]);
-		if (lval >= 0) {
-			int8_t d = (int8_t)(lval - (int64_t)(a->out->e.len + 2));
-			emit_jcc_rel8_direct(&a->out->e, op, d);
-		} else {
-			uint8_t bytes[2] = {op, 0};
-			size_t foff = a->out->e.len + 1;
-			size_t fend = a->out->e.len + 2;
+		if (lval >= 0)
+		{
+			int64_t disp = lval - (int64_t)(a->out->e.len + 2);
+			if (disp >= -128 && disp <= 127)
+			{
+				emit_jcc_rel8_direct(&a->out->e, op, (int8_t)disp);
+			}
+			else
+			{
+				/* backward mais trop loin pour rel8 : forme near 0F 8x rel32 */
+				int32_t d32 = (int32_t)(lval - (int64_t)(a->out->e.len + 6));
+				uint8_t bytes[6] = {0x0F, (uint8_t)(0x80 | (op & 0x0F)), 0,0,0,0};
+				memcpy(bytes + 2, &d32, 4);
+				emit_raw(&a->out->e, bytes, 6);
+			}
+		}
+		else
+		{
+			/* forward, distance inconnue : trampoline (condition inversée + jmp rel32) */
+			uint8_t bytes[2] = { (uint8_t)(op ^ 1), 5 };
 			emit_raw(&a->out->e, bytes, 2);
-			addfixup(a, toks[1], foff, fend, 1);
+			size_t dummy;
+			emit_jmp_rel32(&a->out->e, &dummy);
+			addfixup(a, toks[1], dummy, dummy + 4, 0);   /* is_rel8 = 0 */
 		}
 		return 0;
 	}
@@ -646,36 +661,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			addfixup(a, toks[1], poff, pend, 0);
 		}
 		return (0);
-	}
-	if (n == 2 && (op = jcc_opcode(toks[0])))
-	{
-		int64_t lval = sym(a, toks[1]);
-		if (lval >= 0)
-		{
-			int64_t disp = lval - (int64_t)(a->out->e.len + 2);
-			if (disp >= -128 && disp <= 127)
-			{
-				emit_jcc_rel8_direct(&a->out->e, op, (int8_t)disp);
-			}
-			else
-			{
-				/* backward mais trop loin pour rel8 : forme near 0F 8x rel32 */
-				int32_t d32 = (int32_t)(lval - (int64_t)(a->out->e.len + 6));
-				uint8_t bytes[6] = {0x0F, (uint8_t)(0x80 | (op & 0x0F)), 0,0,0,0};
-				memcpy(bytes + 2, &d32, 4);
-				emit_raw(&a->out->e, bytes, 6);
-			}
-		}
-		else
-		{
-			/* forward, distance inconnue : trampoline (condition inversée + jmp rel32) */
-			uint8_t bytes[2] = { (uint8_t)(op ^ 1), 5 };
-			emit_raw(&a->out->e, bytes, 2);
-			size_t dummy;
-			emit_jmp_rel32(&a->out->e, &dummy);
-			addfixup(a, toks[1], dummy, dummy + 4, 0);   /* is_rel8 = 0 */
-		}
-		return 0;
 	}
 	/* directives de donnees */
 	if (!strcmp(toks[0], ".evasion_msg"))
