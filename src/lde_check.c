@@ -3,9 +3,9 @@
 
 static int fetch(const uint8_t *buf, size_t len, size_t pos, int off)
 {
-	size_t p = pos + (size_t)off;
-	if (p >= len) return (-1);
-	return (buf[p]);
+    long p = (long)pos + off;
+    if (p < 0 || (size_t)p >= len) return (-1);
+    return (buf[(size_t)p]);
 }
 
 /*
@@ -188,16 +188,13 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 	/* 0xB8-0xBF : MOV r32,imm32 -> bit=1 */
 	if (op >= 0xb8 && op <= 0xbf)
     {
-        if (rex_len == 1)
+        int prev = fetch(buf, len, pos, -1);   /* octet juste avant l'opcode courant */
+        if (prev >= 0x48 && prev <= 0x4f && (prev & 0x08))
         {
-            int rex_byte = fetch(buf, len, pos, 0);
-            if (rex_byte & 0x08)   /* REX.W */
-            {
-                *ilen = rex_len + 9;   /* opcode + imm64 */
-                return (2);
-            }
+            *ilen = rex_len + 9;   /* REX.W présent -> imm64 */
+            return (2);
         }
-        *ilen = rex_len + 5;   /* opcode + imm32 */
+        *ilen = rex_len + 5;       /* pas de REX.W -> imm32 */
         return (2);
     }
 
