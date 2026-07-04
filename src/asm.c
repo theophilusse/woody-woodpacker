@@ -803,6 +803,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			size_t off_before = a->out->e.len; // debug
 			if (s1 == 64)
 			{
 				if (lsb_value) emit_mov_r64_imm64(&a->out->e, r1, (uint64_t)val);
