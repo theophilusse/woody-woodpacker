@@ -813,6 +813,11 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
 			}
+			fprintf(stderr, "_SET imm call#%d reg=%s val=%ld s1=%d lsb=%d bytes=",
+					g_bit_log_len, toks[1], val, s1, lsb_value);
+			for (size_t k = off_before; k < a->out->e.len; k++)
+				fprintf(stderr, "%02x ", a->out->e.buf[k]);
+			fprintf(stderr, "\n");
 		}
 		snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
