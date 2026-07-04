@@ -894,6 +894,22 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	return -1;
 }
 
+/* Retourne le nom du dernier label défini AVANT l'offset donné */
+static const char *nearest_label(t_asm *a, size_t off)
+{
+    const char *best = "?";
+    size_t best_off = 0;
+    for (int i = 0; i < a->nlabels; i++)
+    {
+        if (a->labels[i].off <= off && a->labels[i].off >= best_off)
+        {
+            best_off = a->labels[i].off;
+            best = a->labels[i].name;
+        }
+    }
+    return best;
+}
+
 /* ── entree publique ────────────────────────────────────────────── */
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 {
@@ -973,9 +989,10 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			}
 			if (mismatch_at >= 0)
 			{
-				fprintf(stderr, "PREMIER DESACCORD au call #%d (%s, off=%zu) : asm a choisi %d, LDE a lu %d\n",
-						mismatch_at, g_bit_log_name[mismatch_at], g_bit_log_off[mismatch_at],
-						g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
+				fprintf(stderr, "PREMIER DESACCORD au call #%d (%s, off=%zu, bloc=%s) : asm a choisi %d, LDE a lu %d\n",
+					mismatch_at, g_bit_log_name[mismatch_at], g_bit_log_off[mismatch_at],
+					nearest_label(&a, g_bit_log_off[mismatch_at]),
+					g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
 				fprintf(stderr, "  octets a cet offset: ");
 				for (int k = -2; k < 8; k++)
 					fprintf(stderr, "%02x ", a.out->e.buf[g_bit_log_off[mismatch_at] + k]);
