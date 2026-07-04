@@ -244,14 +244,6 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
         if (verbose)
             fprintf(stderr, "  step @ %zu: op0=0x%02x r=%d ilen=%d bitcount=%d\n",
                     pos, buf[pos], r, ilen, bitcount);
-        /* ── DUMP CIBLÉ : place-le ici, avant l'incrémentation ── */
-        if (bitcount == 96)
-        {
-            fprintf(stderr, "  >>> DUMP autour du bit 96 (pos=%zu, ilen=%d):\n      ", pos, ilen);
-            for (int i = -4; i < 16; i++)
-                fprintf(stderr, "%02x ", buf[pos + i]);
-            fprintf(stderr, "\n");
-        }
 
         if (r == 1 || r == 2)
         {
