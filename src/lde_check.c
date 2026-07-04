@@ -152,17 +152,22 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 
 	/* 0x8D /r : LEA reg,[reg+0] mod01(bit0) / LEA abs mod00+SIB=0x25(bit0) */
 	if (op == 0x8d)
-	{
-		modrm = fetch(buf, len, pos, rex_len + 1);
-		if (modrm < 0) goto fallback;
-		mod = (modrm >> 6) & 3; rm = modrm & 7;
-		if (mod == 0 && rm == 4)
-		{
-			sib = fetch(buf, len, pos, rex_len + 2);
-			if (sib == 0x25) { *ilen = rex_len + 7; return (1); }
-		}
-		if (mod == 1) { *ilen = rex_len + 3 + (rm==4?1:0); return (1); }
-	}
+    {
+        modrm = fetch(buf, len, pos, rex_len + 1);
+        if (modrm < 0) goto fallback;
+        mod = (modrm >> 6) & 3; rm = modrm & 7;
+        if (mod == 0 && rm == 4)
+        {
+            sib = fetch(buf, len, pos, rex_len + 2);
+            if (sib == 0x25) { *ilen = rex_len + 7; return (1); }
+        }
+        if (mod == 0 && rm == 5)          /* NOUVEAU : RIP-relative, aucun bit */
+        {
+            *ilen = rex_len + 6;
+            return (0);
+        }
+        if (mod == 1) { *ilen = rex_len + 3 + (rm==4?1:0); return (1); }
+    }
 
 	/* 0x0F 0xB6 /r : MOVZX -> bit=1(reg-reg) / bit=0(mem) */
 	if (op == 0x0f)

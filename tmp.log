@@ -1,4 +1,76 @@
 _SET imm call#88 reg=rax val=101 s1=64 lsb=0 bytes=48 8d 04 25 65 00 00 00 
+_SET imm call#89 reg=rdi val=0 s1=64 lsb=0 bytes=48 8d 3c 25 00 00 00 00 
+_SET imm call#91 reg=rdx val=1 s1=64 lsb=0 bytes=48 8d 14 25 01 00 00 00 
+_SET imm call#93 reg=eax val=1 s1=32 lsb=32 bytes=b8 01 00 00 00 
+_SET imm call#94 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+_SET imm call#95 reg=rax val=60 s1=64 lsb=128 bytes=48 b8 3c 00 00 00 00 00 00 00 
+_SET imm call#96 reg=rdi val=0 s1=64 lsb=1 bytes=48 bf 00 00 00 00 00 00 00 00 
+_SET imm call#198 reg=eax val=1 s1=32 lsb=64 bytes=b8 01 00 00 00 
+_SET imm call#199 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+  >>> DUMP autour du bit 96 (pos=388, ilen=10):
+      00 00 00 00 48 bf 00 00 00 00 00 00 00 00 0f 05 48 81 ec 10 
+asm_bits=222 lde_bits=128
+PREMIER DESACCORD au call #106 (_SET eax, off=572) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 00 00 0f b6 46 01 89 c2 81 e2 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : A80352CFEC13A14060A968B41163782C
+  simulee : A80352CFEC13A14060A968B411BFC61E
+error: stub generation failed
+_SET imm call#88 reg=rax val=101 s1=64 lsb=0 bytes=48 8d 04 25 65 00 00 00 
+_SET imm call#89 reg=rdi val=0 s1=64 lsb=0 bytes=48 8d 3c 25 00 00 00 00 
+_SET imm call#91 reg=rdx val=1 s1=64 lsb=0 bytes=48 8d 14 25 01 00 00 00 
+_SET imm call#93 reg=eax val=1 s1=32 lsb=32 bytes=b8 01 00 00 00 
+_SET imm call#94 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+_SET imm call#95 reg=rax val=60 s1=64 lsb=0 bytes=48 8d 04 25 3c 00 00 00 
+_SET imm call#96 reg=rdi val=0 s1=64 lsb=1 bytes=48 bf 00 00 00 00 00 00 00 00 
+_SET imm call#198 reg=eax val=1 s1=32 lsb=0 bytes=48 8d 04 25 01 00 00 00 
+_SET imm call#199 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+  >>> DUMP autour du bit 96 (pos=394, ilen=10):
+      3c 00 00 00 48 bf 00 00 00 00 00 00 00 00 0f 05 48 81 ec 10 
+asm_bits=222 lde_bits=128
+PREMIER DESACCORD au call #105 (_INC ecx, off=555) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 15 00 81 c1 01 00 00 00 48 83 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 0C8C24B6D6858F770F9376247D142009
+  simulee : 0C8C24B6D6858F770F9376247DDA6024
+error: stub generation failed
+_SET imm call#88 reg=rax val=101 s1=64 lsb=0 bytes=48 8d 04 25 65 00 00 00 
+_SET imm call#89 reg=rdi val=0 s1=64 lsb=0 bytes=48 8d 3c 25 00 00 00 00 
+_SET imm call#91 reg=rdx val=1 s1=64 lsb=8 bytes=48 ba 01 00 00 00 00 00 00 00 
+_SET imm call#93 reg=eax val=1 s1=32 lsb=32 bytes=b8 01 00 00 00 
+_SET imm call#94 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+_SET imm call#95 reg=rax val=60 s1=64 lsb=0 bytes=48 8d 04 25 3c 00 00 00 
+_SET imm call#96 reg=rdi val=0 s1=64 lsb=0 bytes=48 8d 3c 25 00 00 00 00 
+_SET imm call#198 reg=eax val=1 s1=32 lsb=64 bytes=b8 01 00 00 00 
+_SET imm call#199 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+  >>> DUMP autour du bit 96 (pos=398, ilen=8):
+      3c 00 00 00 48 8d 3c 25 00 00 00 00 0f 05 48 81 ec 10 00 00 
+asm_bits=222 lde_bits=128
+PREMIER DESACCORD au call #107 (_SET eax, off=629) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 00 00 0f b6 46 02 83 f8 00 74 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 7FD7174F473AB1064CE099384286916E
+  simulee : 7FD7174F473AB1064CE0993842BEB849
+error: stub generation failed
+_SET imm call#88 reg=rax val=101 s1=64 lsb=0 bytes=48 8d 04 25 65 00 00 00 
+_SET imm call#89 reg=rdi val=0 s1=64 lsb=0 bytes=48 8d 3c 25 00 00 00 00 
+_SET imm call#91 reg=rdx val=1 s1=64 lsb=0 bytes=48 8d 14 25 01 00 00 00 
+_SET imm call#93 reg=eax val=1 s1=32 lsb=32 bytes=b8 01 00 00 00 
+_SET imm call#94 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+_SET imm call#95 reg=rax val=60 s1=64 lsb=128 bytes=48 b8 3c 00 00 00 00 00 00 00 
+_SET imm call#96 reg=rdi val=0 s1=64 lsb=0 bytes=48 8d 3c 25 00 00 00 00 
+_SET imm call#198 reg=eax val=1 s1=32 lsb=64 bytes=b8 01 00 00 00 
+_SET imm call#199 reg=edi val=1 s1=32 lsb=128 bytes=bf 01 00 00 00 
+  >>> DUMP autour du bit 96 (pos=391, ilen=8):
+      00 00 00 00 48 8d 3c 25 00 00 00 00 0f 05 48 81 ec 10 00 00 
+asm_bits=222 lde_bits=128
+PREMIER DESACCORD au call #105 (_INC ecx, off=553) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 15 00 81 c1 01 00 00 00 48 83 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 278FA90143C12E15D86B2DA040BD9A89
+  simulee : 278FA90143C12E15D86B2DA040FB7533
+error: stub generation failed
+_SET imm call#88 reg=rax val=101 s1=64 lsb=1 bytes=48 b8 65 00 00 00 00 00 00 00 
 _SET imm call#89 reg=rdi val=0 s1=64 lsb=2 bytes=48 bf 00 00 00 00 00 00 00 00 
 _SET imm call#91 reg=rdx val=1 s1=64 lsb=8 bytes=48 ba 01 00 00 00 00 00 00 00 
 _SET imm call#93 reg=eax val=1 s1=32 lsb=32 bytes=b8 01 00 00 00 
@@ -6,574 +78,49 @@ _SET imm call#94 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00
 _SET imm call#95 reg=rax val=60 s1=64 lsb=0 bytes=48 8d 04 25 3c 00 00 00 
 _SET imm call#96 reg=rdi val=0 s1=64 lsb=1 bytes=48 bf 00 00 00 00 00 00 00 00 
 _SET imm call#198 reg=eax val=1 s1=32 lsb=0 bytes=48 8d 04 25 01 00 00 00 
-_SET imm call#199 reg=edi val=1 s1=32 lsb=128 bytes=bf 01 00 00 00 
-  fallback @ 0 (op0=0x52 rex_len=0)
-  fallback @ 1 (op0=0x55 rex_len=0)
-  (resync apres 2 fallback(s) @ 2)
-  step @ 2: op0=0x48 r=1 ilen=3 bitcount=0
-  step @ 5: op0=0x48 r=2 ilen=4 bitcount=1
-  step @ 9: op0=0x48 r=2 ilen=4 bitcount=2
-  step @ 13: op0=0x48 r=1 ilen=3 bitcount=3
-  step @ 16: op0=0x48 r=2 ilen=4 bitcount=4
-  step @ 20: op0=0x48 r=1 ilen=3 bitcount=5
-  step @ 23: op0=0x48 r=2 ilen=4 bitcount=6
-  step @ 27: op0=0x48 r=1 ilen=3 bitcount=7
-  step @ 30: op0=0x48 r=2 ilen=4 bitcount=8
-  step @ 34: op0=0x48 r=1 ilen=3 bitcount=9
-  step @ 37: op0=0x48 r=2 ilen=4 bitcount=10
-  step @ 41: op0=0x48 r=2 ilen=4 bitcount=11
-  step @ 45: op0=0x48 r=2 ilen=4 bitcount=12
-  step @ 49: op0=0x48 r=1 ilen=3 bitcount=13
-  step @ 52: op0=0x48 r=1 ilen=3 bitcount=14
-  step @ 55: op0=0x48 r=2 ilen=4 bitcount=15
-  step @ 59: op0=0x48 r=2 ilen=4 bitcount=16
-  step @ 63: op0=0x48 r=2 ilen=4 bitcount=17
-  step @ 67: op0=0x48 r=1 ilen=3 bitcount=18
-  step @ 70: op0=0x48 r=1 ilen=3 bitcount=19
-  step @ 73: op0=0x48 r=1 ilen=3 bitcount=20
-  step @ 76: op0=0x48 r=2 ilen=4 bitcount=21
-  step @ 80: op0=0x48 r=1 ilen=3 bitcount=22
-  step @ 83: op0=0x48 r=1 ilen=3 bitcount=23
-  step @ 86: op0=0x48 r=1 ilen=3 bitcount=24
-  step @ 89: op0=0x48 r=2 ilen=4 bitcount=25
-  step @ 93: op0=0x48 r=2 ilen=4 bitcount=26
-  step @ 97: op0=0x48 r=1 ilen=3 bitcount=27
-  step @ 100: op0=0x48 r=1 ilen=3 bitcount=28
-  step @ 103: op0=0x48 r=1 ilen=3 bitcount=29
-  step @ 106: op0=0x48 r=1 ilen=3 bitcount=30
-  step @ 109: op0=0x48 r=2 ilen=4 bitcount=31
-  step @ 113: op0=0x48 r=1 ilen=3 bitcount=32
-  step @ 116: op0=0x48 r=2 ilen=4 bitcount=33
-  step @ 120: op0=0x48 r=1 ilen=3 bitcount=34
-  step @ 123: op0=0x48 r=1 ilen=3 bitcount=35
-  step @ 126: op0=0x48 r=1 ilen=3 bitcount=36
-  step @ 129: op0=0x48 r=2 ilen=4 bitcount=37
-  step @ 133: op0=0x48 r=1 ilen=3 bitcount=38
-  step @ 136: op0=0x48 r=2 ilen=4 bitcount=39
-  step @ 140: op0=0x48 r=2 ilen=4 bitcount=40
-  step @ 144: op0=0x48 r=2 ilen=4 bitcount=41
-  step @ 148: op0=0x48 r=1 ilen=3 bitcount=42
-  step @ 151: op0=0x48 r=2 ilen=4 bitcount=43
-  step @ 155: op0=0x48 r=2 ilen=4 bitcount=44
-  step @ 159: op0=0x48 r=1 ilen=3 bitcount=45
-  step @ 162: op0=0x48 r=2 ilen=4 bitcount=46
-  step @ 166: op0=0x48 r=1 ilen=3 bitcount=47
-  step @ 169: op0=0x48 r=2 ilen=4 bitcount=48
-  step @ 173: op0=0x48 r=1 ilen=3 bitcount=49
-  step @ 176: op0=0x48 r=1 ilen=3 bitcount=50
-  step @ 179: op0=0x48 r=1 ilen=3 bitcount=51
-  step @ 182: op0=0x48 r=1 ilen=3 bitcount=52
-  step @ 185: op0=0x48 r=2 ilen=4 bitcount=53
-  step @ 189: op0=0x48 r=2 ilen=4 bitcount=54
-  step @ 193: op0=0x48 r=1 ilen=3 bitcount=55
-  step @ 196: op0=0x48 r=2 ilen=4 bitcount=56
-  step @ 200: op0=0x48 r=1 ilen=3 bitcount=57
-  step @ 203: op0=0x48 r=1 ilen=3 bitcount=58
-  step @ 206: op0=0x48 r=1 ilen=3 bitcount=59
-  step @ 209: op0=0x48 r=1 ilen=3 bitcount=60
-  step @ 212: op0=0x48 r=1 ilen=3 bitcount=61
-  step @ 215: op0=0x48 r=2 ilen=4 bitcount=62
-  step @ 219: op0=0x48 r=1 ilen=3 bitcount=63
-  step @ 222: op0=0x48 r=2 ilen=4 bitcount=64
-  step @ 226: op0=0x48 r=2 ilen=4 bitcount=65
-  step @ 230: op0=0x48 r=1 ilen=3 bitcount=66
-  step @ 233: op0=0x48 r=1 ilen=3 bitcount=67
-  step @ 236: op0=0x48 r=2 ilen=4 bitcount=68
-  step @ 240: op0=0x48 r=2 ilen=4 bitcount=69
-  step @ 244: op0=0x48 r=1 ilen=3 bitcount=70
-  step @ 247: op0=0x48 r=2 ilen=4 bitcount=71
-  step @ 251: op0=0x48 r=1 ilen=3 bitcount=72
-  step @ 254: op0=0x48 r=2 ilen=4 bitcount=73
-  step @ 258: op0=0x48 r=1 ilen=3 bitcount=74
-  step @ 261: op0=0x48 r=1 ilen=3 bitcount=75
-  step @ 264: op0=0x48 r=1 ilen=3 bitcount=76
-  step @ 267: op0=0x48 r=1 ilen=3 bitcount=77
-  step @ 270: op0=0x48 r=2 ilen=4 bitcount=78
-  step @ 274: op0=0x48 r=1 ilen=3 bitcount=79
-  step @ 277: op0=0x48 r=2 ilen=4 bitcount=80
-  step @ 281: op0=0x48 r=2 ilen=4 bitcount=81
-  step @ 285: op0=0x48 r=2 ilen=4 bitcount=82
-  step @ 289: op0=0x48 r=2 ilen=4 bitcount=83
-  step @ 293: op0=0x48 r=2 ilen=4 bitcount=84
-  step @ 297: op0=0x48 r=1 ilen=3 bitcount=85
-  step @ 300: op0=0x48 r=1 ilen=3 bitcount=86
-  step @ 303: op0=0x48 r=1 ilen=3 bitcount=87
-  step @ 306: op0=0x48 r=1 ilen=8 bitcount=88
-  step @ 314: op0=0x48 r=2 ilen=10 bitcount=89
-  step @ 324: op0=0x48 r=2 ilen=4 bitcount=90
-  step @ 328: op0=0x48 r=2 ilen=10 bitcount=91
-  step @ 338: op0=0x4d r=1 ilen=3 bitcount=92
-  fallback @ 341 (op0=0x0f rex_len=0)
-  fallback @ 342 (op0=0x05 rex_len=0)
-  (resync apres 2 fallback(s) @ 343)
-  step @ 343: op0=0x83 r=0 ilen=3 bitcount=93
-  fallback @ 346 (op0=0x75 rex_len=0)
-  fallback @ 347 (op0=0x05 rex_len=0)
-  fallback @ 348 (op0=0xe9 rex_len=0)
-  fallback @ 349 (op0=0x05 rex_len=0)
-  fallback @ 350 (op0=0x00 rex_len=0)
-  fallback @ 351 (op0=0x00 rex_len=0)
-  fallback @ 352 (op0=0x00 rex_len=0)
-  fallback @ 353 (op0=0xe9 rex_len=0)
-  fallback @ 354 (op0=0x30 rex_len=0)
-  fallback @ 355 (op0=0x00 rex_len=0)
-  fallback @ 356 (op0=0x00 rex_len=0)
-  fallback @ 357 (op0=0x00 rex_len=0)
-  (resync apres 12 fallback(s) @ 358)
-  step @ 358: op0=0xb8 r=2 ilen=5 bitcount=93
-  step @ 363: op0=0x48 r=1 ilen=8 bitcount=94
-  fallback @ 371 (op0=0x48 rex_len=1)
-  fallback @ 372 (op0=0x8d rex_len=0)
-  fallback @ 373 (op0=0x35 rex_len=0)
-  fallback @ 374 (op0=0xc3 rex_len=0)
-  fallback @ 375 (op0=0x0d rex_len=0)
-  fallback @ 376 (op0=0x00 rex_len=0)
-  fallback @ 377 (op0=0x00 rex_len=0)
-  fallback @ 378 (op0=0xc7 rex_len=0)
-  fallback @ 379 (op0=0xc2 rex_len=0)
-  fallback @ 380 (op0=0x09 rex_len=0)
-  fallback @ 381 (op0=0x00 rex_len=0)
-  fallback @ 382 (op0=0x00 rex_len=0)
-  fallback @ 383 (op0=0x00 rex_len=0)
-  fallback @ 384 (op0=0x0f rex_len=0)
-  fallback @ 385 (op0=0x05 rex_len=0)
-  (resync apres 15 fallback(s) @ 386)
-  step @ 386: op0=0x48 r=1 ilen=8 bitcount=95
-  step @ 394: op0=0x48 r=2 ilen=10 bitcount=96
+_SET imm call#199 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
   >>> DUMP autour du bit 96 (pos=394, ilen=10):
       3c 00 00 00 48 bf 00 00 00 00 00 00 00 00 0f 05 48 81 ec 10 
-  fallback @ 404 (op0=0x0f rex_len=0)
-  fallback @ 405 (op0=0x05 rex_len=0)
-  fallback @ 406 (op0=0x48 rex_len=1)
-  fallback @ 407 (op0=0x81 rex_len=0)
-  fallback @ 408 (op0=0xec rex_len=0)
-  fallback @ 409 (op0=0x10 rex_len=0)
-  fallback @ 410 (op0=0x00 rex_len=0)
-  fallback @ 411 (op0=0x00 rex_len=0)
-  fallback @ 412 (op0=0x00 rex_len=0)
-  (resync apres 9 fallback(s) @ 413)
-  step @ 413: op0=0x31 r=1 ilen=2 bitcount=97
-  step @ 415: op0=0x31 r=1 ilen=2 bitcount=98
-  fallback @ 417 (op0=0x88 rex_len=0)
-  fallback @ 418 (op0=0x04 rex_len=0)
-  fallback @ 419 (op0=0x0c rex_len=0)
-  (resync apres 3 fallback(s) @ 420)
-  step @ 420: op0=0xff r=2 ilen=2 bitcount=99
-  step @ 422: op0=0x83 r=0 ilen=3 bitcount=100
-  fallback @ 425 (op0=0x7c rex_len=0)
-  fallback @ 426 (op0=0xf6 rex_len=0)
-  (resync apres 2 fallback(s) @ 427)
-  step @ 427: op0=0x48 r=1 ilen=5 bitcount=100
-  fallback @ 432 (op0=0xe9 rex_len=0)
-  fallback @ 433 (op0=0xf5 rex_len=0)
-  fallback @ 434 (op0=0x0b rex_len=0)
-  fallback @ 435 (op0=0x00 rex_len=0)
-  fallback @ 436 (op0=0x00 rex_len=0)
-  (resync apres 5 fallback(s) @ 437)
-  step @ 437: op0=0x31 r=1 ilen=2 bitcount=101
-  fallback @ 439 (op0=0x48 rex_len=1)
-  fallback @ 440 (op0=0x8d rex_len=0)
-  fallback @ 441 (op0=0x35 rex_len=0)
-  fallback @ 442 (op0=0x42 rex_len=1)
-  fallback @ 443 (op0=0xfe rex_len=0)
-  fallback @ 444 (op0=0xff rex_len=0)
-  fallback @ 445 (op0=0xff rex_len=0)
-  fallback @ 446 (op0=0x48 rex_len=1)
-  fallback @ 447 (op0=0x8d rex_len=0)
-  fallback @ 448 (op0=0x1d rex_len=0)
-  fallback @ 449 (op0=0x78 rex_len=0)
-  fallback @ 450 (op0=0x0d rex_len=0)
-  fallback @ 451 (op0=0x00 rex_len=0)
-  fallback @ 452 (op0=0x00 rex_len=0)
-  fallback @ 453 (op0=0x48 rex_len=1)
-  fallback @ 454 (op0=0x39 rex_len=0)
-  fallback @ 455 (op0=0xde rex_len=0)
-  fallback @ 456 (op0=0x73 rex_len=0)
-  fallback @ 457 (op0=0x05 rex_len=0)
-  fallback @ 458 (op0=0xe9 rex_len=0)
-  fallback @ 459 (op0=0x05 rex_len=0)
-  fallback @ 460 (op0=0x00 rex_len=0)
-  fallback @ 461 (op0=0x00 rex_len=0)
-  fallback @ 462 (op0=0x00 rex_len=0)
-  fallback @ 463 (op0=0xe9 rex_len=0)
-  fallback @ 464 (op0=0xd1 rex_len=0)
-  fallback @ 465 (op0=0x0b rex_len=0)
-  fallback @ 466 (op0=0x00 rex_len=0)
-  fallback @ 467 (op0=0x00 rex_len=0)
-  (resync apres 29 fallback(s) @ 468)
-  step @ 468: op0=0x0f r=1 ilen=3 bitcount=102
-  step @ 471: op0=0x83 r=0 ilen=3 bitcount=103
-  fallback @ 474 (op0=0x7d rex_len=0)
-  fallback @ 475 (op0=0x05 rex_len=0)
-  fallback @ 476 (op0=0xe9 rex_len=0)
-  fallback @ 477 (op0=0x0e rex_len=0)
-  fallback @ 478 (op0=0x00 rex_len=0)
-  fallback @ 479 (op0=0x00 rex_len=0)
-  fallback @ 480 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 481)
-  step @ 481: op0=0x83 r=0 ilen=3 bitcount=103
-  fallback @ 484 (op0=0x7e rex_len=0)
-  fallback @ 485 (op0=0x05 rex_len=0)
-  fallback @ 486 (op0=0xe9 rex_len=0)
-  fallback @ 487 (op0=0x04 rex_len=0)
-  fallback @ 488 (op0=0x00 rex_len=0)
-  fallback @ 489 (op0=0x00 rex_len=0)
-  fallback @ 490 (op0=0x00 rex_len=0)
-  fallback @ 491 (op0=0x48 rex_len=1)
-  fallback @ 492 (op0=0x83 rex_len=0)
-  fallback @ 493 (op0=0xc6 rex_len=0)
-  fallback @ 494 (op0=0x01 rex_len=0)
-  (resync apres 11 fallback(s) @ 495)
-  step @ 495: op0=0x0f r=1 ilen=3 bitcount=103
-  step @ 498: op0=0x83 r=0 ilen=3 bitcount=104
-  fallback @ 501 (op0=0x74 rex_len=0)
-  fallback @ 502 (op0=0x05 rex_len=0)
-  fallback @ 503 (op0=0xe9 rex_len=0)
-  fallback @ 504 (op0=0x37 rex_len=0)
-  fallback @ 505 (op0=0x00 rex_len=0)
-  fallback @ 506 (op0=0x00 rex_len=0)
-  fallback @ 507 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 508)
-  step @ 508: op0=0x8b r=2 ilen=3 bitcount=104
-  step @ 511: op0=0x83 r=0 ilen=3 bitcount=105
-  fallback @ 514 (op0=0x74 rex_len=0)
-  fallback @ 515 (op0=0x05 rex_len=0)
-  fallback @ 516 (op0=0xe9 rex_len=0)
-  (resync apres 3 fallback(s) @ 517)
-  step @ 517: op0=0x24 r=2 ilen=2 bitcount=105
-  fallback @ 519 (op0=0x00 rex_len=0)
-  fallback @ 520 (op0=0x00 rex_len=0)
-  (resync apres 2 fallback(s) @ 521)
-  step @ 521: op0=0x81 r=0 ilen=6 bitcount=106
-  fallback @ 527 (op0=0x7c rex_len=0)
-  fallback @ 528 (op0=0x05 rex_len=0)
-  fallback @ 529 (op0=0xe9 rex_len=0)
-  fallback @ 530 (op0=0x17 rex_len=0)
-  fallback @ 531 (op0=0x00 rex_len=0)
-  fallback @ 532 (op0=0x00 rex_len=0)
-  fallback @ 533 (op0=0x00 rex_len=0)
-  fallback @ 534 (op0=0x51 rex_len=0)
-  (resync apres 8 fallback(s) @ 535)
-  step @ 535: op0=0x89 r=2 ilen=2 bitcount=106
-  fallback @ 537 (op0=0xc1 rex_len=0)
-  fallback @ 538 (op0=0xfa rex_len=0)
-  fallback @ 539 (op0=0x03 rex_len=0)
-  fallback @ 540 (op0=0x81 rex_len=0)
-  fallback @ 541 (op0=0xe1 rex_len=0)
-  fallback @ 542 (op0=0x07 rex_len=0)
-  fallback @ 543 (op0=0x00 rex_len=0)
-  fallback @ 544 (op0=0x00 rex_len=0)
-  fallback @ 545 (op0=0x00 rex_len=0)
-  fallback @ 546 (op0=0xb0 rex_len=0)
-  fallback @ 547 (op0=0x01 rex_len=0)
-  fallback @ 548 (op0=0xd2 rex_len=0)
-  fallback @ 549 (op0=0xe0 rex_len=0)
-  fallback @ 550 (op0=0x59 rex_len=0)
-  fallback @ 551 (op0=0x08 rex_len=0)
-  fallback @ 552 (op0=0x44 rex_len=1)
-  fallback @ 553 (op0=0x15 rex_len=0)
-  fallback @ 554 (op0=0x00 rex_len=0)
-  (resync apres 18 fallback(s) @ 555)
-  step @ 555: op0=0xff r=2 ilen=2 bitcount=107
-  fallback @ 557 (op0=0x48 rex_len=1)
-  fallback @ 558 (op0=0x83 rex_len=0)
-  fallback @ 559 (op0=0xc6 rex_len=0)
-  fallback @ 560 (op0=0x02 rex_len=0)
-  fallback @ 561 (op0=0xeb rex_len=0)
-  fallback @ 562 (op0=0x92 rex_len=0)
-  (resync apres 6 fallback(s) @ 563)
-  step @ 563: op0=0x81 r=0 ilen=6 bitcount=108
-  fallback @ 569 (op0=0x74 rex_len=0)
-  fallback @ 570 (op0=0x05 rex_len=0)
-  fallback @ 571 (op0=0xe9 rex_len=0)
-  (resync apres 3 fallback(s) @ 572)
-  step @ 572: op0=0xb8 r=2 ilen=5 bitcount=108
-  fallback @ 577 (op0=0x46 rex_len=1)
-  fallback @ 578 (op0=0x01 rex_len=0)
-  (resync apres 2 fallback(s) @ 579)
-  step @ 579: op0=0x89 r=2 ilen=2 bitcount=109
-  fallback @ 581 (op0=0x81 rex_len=0)
-  fallback @ 582 (op0=0xe2 rex_len=0)
-  fallback @ 583 (op0=0x38 rex_len=0)
-  fallback @ 584 (op0=0x00 rex_len=0)
-  fallback @ 585 (op0=0x00 rex_len=0)
-  fallback @ 586 (op0=0x00 rex_len=0)
-  (resync apres 6 fallback(s) @ 587)
-  step @ 587: op0=0x83 r=0 ilen=3 bitcount=110
-  fallback @ 590 (op0=0x75 rex_len=0)
-  fallback @ 591 (op0=0x05 rex_len=0)
-  fallback @ 592 (op0=0xe9 rex_len=0)
-  fallback @ 593 (op0=0x19 rex_len=0)
-  fallback @ 594 (op0=0x00 rex_len=0)
-  fallback @ 595 (op0=0x00 rex_len=0)
-  fallback @ 596 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 597)
-  step @ 597: op0=0x83 r=0 ilen=3 bitcount=110
-  fallback @ 600 (op0=0x75 rex_len=0)
-  fallback @ 601 (op0=0x05 rex_len=0)
-  fallback @ 602 (op0=0xe9 rex_len=0)
-  fallback @ 603 (op0=0x4a rex_len=1)
-  fallback @ 604 (op0=0x00 rex_len=0)
-  fallback @ 605 (op0=0x00 rex_len=0)
-  fallback @ 606 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 607)
-  step @ 607: op0=0x83 r=0 ilen=3 bitcount=110
-  fallback @ 610 (op0=0x75 rex_len=0)
-  fallback @ 611 (op0=0x05 rex_len=0)
-  fallback @ 612 (op0=0xe9 rex_len=0)
-  fallback @ 613 (op0=0x65 rex_len=0)
-  fallback @ 614 (op0=0x00 rex_len=0)
-  fallback @ 615 (op0=0x00 rex_len=0)
-  fallback @ 616 (op0=0x00 rex_len=0)
-  fallback @ 617 (op0=0xe9 rex_len=0)
-  fallback @ 618 (op0=0x2e rex_len=0)
-  fallback @ 619 (op0=0x0b rex_len=0)
-  fallback @ 620 (op0=0x00 rex_len=0)
-  fallback @ 621 (op0=0x00 rex_len=0)
-  (resync apres 12 fallback(s) @ 622)
-  step @ 622: op0=0x0f r=1 ilen=4 bitcount=110
-  step @ 626: op0=0x83 r=0 ilen=3 bitcount=111
-  fallback @ 629 (op0=0x74 rex_len=0)
-  fallback @ 630 (op0=0x05 rex_len=0)
-  fallback @ 631 (op0=0xe9 rex_len=0)
-  fallback @ 632 (op0=0x20 rex_len=0)
-  fallback @ 633 (op0=0x0b rex_len=0)
-  fallback @ 634 (op0=0x00 rex_len=0)
-  fallback @ 635 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 636)
-  step @ 636: op0=0x81 r=0 ilen=6 bitcount=111
-  fallback @ 642 (op0=0x7c rex_len=0)
-  fallback @ 643 (op0=0x05 rex_len=0)
-  fallback @ 644 (op0=0xe9 rex_len=0)
-  fallback @ 645 (op0=0x17 rex_len=0)
-  fallback @ 646 (op0=0x00 rex_len=0)
-  fallback @ 647 (op0=0x00 rex_len=0)
-  fallback @ 648 (op0=0x00 rex_len=0)
-  fallback @ 649 (op0=0x51 rex_len=0)
-  (resync apres 8 fallback(s) @ 650)
-  step @ 650: op0=0x89 r=2 ilen=2 bitcount=111
-  fallback @ 652 (op0=0xc1 rex_len=0)
-  fallback @ 653 (op0=0xfa rex_len=0)
-  fallback @ 654 (op0=0x03 rex_len=0)
-  fallback @ 655 (op0=0x81 rex_len=0)
-  fallback @ 656 (op0=0xe1 rex_len=0)
-  fallback @ 657 (op0=0x07 rex_len=0)
-  fallback @ 658 (op0=0x00 rex_len=0)
-  fallback @ 659 (op0=0x00 rex_len=0)
-  fallback @ 660 (op0=0x00 rex_len=0)
-  fallback @ 661 (op0=0xb0 rex_len=0)
-  fallback @ 662 (op0=0x01 rex_len=0)
-  fallback @ 663 (op0=0xd2 rex_len=0)
-  fallback @ 664 (op0=0xe0 rex_len=0)
-  fallback @ 665 (op0=0x59 rex_len=0)
-  fallback @ 666 (op0=0x08 rex_len=0)
-  fallback @ 667 (op0=0x44 rex_len=1)
-  fallback @ 668 (op0=0x15 rex_len=0)
-  fallback @ 669 (op0=0x00 rex_len=0)
-  (resync apres 18 fallback(s) @ 670)
-  step @ 670: op0=0xff r=2 ilen=2 bitcount=112
-  fallback @ 672 (op0=0x48 rex_len=1)
-  fallback @ 673 (op0=0x83 rex_len=0)
-  fallback @ 674 (op0=0xc6 rex_len=0)
-  fallback @ 675 (op0=0x03 rex_len=0)
-  fallback @ 676 (op0=0xe9 rex_len=0)
-  fallback @ 677 (op0=0x1c rex_len=0)
-  fallback @ 678 (op0=0xff rex_len=0)
-  fallback @ 679 (op0=0xff rex_len=0)
-  fallback @ 680 (op0=0xff rex_len=0)
-  (resync apres 9 fallback(s) @ 681)
-  step @ 681: op0=0x8b r=2 ilen=3 bitcount=113
-  step @ 684: op0=0x83 r=0 ilen=3 bitcount=114
-  fallback @ 687 (op0=0x74 rex_len=0)
-  fallback @ 688 (op0=0x05 rex_len=0)
-  fallback @ 689 (op0=0xe9 rex_len=0)
-  fallback @ 690 (op0=0xe6 rex_len=0)
-  fallback @ 691 (op0=0x0a rex_len=0)
-  fallback @ 692 (op0=0x00 rex_len=0)
-  fallback @ 693 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 694)
-  step @ 694: op0=0x81 r=0 ilen=6 bitcount=114
-  fallback @ 700 (op0=0x7c rex_len=0)
-  fallback @ 701 (op0=0x05 rex_len=0)
-  fallback @ 702 (op0=0xe9 rex_len=0)
-  fallback @ 703 (op0=0x02 rex_len=0)
-  fallback @ 704 (op0=0x00 rex_len=0)
-  fallback @ 705 (op0=0x00 rex_len=0)
-  fallback @ 706 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 707)
-  step @ 707: op0=0xff r=2 ilen=2 bitcount=114
-  fallback @ 709 (op0=0x48 rex_len=1)
-  fallback @ 710 (op0=0x83 rex_len=0)
-  fallback @ 711 (op0=0xc6 rex_len=0)
-  fallback @ 712 (op0=0x03 rex_len=0)
-  fallback @ 713 (op0=0xe9 rex_len=0)
-  fallback @ 714 (op0=0xf7 rex_len=0)
-  fallback @ 715 (op0=0xfe rex_len=0)
-  fallback @ 716 (op0=0xff rex_len=0)
-  fallback @ 717 (op0=0xff rex_len=0)
-  (resync apres 9 fallback(s) @ 718)
-  step @ 718: op0=0x0f r=1 ilen=4 bitcount=115
-  step @ 722: op0=0x83 r=0 ilen=3 bitcount=116
-  fallback @ 725 (op0=0x74 rex_len=0)
-  fallback @ 726 (op0=0x05 rex_len=0)
-  fallback @ 727 (op0=0xe9 rex_len=0)
-  fallback @ 728 (op0=0xc0 rex_len=0)
-  fallback @ 729 (op0=0x0a rex_len=0)
-  fallback @ 730 (op0=0x00 rex_len=0)
-  fallback @ 731 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 732)
-  step @ 732: op0=0x81 r=0 ilen=6 bitcount=116
-  fallback @ 738 (op0=0x7c rex_len=0)
-  fallback @ 739 (op0=0x05 rex_len=0)
-  fallback @ 740 (op0=0xe9 rex_len=0)
-  fallback @ 741 (op0=0x06 rex_len=0)
-  fallback @ 742 (op0=0x00 rex_len=0)
-  fallback @ 743 (op0=0x00 rex_len=0)
-  fallback @ 744 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 745)
-  step @ 745: op0=0x81 r=1 ilen=6 bitcount=116
-  fallback @ 751 (op0=0x48 rex_len=1)
-  fallback @ 752 (op0=0x83 rex_len=0)
-  fallback @ 753 (op0=0xc6 rex_len=0)
-  fallback @ 754 (op0=0x03 rex_len=0)
-  fallback @ 755 (op0=0xe9 rex_len=0)
-  fallback @ 756 (op0=0xcd rex_len=0)
-  fallback @ 757 (op0=0xfe rex_len=0)
-  fallback @ 758 (op0=0xff rex_len=0)
-  fallback @ 759 (op0=0xff rex_len=0)
-  (resync apres 9 fallback(s) @ 760)
-  step @ 760: op0=0x81 r=0 ilen=6 bitcount=117
-  fallback @ 766 (op0=0x74 rex_len=0)
-  fallback @ 767 (op0=0x05 rex_len=0)
-  fallback @ 768 (op0=0xe9 rex_len=0)
-  fallback @ 769 (op0=0xf1 rex_len=0)
-  fallback @ 770 (op0=0x00 rex_len=0)
-  fallback @ 771 (op0=0x00 rex_len=0)
-  fallback @ 772 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 773)
-  step @ 773: op0=0x8b r=2 ilen=3 bitcount=117
-  step @ 776: op0=0x89 r=2 ilen=2 bitcount=118
-  fallback @ 778 (op0=0x81 rex_len=0)
-  fallback @ 779 (op0=0xe2 rex_len=0)
-  fallback @ 780 (op0=0x38 rex_len=0)
-  fallback @ 781 (op0=0x00 rex_len=0)
-  fallback @ 782 (op0=0x00 rex_len=0)
-  fallback @ 783 (op0=0x00 rex_len=0)
-  (resync apres 6 fallback(s) @ 784)
-  step @ 784: op0=0x83 r=0 ilen=3 bitcount=119
-  fallback @ 787 (op0=0x75 rex_len=0)
-  fallback @ 788 (op0=0x05 rex_len=0)
-  fallback @ 789 (op0=0xe9 rex_len=0)
-  fallback @ 790 (op0=0x19 rex_len=0)
-  fallback @ 791 (op0=0x00 rex_len=0)
-  fallback @ 792 (op0=0x00 rex_len=0)
-  fallback @ 793 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 794)
-  step @ 794: op0=0x83 r=0 ilen=3 bitcount=119
-  fallback @ 797 (op0=0x75 rex_len=0)
-  fallback @ 798 (op0=0x05 rex_len=0)
-  fallback @ 799 (op0=0xe9 rex_len=0)
-  fallback @ 800 (op0=0x5d rex_len=0)
-  fallback @ 801 (op0=0x00 rex_len=0)
-  fallback @ 802 (op0=0x00 rex_len=0)
-  fallback @ 803 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 804)
-  step @ 804: op0=0x83 r=0 ilen=3 bitcount=119
-  fallback @ 807 (op0=0x75 rex_len=0)
-  fallback @ 808 (op0=0x05 rex_len=0)
-  fallback @ 809 (op0=0xe9 rex_len=0)
-  (resync apres 3 fallback(s) @ 810)
-  step @ 810: op0=0xbf r=2 ilen=5 bitcount=119
-  fallback @ 815 (op0=0x69 rex_len=0)
-  fallback @ 816 (op0=0x0a rex_len=0)
-  fallback @ 817 (op0=0x00 rex_len=0)
-  fallback @ 818 (op0=0x00 rex_len=0)
-  (resync apres 4 fallback(s) @ 819)
-  step @ 819: op0=0x0f r=1 ilen=4 bitcount=120
-  step @ 823: op0=0x83 r=0 ilen=3 bitcount=121
-  fallback @ 826 (op0=0x74 rex_len=0)
-  fallback @ 827 (op0=0x05 rex_len=0)
-  fallback @ 828 (op0=0xe9 rex_len=0)
-  fallback @ 829 (op0=0x5b rex_len=0)
-  fallback @ 830 (op0=0x0a rex_len=0)
-  fallback @ 831 (op0=0x00 rex_len=0)
-  fallback @ 832 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 833)
-  step @ 833: op0=0x8b r=2 ilen=3 bitcount=121
-  step @ 836: op0=0x83 r=0 ilen=3 bitcount=122
-  fallback @ 839 (op0=0x74 rex_len=0)
-  fallback @ 840 (op0=0x05 rex_len=0)
-  fallback @ 841 (op0=0xe9 rex_len=0)
-  fallback @ 842 (op0=0x4e rex_len=1)
-  fallback @ 843 (op0=0x0a rex_len=0)
-  fallback @ 844 (op0=0x00 rex_len=0)
-  fallback @ 845 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 846)
-  step @ 846: op0=0x0f r=1 ilen=4 bitcount=122
-  step @ 850: op0=0x83 r=0 ilen=3 bitcount=123
-  fallback @ 853 (op0=0x74 rex_len=0)
-  fallback @ 854 (op0=0x05 rex_len=0)
-  fallback @ 855 (op0=0xe9 rex_len=0)
-  fallback @ 856 (op0=0x40 rex_len=1)
-  fallback @ 857 (op0=0x0a rex_len=0)
-  fallback @ 858 (op0=0x00 rex_len=0)
-  fallback @ 859 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 860)
-  step @ 860: op0=0x8b r=2 ilen=3 bitcount=123
-  step @ 863: op0=0x83 r=0 ilen=3 bitcount=124
-  fallback @ 866 (op0=0x74 rex_len=0)
-  fallback @ 867 (op0=0x05 rex_len=0)
-  fallback @ 868 (op0=0xe9 rex_len=0)
-  fallback @ 869 (op0=0x33 rex_len=0)
-  fallback @ 870 (op0=0x0a rex_len=0)
-  fallback @ 871 (op0=0x00 rex_len=0)
-  fallback @ 872 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 873)
-  step @ 873: op0=0x81 r=0 ilen=6 bitcount=124
-  fallback @ 879 (op0=0x7c rex_len=0)
-  fallback @ 880 (op0=0x05 rex_len=0)
-  fallback @ 881 (op0=0xe9 rex_len=0)
-  fallback @ 882 (op0=0x02 rex_len=0)
-  fallback @ 883 (op0=0x00 rex_len=0)
-  fallback @ 884 (op0=0x00 rex_len=0)
-  fallback @ 885 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 886)
-  step @ 886: op0=0xff r=2 ilen=2 bitcount=124
-  fallback @ 888 (op0=0x48 rex_len=1)
-  fallback @ 889 (op0=0x83 rex_len=0)
-  fallback @ 890 (op0=0xc6 rex_len=0)
-  fallback @ 891 (op0=0x06 rex_len=0)
-  fallback @ 892 (op0=0xe9 rex_len=0)
-  fallback @ 893 (op0=0x44 rex_len=1)
-  fallback @ 894 (op0=0xfe rex_len=0)
-  fallback @ 895 (op0=0xff rex_len=0)
-  fallback @ 896 (op0=0xff rex_len=0)
-  (resync apres 9 fallback(s) @ 897)
-  step @ 897: op0=0x0f r=1 ilen=4 bitcount=125
-  step @ 901: op0=0x81 r=0 ilen=6 bitcount=126
-  fallback @ 907 (op0=0x74 rex_len=0)
-  fallback @ 908 (op0=0x05 rex_len=0)
-  fallback @ 909 (op0=0xe9 rex_len=0)
-  fallback @ 910 (op0=0x0a rex_len=0)
-  fallback @ 911 (op0=0x0a rex_len=0)
-  fallback @ 912 (op0=0x00 rex_len=0)
-  fallback @ 913 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 914)
-  step @ 914: op0=0x0f r=1 ilen=4 bitcount=126
-  step @ 918: op0=0x83 r=0 ilen=3 bitcount=127
-  fallback @ 921 (op0=0x74 rex_len=0)
-  fallback @ 922 (op0=0x05 rex_len=0)
-  fallback @ 923 (op0=0xe9 rex_len=0)
-  fallback @ 924 (op0=0xfc rex_len=0)
-  fallback @ 925 (op0=0x09 rex_len=0)
-  fallback @ 926 (op0=0x00 rex_len=0)
-  fallback @ 927 (op0=0x00 rex_len=0)
-  (resync apres 7 fallback(s) @ 928)
-  step @ 928: op0=0x0f r=1 ilen=4 bitcount=127
+asm_bits=222 lde_bits=128
+PREMIER DESACCORD au call #106 (_SET eax, off=579) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 00 00 0f b6 46 01 89 c2 81 e2 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 0646DC9720904BAB35E8B12BC14A3C3C
+  simulee : 0646DC9720904BAB35E8B12BC1FEC40F
+error: stub generation failed
+_SET imm call#88 reg=rax val=101 s1=64 lsb=0 bytes=48 8d 04 25 65 00 00 00 
+_SET imm call#89 reg=rdi val=0 s1=64 lsb=0 bytes=48 8d 3c 25 00 00 00 00 
+_SET imm call#91 reg=rdx val=1 s1=64 lsb=8 bytes=48 ba 01 00 00 00 00 00 00 00 
+_SET imm call#93 reg=eax val=1 s1=32 lsb=0 bytes=48 8d 04 25 01 00 00 00 
+_SET imm call#94 reg=edi val=1 s1=32 lsb=64 bytes=bf 01 00 00 00 
+_SET imm call#95 reg=rax val=60 s1=64 lsb=128 bytes=48 b8 3c 00 00 00 00 00 00 00 
+_SET imm call#96 reg=rdi val=0 s1=64 lsb=1 bytes=48 bf 00 00 00 00 00 00 00 00 
+_SET imm call#198 reg=eax val=1 s1=32 lsb=0 bytes=48 8d 04 25 01 00 00 00 
+_SET imm call#199 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+  >>> DUMP autour du bit 96 (pos=395, ilen=10):
+      00 00 00 00 48 bf 00 00 00 00 00 00 00 00 0f 05 48 81 ec 10 
 asm_bits=222 lde_bits=128
 PREMIER DESACCORD au call #107 (_SET eax, off=622) : asm a choisi 0, LDE a lu 1
   octets a cet offset: 00 00 0f b6 46 02 83 f8 00 74 
 asm: MISMATCH cle simulee vs cle reelle
-  reelle  : 569D2386A25B6141B3421F2E09776AB0
-  simulee : 569D2386A25B6141B3421F2E09BFE71A
+  reelle  : 917B989124E65DC3103D96D8C976C082
+  simulee : 917B989124E65DC3103D96D8C9BE9761
+error: stub generation failed
+_SET imm call#88 reg=rax val=101 s1=64 lsb=0 bytes=48 8d 04 25 65 00 00 00 
+_SET imm call#89 reg=rdi val=0 s1=64 lsb=2 bytes=48 bf 00 00 00 00 00 00 00 00 
+_SET imm call#91 reg=rdx val=1 s1=64 lsb=8 bytes=48 ba 01 00 00 00 00 00 00 00 
+_SET imm call#93 reg=eax val=1 s1=32 lsb=0 bytes=48 8d 04 25 01 00 00 00 
+_SET imm call#94 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+_SET imm call#95 reg=rax val=60 s1=64 lsb=0 bytes=48 8d 04 25 3c 00 00 00 
+_SET imm call#96 reg=rdi val=0 s1=64 lsb=1 bytes=48 bf 00 00 00 00 00 00 00 00 
+_SET imm call#198 reg=eax val=1 s1=32 lsb=64 bytes=b8 01 00 00 00 
+_SET imm call#199 reg=edi val=1 s1=32 lsb=0 bytes=48 8d 3c 25 01 00 00 00 
+  >>> DUMP autour du bit 96 (pos=406, ilen=10):
+      3c 00 00 00 48 bf 00 00 00 00 00 00 00 00 0f 05 48 81 ec 10 
+asm_bits=222 lde_bits=128
+PREMIER DESACCORD au call #105 (_INC ecx, off=572) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 15 00 81 c1 01 00 00 00 48 83 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : DEC7CF10519657BC7917D41E458C3EAB
+  simulee : DEC7CF10519657BC7917D41E457AF467
 error: stub generation failed
