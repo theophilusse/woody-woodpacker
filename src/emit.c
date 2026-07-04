@@ -838,13 +838,13 @@ int	emit_lea_r64_reg0(t_emitter *e, t_reg dst, t_reg src)
 	uint8_t b[6]; int n = 0;
 	b[n++] = mk_rex(1, dst, src);
 	b[n++] = 0x8D;
-	if (src == REG_RSP) {
-		b[n++] = MODRM01(dst, 4);   /* rm=4 = SIB */
-		b[n++] = 0x24;               /* SIB: no idx, base=rsp */
-		b[n++] = 0x00;               /* disp8=0 */
+	if ((src & 0x07) == 4) {
+		b[n++] = MODRM01(dst, 4);
+		b[n++] = 0x24;
+		b[n++] = 0x00;
 	} else {
 		b[n++] = MODRM01(dst, src);
-		b[n++] = 0x00;               /* disp8=0 */
+		b[n++] = 0x00;
 	}
 	return emit_raw(e, b, n);
 }
@@ -968,5 +968,23 @@ int	emit_mov_r8_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
 	b[n++] = 0x8A;
 	b[n++] = MODRM01(dst, base);
 	b[n++] = (uint8_t)disp;
+	return emit_raw(e, b, n);
+}
+
+/* LEA r32, [src+0] : 8D mod=01 disp8=0 (avec SIB si src==RSP/R12) */
+int	emit_lea_r32_reg0(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t b[6]; int n = 0;
+	uint8_t r = mk_rex(0, dst, src);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x8D;
+	if ((src & 0x07) == 4) {          /* RSP ou R12 : SIB obligatoire */
+		b[n++] = MODRM01(dst, 4);
+		b[n++] = 0x24;                 /* SIB: no idx, base=src */
+		b[n++] = 0x00;                 /* disp8=0 */
+	} else {
+		b[n++] = MODRM01(dst, src);
+		b[n++] = 0x00;                 /* disp8=0 */
+	}
 	return emit_raw(e, b, n);
 }

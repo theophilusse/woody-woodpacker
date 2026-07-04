@@ -738,6 +738,17 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				return 0;
 			}
 
+			/* r32 → r32 */
+			if (s1 == 32 && s2 == 32)
+			{
+				if (lsb_value)
+					emit_mov_r32_r32(&a->out->e, r1, r2);       /* 89 /r, déjà géré par @check_89 */
+				else
+					emit_lea_r32_reg0(&a->out->e, r1, r2);      /* 8D mod=01 disp8=0, nouvelle fonction */
+				a->key_index++;
+				return 0;
+			}
+
 			if (s1 == 32 && s2 == 8)
 			{
 				if (lsb_value)
