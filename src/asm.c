@@ -1047,6 +1047,34 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
         bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
                   lde_bit_log, &lde_bit_log_len);
 
+		{
+			/* Construit l'ensemble des positions ATTENDUES (enregistrées par asm.c) */
+			/* et compare a TOUTES les positions ou le LDE a compte un bit */
+			int expected_count = 0;
+			int phantom_count = 0;
+			for (int64_t p = ss; p < se; p++)
+			{
+				int bit = lde_bit_at_pos((size_t)p);
+				if (bit == -1) continue;
+
+				int is_expected = 0;
+				for (int i = 0; i < g_bit_log_len; i++)
+				{
+					if (g_bit_log_off[i] == (size_t)p) { is_expected = 1; break; }
+				}
+				if (is_expected)
+					expected_count++;
+				else
+				{
+					phantom_count++;
+					fprintf(stderr, "asm: BIT FANTOME a pos=%ld (bit=%d, bloc=%s) — "
+							"aucun appel macro enregistre a cette position !\n",
+							(long)p, bit, nearest_label(&a, (size_t)p));
+				}
+			}
+			fprintf(stderr, "asm: %d bits attendus retrouves, %d bits fantomes detectes\n",
+					expected_count, phantom_count);
+		}
         fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
 		
 		// debug
