@@ -14,7 +14,7 @@ static const char STUB_SRC[] =
 	"cmp eax, 1\n"
 	"jne far_forward\n"     // ne doit jamais être pris ici, mais teste l'encodage
 	"_SET eax, 42\n"        // ne doit jamais s'exécuter si le jump est bon
-	"jmp end\n"
+	"jmp end_debug\n"
 
 	"padding_start:\n"
 
@@ -169,7 +169,7 @@ static const char STUB_SRC[] =
 	"_SET edi, 0\n"
 	"syscall\n"             // exit(0) si le forward jump est correct
 
-	"end:\n"
+	"end_debug:\n"
 	"_SET eax, 60\n"
 	"_SET edi, 1\n"
 	"syscall\n"             // exit(1) si mal branché (ne devrait jamais arriver)
