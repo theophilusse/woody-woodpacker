@@ -490,6 +490,15 @@ static const char STUB_SRC[] =
 	"sub rsp, 32\n" //; allouer un buffer de 32 octets sur la pile
 	"_SET r8, rsp\n"         //; r8 = pointeur vers les données
 	"add r8, 32\n"
+
+/* ── DEBUG TEMPORAIRE : dump rbp directement, avant tout calcul ── */
+"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
+"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, rbp\n" "_SET rdx, 16\n"
+"syscall\n"
+"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
+/* ── FIN DEBUG ── */
+
+
 	"_SET rsi, rsp\n"
     "_SET r9, rsp\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
     "_ZERO r10\n"           //; r10 = index pour les données (0 à 15)
