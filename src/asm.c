@@ -41,30 +41,27 @@ static int64_t	sym(t_asm *a, const char *n)
 
 static void	deflabel(t_asm *a, const char *name)
 {
-	int i;
-
 	if (DEBUG_MODE)
 		printf("deflabel: %s at %zu\n", name, a->out->e.len);
-	for (i = 0; i < a->nlabels; i++)
+	if (a->nlabels >= MAX_LABELS)
 	{
-		if (!strcmp(a->labels[i].name, name))
-		{
-			fprintf(stderr, "asm: ERREUR label duplique '%s' "
-				"(premiere def @ %zu, redefinition @ %zu)\n",
-				name, a->labels[i].off, a->out->e.len);
-			exit(1);   /* ou propage une erreur via un flag global si tu préfères éviter exit() ici */
-		}
+		fprintf(stderr, "asm: ERREUR MAX_LABELS (%d) depasse a la definition de '%s'\n",
+			MAX_LABELS, name);
+		exit(1);
 	}
-	if (a->nlabels >= MAX_LABELS) return;
 	strncpy(a->labels[a->nlabels].name, name, 63);
 	a->labels[a->nlabels].off = a->out->e.len;
 	a->nlabels++;
 }
 
-//static void	fixup(t_asm *a, const char *name, size_t off, size_t end)
 static void	addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
 {
-	if (a->nfixups >= MAX_FIXUPS) return;
+	if (a->nfixups >= MAX_FIXUPS)
+	{
+		fprintf(stderr, "asm: ERREUR MAX_FIXUPS (%d) depasse pour '%s'\n",
+			MAX_FIXUPS, name);
+		exit(1);
+	}
 	a->fixups[a->nfixups].off = off;
 	a->fixups[a->nfixups].end = end;
 	a->fixups[a->nfixups].is_rel8 = is_rel8;
