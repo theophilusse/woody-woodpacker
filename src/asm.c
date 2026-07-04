@@ -1,20 +1,24 @@
 #include "asm.h"
 
-static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi","r8","r9","r10","r11","r12"};
-static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi","r8d","r9d","r10d","r11d","r12d"};
-static const char *R8[]  = {"al","cl","dl","bl","r8b","r9b","r10b","r11b","r12b"};
+static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi",
+                             "r8","r9","r10","r11","r12","r13","r14","r15"};
+static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi",
+                             "r8d","r9d","r10d","r11d","r12d","r13d","r14d","r15d"};
+static const char *R8L[] = {"al","cl","dl","bl"};                                   /* index 0-3 */
+static const char *R8H[] = {"r8b","r9b","r10b","r11b","r12b","r13b","r14b","r15b"}; /* index 8-15 */
 
-static int	preg(const char *s, t_reg *r, int *sz)
+static int preg(const char *s, t_reg *r, int *sz)
 {
-	int	i;
-
-	for (i = 0; i < 12; i++) {
-		if (!strcmp(s,R64[i])) { *r=(t_reg)i; *sz=64; return 1; }
-		if (!strcmp(s,R32[i])) { *r=(t_reg)i; *sz=32; return 1; }
-	}
-	for (i = 0; i < 8; i++)
-		if (!strcmp(s,R8[i])) { *r=(t_reg)i; *sz=8; return 1; }
-	return 0;
+    int i;
+    for (i = 0; i < 16; i++) {
+        if (!strcmp(s,R64[i])) { *r=(t_reg)i; *sz=64; return 1; }
+        if (!strcmp(s,R32[i])) { *r=(t_reg)i; *sz=32; return 1; }
+    }
+    for (i = 0; i < 4; i++)
+        if (!strcmp(s,R8L[i])) { *r=(t_reg)i; *sz=8; return 1; }
+    for (i = 0; i < 8; i++)
+        if (!strcmp(s,R8H[i])) { *r=(t_reg)(i+8); *sz=8; return 1; }
+    return 0;
 }
 
 /* ── symboles ───────────────────────────────────────────────────── */
@@ -191,7 +195,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
-	lsb_value = a->crypto->key[(a->key_index / 8) % a->crypto->key_len] & (0x01 << a->key_index);
+	lsb_value = a->crypto->key[(a->key_index / 8) % a->crypto->key_len] & (0x01 << (a->key_index % 8));
 	if (!strcmp(toks[0], "syscall"))
 		{ emit_syscall(&a->out->e); return 0; }
 	if (!strcmp(toks[0], "rtdsc"))
@@ -475,45 +479,36 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		if (toks[1][0] != '[' && toks[2][0] == '[')
 		{
-			if (preg(toks[1], &r1, &s1)) // Vérifie si "bl" est un registre 8-bit
+			if (preg(toks[1], &r1, &s1))
 			{
 				mt = pmem(toks[2], &base, &idx, lbl, &d8);
-				if (mt == 0) // No SIB needed
+
+				if (mt == 3) /* [base] seul, pas de disp, pas de SIB */
 				{
-					if (s1 == 8)
-					{
-						emit_mov_r8_mem_reg(&a->out->e, r1, base); // mov r8, [base]
-					}
-					else if (s1 == 32)
-					{
-						emit_mov_r32_mem_reg(&a->out->e, r1, base); // mov r32, [base]
-					}
-					else if (s1 == 64)
-					{
-						emit_mov_r64_mem_reg(&a->out->e, r1, base); // mov r64, [base]
-					}
-					return 0;
+					if (s1 == 8)  { emit_mov_r8_mem_reg(&a->out->e, r1, base); return 0; }
+					if (s1 == 32) { emit_mov_r32_mem_reg(&a->out->e, r1, base); return 0; }
+					if (s1 == 64) { emit_mov_r64_mem_reg(&a->out->e, r1, base); return 0; }
 				}
-				else if (mt == 1) // SIB needed
+				else if (mt == 4) /* [base+disp8] */
 				{
-					if (s1 == 8)
-					{
-						emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r8, [base+idx+d8]
-					}
-					else if (s1 == 32)
-					{
-						emit_mov_r32_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r32, [base+idx+d8]
-					}
-					else if (s1 == 64)
-					{
-						emit_mov_r64_mem_sib_disp(&a->out->e, r1, base, idx, d8); // mov r64, [base+idx+d8]
-					}
-					return 0;
+					if (s1 == 8)  { emit_mov_r8_mem_disp8(&a->out->e, r1, base, d8); return 0; }
+					if (s1 == 32) { emit_mov_r32_mem_disp8(&a->out->e, r1, base, d8); return 0; }
+					if (s1 == 64) { fprintf(stderr, "asm: mov r64,[base+disp8] non implemente\n"); return -1; }
+				}
+				else if (mt == 1) /* SIB (base+idx) */
+				{
+					if (s1 == 8)  { emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, d8); return 0; }
+					if (s1 == 32) { emit_mov_r32_mem_sib_disp(&a->out->e, r1, base, idx, d8); return 0; }
+					if (s1 == 64) { emit_mov_r64_mem_sib_disp(&a->out->e, r1, base, idx, d8); return 0; }
+				}
+				else if (mt == 2) /* [label] RIP-relative */
+				{
+					fprintf(stderr, "asm: mov reg,[label] RIP-relatif non implemente\n");
+					return -1;
 				}
 			}
-			return 1;
+			return -1; /* échec explicite plutôt qu'un 1 ambigu */
 		}
-
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1))
 		{
 			if (s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
@@ -702,6 +697,24 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (toks[2][0] == '[')                       /* source mémoire */
 		{
 			mt = pmem(toks[2], &base, &idx, lbl, &d8);
+
+			if (s1 == 8)
+			{
+				if (lsb_value) {
+					/* bit=1 : MOV r8, r/m8 (0x8A) — nouveau pattern LDE */
+					if (mt == 3) emit_mov_r8_mem_reg(&a->out->e, r1, base);
+					if (mt == 4) emit_mov_r8_mem_disp8(&a->out->e, r1, base, d8);
+					if (mt == 1) emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, 0);
+				} else {
+					/* bit=0 : MOVZX r32(alias), r/m8 — deja reconnu par le LDE */
+					if (mt == 3) emit_movzx_r32_mem_reg(&a->out->e, r1, base);
+					if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
+					if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
+				}
+				a->key_index++;
+				return 0;
+			}
+
 			if (lsb_value) {
 				if (mt == 3) emit_mov_r32_mem_reg(&a->out->e, r1, base);
 				if (mt == 4) emit_mov_r32_mem_disp8(&a->out->e, r1, base, d8);

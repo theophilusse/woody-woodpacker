@@ -262,12 +262,33 @@ static const char STUB_SRC[] =
 
 /* 0x89 : MOV r32, r32 → bit=1 */
 "@check_89:\n"
-"cmp eax, 0x89\n" "jne @check_8b\n"
+"cmp eax, 0x89\n" "jne @check_8a\n"
 "cmp ecx, 128\n" "jge @adv2_89\n"
 "push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
 "and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
 "pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
 "@adv2_89:\n" "add rsi, 2\n" "jmp @lde_loop\n"
+
+/* 0x8A : MOV r8, r/m8 → bit=1 (NOUVEAU) */
+"@check_8a:\n"
+"cmp eax, 0x8a\n" "jne @check_8b\n"
+"cmp ecx, 128\n" "jge @advance_8a\n"
+"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
+"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+"jmp @advance_8a\n"
+"@advance_8a:\n"
+"_SET eax, [rsi+1]\n"
+"mov edx, eax\n" "and edx, 0xc0\n" "sar edx, 6\n" "and eax, 7\n"
+"cmp edx, 0\n" "jne @mod01_8a\n"
+"cmp eax, 4\n" "je @sib_8a\n"
+"add rsi, 2\n" "jmp @lde_loop\n"
+"@sib_8a:\n" "add rsi, 3\n" "jmp @lde_loop\n"
+"@mod01_8a:\n"
+"cmp edx, 1\n" "jne @lde_fallback\n"
+"cmp eax, 4\n" "je @sib_disp8_8a\n"
+"add rsi, 3\n" "jmp @lde_loop\n"
+"@sib_disp8_8a:\n" "add rsi, 4\n" "jmp @lde_loop\n"
 
 /* 0x8B : MOV r32, r/m → bit=1 */
 "@check_8b:\n"

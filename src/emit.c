@@ -1084,3 +1084,15 @@ int emit_jcc_rel32(t_emitter *e, uint8_t op, int32_t disp)
     memcpy(b + 2, &disp, 4);
     return emit_raw(e, b, 6);
 }
+
+/* MOV r8, [base+disp8] sans SIB : 8A /r mod=01 */
+int	emit_mov_r8_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
+{
+	uint8_t b[4]; int n = 0;
+	uint8_t r = mk_rex(0, dst, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x8A;
+	b[n++] = MODRM01(dst, base);
+	b[n++] = (uint8_t)disp;
+	return emit_raw(e, b, n);
+}
