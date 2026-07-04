@@ -516,7 +516,7 @@ static const char STUB_SRC[] =
     "mov rax, 1\n"           //; sys_write
     "mov rdi, 1\n"           //; stdout
     "mov rsi, r9\n"
-    "mov rdx, 33\n"
+    "mov rdx, 32\n"
     "syscall\n"
 
 	"mov [r8], 10\n"
