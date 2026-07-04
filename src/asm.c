@@ -951,11 +951,16 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
                 }
             }
             if (mismatch_at >= 0)
+			{
 				fprintf(stderr, "PREMIER DESACCORD au call #%d (%s) : asm a choisi %d, LDE a lu %d\n",
 						mismatch_at, g_bit_log_name[mismatch_at],
 						g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
-                fprintf(stderr, "Nombre d'appels different (asm=%d, lde=%d) mais tous les bits communs concordent\n",
-                        g_bit_log_len, lde_bit_log_len);
+			}
+			else if (g_bit_log_len != lde_bit_log_len)
+			{
+				fprintf(stderr, "Nombre d'appels different (asm=%d, lde=%d) mais tous les bits communs concordent\n",
+						g_bit_log_len, lde_bit_log_len);
+			}
         }
 
         if (bits < 128)
