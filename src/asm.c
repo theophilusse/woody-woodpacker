@@ -982,7 +982,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
     }
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
-	dump_all_blocks(a); // debug
+	dump_all_blocks(&a); // debug
     {
         int64_t ss = sym(&a, "scan_start");
         int64_t se = sym(&a, "scan_end");
