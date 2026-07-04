@@ -722,6 +722,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
 					if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 				}
+				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
 			}
@@ -735,6 +736,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
 				if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 			}
+			g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 			a->key_index++;
 			return 0;
 		}
@@ -747,6 +749,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_mov_r64_r64(&a->out->e, r1, r2);       /* 48 89 /r */
 				else
 					emit_lea_r64_reg0(&a->out->e, r1, r2);       /* 48 8D mod=01 disp8=0 */
+				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
 			}
@@ -758,6 +761,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_mov_r32_r32(&a->out->e, r1, r2);       /* 89 /r, déjà géré par @check_89 */
 				else
 					emit_lea_r32_reg0(&a->out->e, r1, r2);      /* 8D mod=01 disp8=0, nouvelle fonction */
+				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
 			}
@@ -768,6 +772,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_movzx_r32_r8(&a->out->e, r1, r2);
 				else
 					emit_and_r32_imm32(&a->out->e, r1, 0xff);
+				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
 			}
@@ -779,6 +784,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					emit_mov_r8_imm8(&a->out->e, r1, (uint8_t)val);   /* B0+r ib */
 				else
 					emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val); /* B8+r id, zero-extend */
+				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
 				return 0;
 			}
@@ -792,6 +798,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 			else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
 		}
+		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return 0;
 	}
@@ -811,6 +818,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else if (s1 == 32 || s1 == 64)
 				emit_add_r32_imm32_long(&a->out->e, r1, 1);
 		}
+		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return (0);
 	}
@@ -830,6 +838,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else if (s1 == 32) emit_sub_r32_imm8(&a->out->e, r1, 1);
 			else               emit_sub_r64_imm8(&a->out->e, r1, 1);
 		}
+		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return (0);
 	}
@@ -846,11 +855,16 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
     char    toks[8][64];
     char    line[256];
     int     n, llen, tok0len;
+    int     lde_bit_log[512];
+    int     lde_bit_log_len;
+    int     bits;
+
+    g_bit_log_len = 0;          /* reset du log cote asm.c pour cette generation */
+    lde_bit_log_len = 0;
 
     memset(&a, 0, sizeof(a));
     a.out    = out;
     a.crypto = crypto;
-
     const char *p = src;
     while (*p) {
         const char *start = p;
@@ -884,31 +898,55 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
             patch_disp32_buf(a.out->e.buf, a.fixups[i].off, d);
         }
     }
-	/* ── verification LDE : bloque la generation si le scan runtime
+    /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
     {
-		int lde_bit_log[512];
-		int lde_bit_log_len = 0;
-		bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
-						lde_bit_log, &lde_bit_log_len);
+        int64_t ss = sym(&a, "scan_start");
+        int64_t se = sym(&a, "scan_end");
+        uint8_t simulated[16];
 
-		fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
-		int mismatch_at = -1;
-		int n_compare = (g_bit_log_len < lde_bit_log_len) ? g_bit_log_len : lde_bit_log_len;
-		for (int i = 0; i < n_compare; i++)
-		{
-			if (g_bit_log[i] != lde_bit_log[i])
-			{
-				mismatch_at = i;
-				break;
-			}
-		}
-		if (mismatch_at >= 0)
-			fprintf(stderr, "PREMIER DESACCORD au call #%d : asm a choisi %d, LDE a lu %d\n",
-					mismatch_at, g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
-		else if (g_bit_log_len != lde_bit_log_len)
-			fprintf(stderr, "Nombre d'appels different (asm=%d, lde=%d) mais tous les bits communs concordent\n",
-					g_bit_log_len, lde_bit_log_len);
-	}
+        if (ss < 0 || se < 0)
+        {
+            fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
+            return (-1);
+        }
+        bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
+                          lde_bit_log, &lde_bit_log_len);
+
+        fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
+        {
+            int mismatch_at = -1;
+            int n_compare = (g_bit_log_len < lde_bit_log_len) ? g_bit_log_len : lde_bit_log_len;
+            for (int i = 0; i < n_compare; i++)
+            {
+                if (g_bit_log[i] != lde_bit_log[i])
+                {
+                    mismatch_at = i;
+                    break;
+                }
+            }
+            if (mismatch_at >= 0)
+                fprintf(stderr, "PREMIER DESACCORD au call #%d : asm a choisi %d, LDE a lu %d\n",
+                        mismatch_at, g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
+            else if (g_bit_log_len != lde_bit_log_len)
+                fprintf(stderr, "Nombre d'appels different (asm=%d, lde=%d) mais tous les bits communs concordent\n",
+                        g_bit_log_len, lde_bit_log_len);
+        }
+
+        if (bits < 128)
+        {
+            fprintf(stderr, "asm: LDE simule n'a extrait que %d/128 bits\n", bits);
+            return (-1);
+        }
+        if (memcmp(simulated, crypto->key, 16) != 0)
+        {
+            fprintf(stderr, "asm: MISMATCH cle simulee vs cle reelle\n  reelle  : ");
+            for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", crypto->key[i]);
+            fprintf(stderr, "\n  simulee : ");
+            for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", simulated[i]);
+            fprintf(stderr, "\n");
+            return (-1);
+        }
+    }
     return 0;
 }

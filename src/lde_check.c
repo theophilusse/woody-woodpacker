@@ -203,7 +203,7 @@ fallback:
 ** Retourne le nombre de bits extraits (128 = succès complet).
 */
 int lde_run_c(const uint8_t *buf, size_t start, size_t end,
-              uint8_t key_out[16], int verbose)
+              uint8_t key_out[16], int verbose, int lde_bit_log[512], int *lde_bit_log_len)
 {
 	size_t pos = start;
 	int bitcount = 0;
