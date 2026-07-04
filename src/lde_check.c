@@ -245,24 +245,22 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
     memset(key_out, 0, 16);
     memset(lde_bit_by_pos, -1, sizeof(lde_bit_by_pos));
 
-    while (pos < end && bitcount < 128)
+    while (pos < end)                          /* MODIFIÉ : ne s'arrête plus à bitcount<128 */
     {
         int ilen;
         int r = lde_step_c(buf, end, pos, &ilen, verbose);
         if (r == -1)
         {
             fallback_streak++;
-            if (verbose)                                            /* RESTAURÉ */
-                fprintf(stderr, "  fallback @ %zu (op0=0x%02x rex_len=0)\n",
-                        pos, buf[pos]);
+            if (verbose)
+                fprintf(stderr, "  fallback @ %zu (op0=0x%02x rex_len=0)\n", pos, buf[pos]);
             pos += (size_t)ilen;
             continue;
         }
-        if (fallback_streak > 0 && verbose)                          /* RESTAURÉ */
-            fprintf(stderr, "  (resync apres %d fallback(s) @ %zu)\n",
-                    fallback_streak, pos);
+        if (fallback_streak > 0 && verbose)
+            fprintf(stderr, "  (resync apres %d fallback(s) @ %zu)\n", fallback_streak, pos);
         fallback_streak = 0;
-        if (verbose)                                                 /* RESTAURÉ */
+        if (verbose)
             fprintf(stderr, "  step @ %zu: op0=0x%02x r=%d ilen=%d bitcount=%d\n",
                     pos, buf[pos], r, ilen, bitcount);
         if (r == 1 || r == 2)
@@ -270,13 +268,16 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
             int bit = (r == 2) ? 1 : 0;
             if (pos < 8192)
                 lde_bit_by_pos[pos] = bit;
-            if (bit)
-                key_out[bitcount/8] |= (uint8_t)(1 << (bitcount % 8));
-            lde_bit_log[*lde_bit_log_len] = bit;
-            (*lde_bit_log_len)++;
+            if (bitcount < 128)                /* MODIFIÉ : n'écrit plus la clé au-delà de 128 */
+            {
+                if (bit)
+                    key_out[bitcount/8] |= (uint8_t)(1 << (bitcount % 8));
+                lde_bit_log[*lde_bit_log_len] = bit;
+                (*lde_bit_log_len)++;
+            }
             bitcount++;
         }
         pos += (size_t)ilen;
     }
-    return bitcount;
+    return (bitcount < 128) ? bitcount : 128;   /* retourne 128 si on a bien atteint le seuil */
 }
