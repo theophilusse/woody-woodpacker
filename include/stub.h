@@ -407,9 +407,9 @@ static const char STUB_SRC[] =
 "_INC ecx\n"
 "@adv3_cmp:\n" "add rsi, 3\n" "jmp @lde_loop\n"
 
-/* 0x83 /4 : AND r32, imm8 → bit=1 */
+/* 0x83 /4 : AND r32, imm8 → bit=1 (NOUVEAU) */
 "@check_and83:\n"
-"_SET eax, [rsi+1]\n" "and eax, 0xf8\n" "cmp eax, 0xe0\n"   /* mod=11, reg=100 (AND) */
+"_SET eax, [rsi+1]\n" "and eax, 0xf8\n" "cmp eax, 0xe0\n"
 "jne @check_dec_ff\n"
 "cmp ecx, 128\n" "jge @adv3_and83\n"
 "push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
@@ -519,10 +519,12 @@ static const char STUB_SRC[] =
     "mov rdx, 33\n"
     "syscall\n"
 
-    //; === Terminer le programme ===
-    "mov rax, 60\n"          //; sys_exit
-    "_ZERO rdi\n"         //; code de sortie 0
-    "syscall\n"
+	"mov [r8], 10\n"
+	"mov rax, 1\n"
+	"mov rdi, 1\n"
+	"mov rsi, r8\n"
+	"mov rdx 1\n"
+	"syscall\n"
 
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
 
