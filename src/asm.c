@@ -647,31 +647,33 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		return (0);
 	}
-	if (n == 2 && (
-    !strcmp(toks[0],"jne") || !strcmp(toks[0],"je")  ||
-    !strcmp(toks[0],"jg")  || !strcmp(toks[0],"jl")  ||
-    !strcmp(toks[0],"jae") || !strcmp(toks[0],"jge") ||
-    !strcmp(toks[0],"jnz")))
+	if (n == 2 && (op = jcc_opcode(toks[0])))
 	{
-		uint8_t op = !strcmp(toks[0],"jne")||!strcmp(toks[0],"jnz") ? 0x75 :
-					!strcmp(toks[0],"je")  ? 0x74 :
-					!strcmp(toks[0],"jg")  ? 0x7F :
-					!strcmp(toks[0],"jl")  ? 0x7C :
-					!strcmp(toks[0],"jge") ? 0x7D : 0x73; /* jae */
-		int64_t val = sym(a, toks[1]);
-		if (val >= 0) {
-			/* backward : REL8 si possible */
-			int8_t d = (int8_t)(val - (int64_t)(a->out->e.len + 2));
-			emit_jcc_rel8_direct(&a->out->e, op, d);
-		} else {
-			/* forward : TOUJOURS REL32 via je+jmp trampoline */
-			//size_t poff = a->out->e.len + 1;
-			//size_t pend = a->out->e.len + 2;
-			uint8_t bytes[2] = {op ^ 1, 5};  /* inverse la condition, saute le jmp */
+		int64_t lval = sym(a, toks[1]);
+		if (lval >= 0)
+		{
+			int64_t disp = lval - (int64_t)(a->out->e.len + 2);
+			if (disp >= -128 && disp <= 127)
+			{
+				emit_jcc_rel8_direct(&a->out->e, op, (int8_t)disp);
+			}
+			else
+			{
+				/* backward mais trop loin pour rel8 : forme near 0F 8x rel32 */
+				int32_t d32 = (int32_t)(lval - (int64_t)(a->out->e.len + 6));
+				uint8_t bytes[6] = {0x0F, (uint8_t)(0x80 | (op & 0x0F)), 0,0,0,0};
+				memcpy(bytes + 2, &d32, 4);
+				emit_raw(&a->out->e, bytes, 6);
+			}
+		}
+		else
+		{
+			/* forward, distance inconnue : trampoline (condition inversée + jmp rel32) */
+			uint8_t bytes[2] = { (uint8_t)(op ^ 1), 5 };
 			emit_raw(&a->out->e, bytes, 2);
 			size_t dummy;
 			emit_jmp_rel32(&a->out->e, &dummy);
-			addfixup(a, toks[1], dummy, dummy + 4, 0);
+			addfixup(a, toks[1], dummy, dummy + 4, 0);   /* is_rel8 = 0 */
 		}
 		return 0;
 	}

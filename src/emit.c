@@ -1077,3 +1077,10 @@ int emit_rdtsc(t_emitter *e) {
     uint8_t b[2] = {0x0F, 0x31};  // Opcode de rdtsc
     return emit_raw(e, b, 2);
 }
+
+int emit_jcc_rel32(t_emitter *e, uint8_t op, int32_t disp)
+{
+    uint8_t b[6] = {0x0F, (uint8_t)(0x80 | (op & 0x0F)), 0,0,0,0};
+    memcpy(b + 2, &disp, 4);
+    return emit_raw(e, b, 6);
+}
