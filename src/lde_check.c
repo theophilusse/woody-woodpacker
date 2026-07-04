@@ -191,9 +191,12 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
 			continue;
 		}
 		if (fallback_streak > 0 && verbose)
+        {
 			fprintf(stderr, "  (resync apres %d fallback(s) @ %zu)\n",
 				fallback_streak, pos);
-		fallback_streak = 0;
+            fprintf(stderr, "  step @ %zu: r=%d ilen=%d bitcount=%d\n", pos, r, ilen, bitcount);
+        }
+        fallback_streak = 0;
 		if (r == 1 || r == 2)
 		{
 			if (r == 2)
