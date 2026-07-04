@@ -451,14 +451,23 @@ static const char STUB_SRC[] =
 	"cmp edx, 0x0\n"  "je @o8d_m00\n"
 	"jmp @lde_fallback\n"
 
-	"@o8d_m00:\n"                                  /* LEA absolue : mod00 rm=100 SIB=0x25 disp32 */
-	"cmp eax, 4\n" "jne @lde_fallback\n"
+	"@o8d_m00:\n"                                  /* MODIFIÉ : dispatch SIB vs RIP-relative */
+	"cmp eax, 4\n" "je @o8d_absSIB\n"
+	"cmp eax, 5\n" "je @o8d_ripRel\n"
+	"jmp @lde_fallback\n"
+
+	"@o8d_absSIB:\n"                               /* LEA absolue via SIB : mod00 rm=100 SIB=0x25 disp32 */
 	"_SET eax, [rsi+2]\n" "cmp eax, 0x25\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv_8dabs\n"
 	"_INC ecx\n"
 	"@adv_8dabs:\n" "add rsi, 7\n" "jmp @lde_loop\n"
 
-	"@o8d_m01:\n"                                  /* LEA reg,[reg+0] : mod01 disp8=0 */
+	"@o8d_ripRel:\n"                               /* NOUVEAU : LEA RIP-relative, mod00 rm=101
+													** aucun bit — saute tout le bloc d'un coup,
+													** sans jamais réinterpréter le disp32 octet par octet */
+	"add rsi, 6\n" "jmp @lde_loop\n"
+
+	"@o8d_m01:\n"                                  /* INCHANGÉ : LEA reg,[reg+0] : mod01 disp8=0 */
 	"cmp ecx, 128\n" "jge @adv_8d01\n"
 	"_INC ecx\n"
 	"@adv_8d01:\n"
