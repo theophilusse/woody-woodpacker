@@ -448,10 +448,10 @@ static const char STUB_SRC[] =
     "add ecx, 48\n"         //; Convertir en chiffre (0-9)
 ".store_high:\n"
     "mov [r9+r11], cl\n" //; Stocker le nibble haut
-    "_INC ecx\n"              //; Incrémenter l'index du buffer
+    "_INC r11\n"              //; Incrémenter l'index du buffer
 
     //; Extraire le nibble bas (4 bits de poids faible)
-    "mov ecx, r13\n"
+    "mov ecx, ebx\n"
     "and ecx, 15\n" // 0x0F
     "cmp ecx, 9\n"
     "jbe .digit_low\n"
