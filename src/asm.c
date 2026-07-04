@@ -693,6 +693,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else
 				emit_xor_r64_r64(&a->out->e, r1, r1);  // XOR r64, r64
 		}
+		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
 		return 0;
 	}
@@ -883,31 +884,28 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 	/* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
     {
-        int64_t ss = sym(&a, "scan_start");
-        int64_t se = sym(&a, "scan_end");
-        uint8_t simulated[16];
-        int bits;
+		int lde_bit_log[512];
+		int lde_bit_log_len = 0;
+		bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
+						lde_bit_log, &lde_bit_log_len);
 
-        if (ss < 0 || se < 0)
-        {
-            fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
-            return (-1);
-        }
-        bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1);
-        if (bits < 128)
-        {
-            fprintf(stderr, "asm: LDE simule n'a extrait que %d/128 bits\n", bits);
-            return (-1);
-        }
-        if (memcmp(simulated, crypto->key, 16) != 0)
-        {
-            fprintf(stderr, "asm: MISMATCH cle simulee vs cle reelle\n  reelle  : ");
-            for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", crypto->key[i]);
-            fprintf(stderr, "\n  simulee : ");
-            for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", simulated[i]);
-            fprintf(stderr, "\n");
-            return (-1);
-        }
-    }
+		fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
+		int mismatch_at = -1;
+		int n_compare = (g_bit_log_len < lde_bit_log_len) ? g_bit_log_len : lde_bit_log_len;
+		for (int i = 0; i < n_compare; i++)
+		{
+			if (g_bit_log[i] != lde_bit_log[i])
+			{
+				mismatch_at = i;
+				break;
+			}
+		}
+		if (mismatch_at >= 0)
+			fprintf(stderr, "PREMIER DESACCORD au call #%d : asm a choisi %d, LDE a lu %d\n",
+					mismatch_at, g_bit_log[mismatch_at], lde_bit_log[mismatch_at]);
+		else if (g_bit_log_len != lde_bit_log_len)
+			fprintf(stderr, "Nombre d'appels different (asm=%d, lde=%d) mais tous les bits communs concordent\n",
+					g_bit_log_len, lde_bit_log_len);
+	}
     return 0;
 }

@@ -238,8 +238,9 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
 
         if (r == 1 || r == 2)
         {
-            if (r == 2)
-                key_out[bitcount/8] |= (uint8_t)(1 << (bitcount % 8));
+            lde_bit_log[*lde_bit_log_len] = (r == 2) ? 1 : 0;   /* AJOUT */
+            (*lde_bit_log_len)++;
+            if (r == 2) key_out[bitcount/8] |= (1 << (bitcount%8));
             bitcount++;
         }
         pos += (size_t)ilen;
