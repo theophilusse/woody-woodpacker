@@ -78,7 +78,7 @@ static const char STUB_SRC[] =
 	/* ══════════ 0x80 /r ib : AND r8,0 (bit1) / ADD r8,1 (bit0) / SUB r8,1 (bit0) ══════════ */
 	"@o_80:\n"
 	"cmp eax, 0x80\n" "jne @o_81\n"
-	"_SET eax, [rsi+1]\n" "mov edx, eax\n" "and edx, 0x38\n"
+	"_SET eax, [rsi+1]\n" "_SET edx, eax\n" "and edx, 0x38\n"
 	"cmp edx, 0x20\n" "je @o80_and\n"
 	"cmp edx, 0x0\n"  "je @o80_add\n"
 	"cmp edx, 0x28\n" "je @o80_sub\n"
@@ -107,7 +107,7 @@ static const char STUB_SRC[] =
 	/* ══════════ 0x81 /r id : ADD r32,1 long (bit0) / AND r32,imm32 (bit0) / CMP (skip) ══════════ */
 	"@o_81:\n"
 	"cmp eax, 0x81\n" "jne @o_83\n"
-	"_SET eax, [rsi+1]\n" "mov edx, eax\n" "and edx, 0x38\n"
+	"_SET eax, [rsi+1]\n" "_SET edx, eax\n" "and edx, 0x38\n"
 	"cmp edx, 0x0\n"  "je @o81_add\n"
 	"cmp edx, 0x20\n" "je @o81_and\n"
 	"cmp edx, 0x38\n" "je @o81_cmp\n"
@@ -153,13 +153,6 @@ static const char STUB_SRC[] =
 	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
 	"@adv3_83and:\n" "add rsi, 3\n" "jmp @lde_loop\n"
 
-	"@o83_and:\n"
-	"cmp ecx, 128\n" "jge @adv3_83and\n"
-	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
-	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
-	"@adv3_83and:\n" "add rsi, 3\n" "jmp @lde_loop\n"
-
 	"@o83_sub:\n"
 	"_SET eax, [rsi+2]\n" "cmp eax, 0x1\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv3_83sub\n"
@@ -172,8 +165,8 @@ static const char STUB_SRC[] =
 	"@o_31:\n"
 	"cmp eax, 0x31\n" "jne @o_89\n"
 	"_SET eax, [rsi+1]\n"
-	"mov edx, eax\n" "and edx, 0xc0\n" "cmp edx, 0xc0\n" "jne @adv2_31\n"
-	"mov edx, eax\n" "and edx, 0x38\n" "sar edx, 3\n"
+	"_SET edx, eax\n" "and edx, 0xc0\n" "cmp edx, 0xc0\n" "jne @adv2_31\n"
+	"_SET edx, eax\n" "and edx, 0x38\n" "sar edx, 3\n"
 	"and eax, 0x7\n"
 	"cmp eax, edx\n" "jne @adv2_31\n"
 	"cmp ecx, 128\n" "jge @adv2_31\n"
@@ -194,7 +187,7 @@ static const char STUB_SRC[] =
 	"@o_8a:\n"
 	"cmp eax, 0x8a\n" "jne @o_8b_and_pair\n"
 	"_SET eax, [rsi+1]\n"
-	"mov edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
+	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0x0\n" "je @o8a_m00\n"
 	"cmp edx, 0x40\n" "je @o8a_m01\n"
 	"jmp @lde_fallback\n"
@@ -227,7 +220,7 @@ static const char STUB_SRC[] =
 "@o_8b_and_pair:\n"
 "cmp eax, 0x8b\n" "jne @o_8b\n"
 "_SET edi, [rsi+1]\n"                       /* edi = modrm du 8B */
-"mov r8d, edi\n" "and r8d, 0xc0\n"          /* r8d = mod */
+"_SET r8d, edi\n" "and r8d, 0xc0\n"          /* r8d = mod */
 "and edi, 0x7\n"                            /* edi = rm */
 "cmp r8d, 0x0\n"  "je @o8bp_try00\n"
 "cmp r8d, 0x40\n" "je @o8bp_try01\n"
@@ -328,7 +321,7 @@ static const char STUB_SRC[] =
 	"@o_8b:\n"
 	"cmp eax, 0x8b\n" "jne @o_8d\n"
 	"_SET eax, [rsi+1]\n"
-	"mov edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
+	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0x0\n" "je @o8b_m00\n"
 	"cmp edx, 0x40\n" "je @o8b_m01\n"
 	"jmp @lde_fallback\n"
@@ -357,7 +350,7 @@ static const char STUB_SRC[] =
 	"@o_8d:\n"
 	"cmp eax, 0x8d\n" "jne @o_0f\n"
 	"_SET eax, [rsi+1]\n"
-	"mov edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
+	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0x40\n" "je @o8d_m01\n"
 	"cmp edx, 0x0\n"  "je @o8d_m00\n"
 	"jmp @lde_fallback\n"
@@ -391,7 +384,7 @@ static const char STUB_SRC[] =
 	"cmp eax, 0x0f\n" "jne @o_b8\n"
 	"_SET eax, [rsi+1]\n" "cmp eax, 0xb6\n" "jne @lde_fallback\n"
 	"_SET eax, [rsi+2]\n"
-	"mov edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
+	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0xc0\n" "je @o0f_reg\n"
 	"cmp edx, 0x0\n"  "je @o0f_m00\n"
 	"cmp edx, 0x40\n" "je @o0f_m01\n"
@@ -487,10 +480,10 @@ static const char STUB_SRC[] =
 	/////////////////////////////////// AFFICHE LA CLE (DEBUG)
 
 	"sub rsp, 32\n" //; allouer un buffer de 32 octets sur la pile
-	"mov r8, rsp\n"         //; r8 = pointeur vers les données
+	"_SET r8, rsp\n"         //; r8 = pointeur vers les données
 	"add r8, 32\n"
-	"mov rsi, rsp\n"
-    "mov r9, rsp\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
+	"_SET rsi, rsp\n"
+    "_SET r9, rsp\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
     "mov r10, 0\n"           //; r10 = index pour les données (0 à 15)
     "mov r11, 0\n"           //; r11 = index pour le buffer de sortie (0 à 31)
 
@@ -502,7 +495,7 @@ static const char STUB_SRC[] =
     //; === Traiter l'octet courant ===
     //"movzx rbx, byte [r8 + r10]\n" //; r13 = octet à convertir
     "_SET bl, [r8+r10]\n"//"mov ebx, [r8+r10]\n"//"mov bl, [r8+r10]\n"
-	"mov ecx, ebx\n"        //; Copie de l'octet
+	"_SET ecx, ebx\n"        //; Copie de l'octet
 
     //; Extraire le nibble haut (4 bits de poids fort)
     "shr ecx, 4\n"
@@ -518,7 +511,7 @@ static const char STUB_SRC[] =
     "_INC r11\n"              //; Incrémenter l'index du buffer
 
     //; Extraire le nibble bas (4 bits de poids faible)
-    "mov ecx, ebx\n"
+    "_SET ecx, ebx\n"
     "and ecx, 15\n" // 0x0F
     "cmp ecx, 9\n"
     "jbe .digit_low\n"
@@ -541,7 +534,7 @@ static const char STUB_SRC[] =
     //; === Écrire le buffer complet (34 octets : "0x" + 32 hex + '\n') ===
     "mov rax, 1\n"           //; sys_write
     "mov rdi, 1\n"           //; stdout
-    "mov rsi, r9\n"
+    "_SET rsi, r9\n"
     "mov rdx, 32\n"
     "syscall\n"
 
@@ -564,10 +557,10 @@ static const char STUB_SRC[] =
 
 	// S-box sur la pile
 	"sub rsp, 256\n"
-	"mov rsi, rbp\n"
+	"_SET rsi, rbp\n"
 
 	// rsi = base de la cle (RIP-relative)
-	"mov rsi, rbp\n"
+	"_SET rsi, rbp\n"
 
 	// KSA init : S[i] = i, i = 0..255
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
