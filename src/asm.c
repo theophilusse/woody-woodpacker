@@ -323,17 +323,17 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		if (val < 0) val = strtoll(toks[2], NULL, 0);
 		if (s1 == 8)
 		{
-			emit_shr_r8_imm8(&a->out->e, s1, (uint8_t)val);
+			emit_shr_r8_imm8(&a->out->e, r1, (uint8_t)val);
 			return 0;
 		}
 		if (s1 == 32)
 		{
-			emit_shr_r32_imm8(&a->out->e, s1, (uint8_t)val);
+			emit_shr_r32_imm8(&a->out->e, r1, (uint8_t)val);
 			return 0;
 		}
 		if (s1 == 64)
 		{
-			emit_shr_r64_imm8(&a->out->e, s1, (uint8_t)val);
+			emit_shr_r64_imm8(&a->out->e, r1, (uint8_t)val);
 			return 0;
 		}
 		return 1;
