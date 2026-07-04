@@ -910,6 +910,26 @@ static const char *nearest_label(t_asm *a, size_t off)
     return best;
 }
 
+/* Pour chaque label @o_XX connu, dump ses N premiers octets réels */
+void dump_all_blocks(t_asm *a)
+{
+    const char *blocks[] = {
+        "@o80_and", "@o80_add", "@o80_sub", "@o81_add", "@o81_and",
+        "@o83_and", "@o83_sub", "@o_31", "@o_89", "@o_8a", "@o_8b",
+        "@o8d_absSIB", "@o8d_ripRel", "@o8d_m01", "@o_0f", "@o_b8",
+        "@o_inc", "@o_dec", NULL
+    };
+    for (int i = 0; blocks[i]; i++)
+    {
+        int64_t off = sym(a, blocks[i]);
+        if (off < 0) { fprintf(stderr, "%s: NON TROUVE\n", blocks[i]); continue; }
+        fprintf(stderr, "%-16s @%-5ld : ", blocks[i], (long)off);
+        for (int k = 0; k < 16; k++)
+            fprintf(stderr, "%02x ", a->out->e.buf[off + k]);
+        fprintf(stderr, "\n");
+    }
+}
+
 /* ── entree publique ────────────────────────────────────────────── */
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 {
@@ -962,6 +982,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
     }
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
+	dump_all_blocks(a); // debug
     {
         int64_t ss = sym(&a, "scan_start");
         int64_t se = sym(&a, "scan_end");
