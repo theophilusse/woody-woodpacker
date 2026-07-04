@@ -698,13 +698,14 @@ static const char STUB_SRC[] =
 	"pop rbp\n"
 	"jmp @oep\n"
 
+	"scan_end:\n"
+
 	// donnees embarquees apres le code
     "evasion_msg:\n"
     ".evasion_msg\n"
 	"msg:\n"
 	".msg\n"
 	"key:\n"
-	".key\n"
-	"scan_end:\n";
+	".key\n";
 
 #endif
