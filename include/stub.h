@@ -70,6 +70,10 @@ static const char STUB_SRC[] =
 	"cmp eax, 0xe9\n" "jne @o_9e\n"
 	"add rsi, 5\n" "jmp @lde_loop\n"
 
+	"@o_9e:\n"
+	"cmp eax, 0x9e\n" "jne @o_3c\n"
+	"add rsi, 5\n" "jmp @lde_loop\n"
+
 	"@o_3c:\n"
 	"cmp eax, 0x3c\n" "jne @o_24\n"
 	"add rsi, 2\n" "jmp @lde_loop\n"
