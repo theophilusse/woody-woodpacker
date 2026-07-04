@@ -129,124 +129,84 @@ int	emit_mov_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 int emit_mov_r8_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int8_t disp)
 {
     uint8_t b[7]; int n = 0;
-    uint8_t r = mk_rex(0, reg_dest >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(0, reg_dest, idx, base);
     if (r != 0x40) b[n++] = r;
 
-    b[n++] = 0x8A;  // mov r8, [base+idx+disp]
+    b[n++] = 0x8A;
 
-    // ModR/M
-    if (disp == 0 && base != 5) {
-        b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx]
-    } else {
-        b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx+disp8]
-    }
+    if (disp == 0 && (base & 0x07) != 5)
+        b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;
+    else
+        b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;
 
-    // SIB - Gestion des registres étendus
-    uint8_t base_num = base & 0x07;
-    uint8_t idx_num = idx & 0x07;
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
 
-    // Mise à jour du REX si nécessaire
-    r = mk_rex(0, reg_dest >> 3, base >> 3);
-    if (r != 0x40) b[0] = r;
-
-    b[n++] = (base_num << 3) | idx_num;
-
-    // Displacement
-    if (disp != 0 || base == 5) {
+    if (disp != 0 || (base & 0x07) == 5)
         b[n++] = (uint8_t)disp;
-    }
 
     return emit_raw(e, b, n);
 }
 
 
-int	emit_mov_r32_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp)
+int emit_mov_r32_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp)
 {
-	uint8_t b[7]; int n = 0;
-	uint8_t r = mk_rex(0, reg_dest >> 3, base >> 3);
-	if (r != 0x40) b[n++] = r;
+    uint8_t b[7]; int n = 0;
+    uint8_t r = mk_rex_sib(0, reg_dest, idx, base);
+    if (r != 0x40) b[n++] = r;
 
-	b[n++] = 0x8B;  // mov r32, [base+idx+disp]
+    b[n++] = 0x8B;
 
-	// ModR/M
-	if (disp == 0 && base != 5) {
-		b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx]
-	} else {
-		b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx+disp8]
-	}
+    if (disp == 0 && (base & 0x07) != 5)
+        b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;
+    else
+        b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;
 
-	// SIB - CORRECTION POUR LES REGISTRES ETENDUS
-	uint8_t base_num = base & 0x07;
-	uint8_t idx_num = idx & 0x07;
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
 
-	// Si base est un registre étendu (R8-R15), on doit utiliser REX.B
-	if (base >= REG_R8) {
-		r = mk_rex(0, reg_dest >> 3, base >> 3);
-		if (r != 0x40) b[0] = r;  // Mise à jour du REX si nécessaire
-	}
-
-	// Si index est un registre étendu (R8-R15), on doit utiliser REX.X
-	if (idx >= REG_R8) {
-		r = mk_rex(0, reg_dest >> 3, base >> 3);
-		if (r != 0x40) b[0] = r;  // Mise à jour du REX si nécessaire
-	}
-
-	b[n++] = (base_num << 3) | idx_num;  // SIB byte
-
-	// Displacement (si nécessaire)
-	if (disp != 0 || base == 5) {
-		if (disp >= -128 && disp <= 127) {
-			b[n++] = (uint8_t)disp;  // disp8
-		} else {
-			b[n++] = 0x24;  // SIB avec disp32
-			*(int32_t*)&b[n] = disp;
-			n += 4;
-		}
-	}
-
+    if (disp != 0 || (base & 0x07) == 5)
+    {
+        if (disp >= -128 && disp <= 127)
+            b[n++] = (uint8_t)disp;
+        else
+        {
+            /* nécessite mod=10 (disp32), à corriger si ce cas se présente */
+            b[n-1] = 0x80 | ((reg_dest & 0x07) << 3) | 0x04; /* repatch mod=10 */
+            memcpy(b + n, &disp, 4);
+            n += 4;
+        }
+    }
 	return emit_raw(e, b, n);
 }
-
 
 int emit_mov_r64_mem_sib_disp(t_emitter *e, t_reg reg_dest, t_reg base, t_reg idx, int32_t disp)
 {
     uint8_t b[10]; int n = 0;
-    uint8_t r = mk_rex(1, reg_dest >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(1, reg_dest, idx, base);
     if (r != 0x40) b[n++] = r;
 
-    b[n++] = 0x8B;  // mov r64, [base+idx+disp]
+    b[n++] = 0x8B;
 
-    // ModR/M
-    if (disp == 0 && base != 5) {
-        b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx]
-    } else {
-        b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;  // [base+idx+disp8]
-    }
+    if (disp == 0 && (base & 0x07) != 5)
+        b[n++] = 0x00 | ((reg_dest & 0x07) << 3) | 0x04;
+    else
+        b[n++] = 0x40 | ((reg_dest & 0x07) << 3) | 0x04;
 
-    // SIB - Gestion des registres étendus
-    uint8_t base_num = base & 0x07;
-    uint8_t idx_num = idx & 0x07;
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
 
-    // Mise à jour du REX si nécessaire
-    r = mk_rex(1, reg_dest >> 3, base >> 3);
-    if (r != 0x40) b[0] = r;
-
-    b[n++] = (base_num << 3) | idx_num;
-
-    // Displacement
-    if (disp != 0 || base == 5) {
-        if (disp >= -128 && disp <= 127) {
-            b[n++] = (uint8_t)disp;  // disp8
-        } else {
-            b[n++] = 0x24;  // SIB avec disp32
-            *(int32_t*)&b[n] = disp;
+    if (disp != 0 || (base & 0x07) == 5)
+    {
+        if (disp >= -128 && disp <= 127)
+            b[n++] = (uint8_t)disp;
+        else
+        {
+            b[n-1] = 0x80 | ((reg_dest & 0x07) << 3) | 0x04;
+            memcpy(b + n, &disp, 4);
             n += 4;
         }
     }
 
     return emit_raw(e, b, n);
 }
-
 
 int	emit_mov_r32_r32(t_emitter *e, t_reg dst, t_reg src)
 {
@@ -301,17 +261,11 @@ int	emit_mov_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 int emit_mov_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
     uint8_t b[4]; int n = 0;
-    uint8_t r = mk_rex(0, src >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(0, src, idx, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x89;  // mov [base+idx], r32
-
-    // ModR/M
-    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;  // [base+idx]
-
-    // SIB
+    b[n++] = 0x89;
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
     b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
-
     return emit_raw(e, b, n);
 }
 
@@ -319,17 +273,11 @@ int emit_mov_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 int emit_mov_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
     uint8_t b[4]; int n = 0;
-    uint8_t r = mk_rex(1, src >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(1, src, idx, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x89;  // mov [base+idx], r64
-
-    // ModR/M
-    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;  // [base+idx]
-
-    // SIB
+    b[n++] = 0x89;
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
     b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
-
     return emit_raw(e, b, n);
 }
 
@@ -337,12 +285,10 @@ int emit_mov_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 int emit_mov_r8_mem_reg(t_emitter *e, t_reg reg_dest, t_reg base)
 {
     uint8_t b[3]; int n = 0;
-    uint8_t r = mk_rex(0, reg_dest >> 3, base >> 3);
+    uint8_t r = mk_rex(0, reg_dest, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x8A;  // mov r8, [base]
+    b[n++] = 0x8A;
     b[n++] = MODRM00(reg_dest, base);
-
     return emit_raw(e, b, n);
 }
 
@@ -350,12 +296,10 @@ int emit_mov_r8_mem_reg(t_emitter *e, t_reg reg_dest, t_reg base)
 int emit_mov_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base)
 {
     uint8_t b[3]; int n = 0;
-    uint8_t r = mk_rex(0, dst >> 3, base >> 3);
+    uint8_t r = mk_rex(0, dst, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x8B;  // mov r32, [base]
+    b[n++] = 0x8B;
     b[n++] = MODRM00(dst, base);
-
     return emit_raw(e, b, n);
 }
 
@@ -363,12 +307,10 @@ int emit_mov_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base)
 int emit_mov_r64_mem_reg(t_emitter *e, t_reg dst, t_reg base)
 {
     uint8_t b[3]; int n = 0;
-    uint8_t r = mk_rex(1, dst >> 3, base >> 3);
+    uint8_t r = mk_rex(1, dst, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x8B;  // mov r64, [base]
+    b[n++] = 0x8B;
     b[n++] = MODRM00(dst, base);
-
     return emit_raw(e, b, n);
 }
 
@@ -430,94 +372,44 @@ int	emit_xor_r8_r8(t_emitter *e, t_reg dst, t_reg src)
 int emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
     uint8_t b[4]; int n = 0;
-    uint8_t r = mk_rex(0, src >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(0, src, idx, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x30;  // xor [base+idx], r8
-
-    // ModR/M
-    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;  // [base+idx]
-
-    // SIB - Gestion des registres étendus
-    uint8_t base_num = base & 0x07;
-    uint8_t idx_num = idx & 0x07;
-
-    // Mise à jour du REX si nécessaire
-    r = mk_rex(0, src >> 3, base >> 3);
-    if (r != 0x40) b[0] = r;
-
-    b[n++] = (base_num << 3) | idx_num;
-
+    b[n++] = 0x30;
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
     return emit_raw(e, b, n);
 }
 
-/* XOR [base+idx], r32 */
 int emit_xor_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
     uint8_t b[4]; int n = 0;
-    uint8_t r = mk_rex(0, src >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(0, src, idx, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x31;  // xor [base+idx], r32
-
-    // ModR/M
-    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;  // [base+idx]
-
-    // SIB - Gestion des registres étendus
-    uint8_t base_num = base & 0x07;
-    uint8_t idx_num = idx & 0x07;
-
-    // Mise à jour du REX si nécessaire
-    r = mk_rex(0, src >> 3, base >> 3);
-    if (r != 0x40) b[0] = r;
-
-    b[n++] = (base_num << 3) | idx_num;
-
+    b[n++] = 0x31;
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
     return emit_raw(e, b, n);
 }
 
-
-/* XOR [base+idx], r64 */
 int emit_xor_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
     uint8_t b[4]; int n = 0;
-    uint8_t r = mk_rex(1, src >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(1, src, idx, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x31;  // xor [base+idx], r64
-
-    // ModR/M
-    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;  // [base+idx]
-
-    // SIB - Gestion des registres étendus
-    uint8_t base_num = base & 0x07;
-    uint8_t idx_num = idx & 0x07;
-
-    // Mise à jour du REX si nécessaire
-    r = mk_rex(1, src >> 3, base >> 3);
-    if (r != 0x40) b[0] = r;
-
-    b[n++] = (base_num << 3) | idx_num;
-
+    b[n++] = 0x31;
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
+    b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
     return emit_raw(e, b, n);
 }
 
-
-/* XOR r8, [base+idx] */
 int emit_xor_r8_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
 {
     uint8_t b[4]; int n = 0;
-    uint8_t r = mk_rex(0, dst >> 3, base >> 3);
+    uint8_t r = mk_rex_sib(0, dst, idx, base);
     if (r != 0x40) b[n++] = r;
-
-    b[n++] = 0x32;  // xor r8, [base+idx]
-
-    // ModR/M
-    b[n++] = 0x00 | ((dst & 0x07) << 3) | 0x04;  // [base+idx]
-
-    // SIB
+    b[n++] = 0x32;
+    b[n++] = 0x00 | ((dst & 0x07) << 3) | 0x04;
     b[n++] = ((base & 0x07) << 3) | (idx & 0x07);
-
     return emit_raw(e, b, n);
 }
 
@@ -873,39 +765,33 @@ int	emit_shl_r8_cl(t_emitter *e, t_reg reg)
 int	emit_shr_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 {
 	uint8_t b[4]; int n = 0;
-	uint8_t r = mk_rex(1, 0, reg >> 3);  // REX.W (1), REX.B (reg)
+	uint8_t r = mk_rex(1, 0, reg);
 	if (r != 0x40) b[n++] = r;
-
-	b[n++] = 0xC1;  // Opcode pour SHR r64, imm8
-	b[n++] = 0xE8 | (reg & 0x07);  // ModR/M : 11 101 reg
-	b[n++] = imm;  // Immédiat (4 dans notre cas)
-
+	b[n++] = 0xC1;
+	b[n++] = 0xE8 | (reg & 0x07);
+	b[n++] = imm;
 	return emit_raw(e, b, n);
 }
 
 int	emit_shr_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 {
 	uint8_t b[3]; int n = 0;
-	uint8_t r = mk_rex(0, 0, reg >> 3);  // Pas de REX.W
+	uint8_t r = mk_rex(0, 0, reg);
 	if (r != 0x40) b[n++] = r;
-
-	b[n++] = 0xC1;  // Opcode pour SHR r32, imm8
-	b[n++] = 0xE8 | (reg & 0x07);  // ModR/M
-	b[n++] = imm;  // Immédiat
-
+	b[n++] = 0xC1;
+	b[n++] = 0xE8 | (reg & 0x07);
+	b[n++] = imm;
 	return emit_raw(e, b, n);
 }
 
 int	emit_shr_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 {
 	uint8_t b[3]; int n = 0;
-	uint8_t r = mk_rex(0, 0, reg >> 3);  // Pas de REX.W, REX.B pour reg8
+	uint8_t r = mk_rex(0, 0, reg);
 	if (r != 0x40) b[n++] = r;
-
-	b[n++] = 0xC0;  // Opcode pour SHR r8, imm8
-	b[n++] = 0xE8 | (reg & 0x07);  // ModR/M : 11 101 reg
-	b[n++] = imm;  // Immédiat (4 dans notre cas)
-
+	b[n++] = 0xC0;
+	b[n++] = 0xE8 | (reg & 0x07);
+	b[n++] = imm;
 	return emit_raw(e, b, n);
 }
 
@@ -913,36 +799,30 @@ int	emit_shr_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
 int	emit_test_r8_r8(t_emitter *e, t_reg reg1, t_reg reg2)
 {
 	uint8_t b[3]; int n = 0;
-	uint8_t r = mk_rex(0, reg1 >> 3, reg2 >> 3);  // REX.R (reg1), REX.B (reg2)
+	uint8_t r = mk_rex(0, reg1, reg2);
 	if (r != 0x40) b[n++] = r;
-
-	b[n++] = 0x84;  // Opcode pour TEST r8, r8
-	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);  // ModR/M
-
+	b[n++] = 0x84;
+	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);
 	return emit_raw(e, b, n);
 }
 
 int	emit_test_r32_r32(t_emitter *e, t_reg reg1, t_reg reg2)
 {
 	uint8_t b[3]; int n = 0;
-	uint8_t r = mk_rex(0, reg1 >> 3, reg2 >> 3);  // Pas de REX.W
+	uint8_t r = mk_rex(0, reg1, reg2);
 	if (r != 0x40) b[n++] = r;
-
-	b[n++] = 0x85;  // Opcode pour TEST r32, r32
-	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);  // ModR/M
-
+	b[n++] = 0x85;
+	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);
 	return emit_raw(e, b, n);
 }
 
 int	emit_test_r64_r64(t_emitter *e, t_reg reg1, t_reg reg2)
 {
-	uint8_t b[4]; int n = 0;
-	uint8_t r = mk_rex(1, reg1 >> 3, reg2 >> 3);  // REX.W (1), REX.R (reg1), REX.B (reg2)
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(1, reg1, reg2);
 	if (r != 0x40) b[n++] = r;
-
-	b[n++] = 0x85;  // Opcode pour TEST r64, r64
-	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);  // ModR/M
-
+	b[n++] = 0x85;
+	b[n++] = 0xC0 | ((reg1 & 0x07) << 3) | (reg2 & 0x07);
 	return emit_raw(e, b, n);
 }
 
