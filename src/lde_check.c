@@ -180,7 +180,20 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 	}
 
 	/* 0xB8-0xBF : MOV r32,imm32 -> bit=1 */
-	if (op >= 0xb8 && op <= 0xbf) { *ilen = rex_len + 5; return (2); }
+	if (op >= 0xb8 && op <= 0xbf)
+    {
+        if (rex_len == 1)
+        {
+            int rex_byte = fetch(buf, len, pos, 0);
+            if (rex_byte & 0x08)   /* REX.W */
+            {
+                *ilen = rex_len + 9;   /* opcode + imm64 */
+                return (2);
+            }
+        }
+        *ilen = rex_len + 5;   /* opcode + imm32 */
+        return (2);
+    }
 
 	/* 0xFE/0xFF /0(INC,bit1) /1(DEC,bit1) */
 	if (op == 0xfe || op == 0xff)
