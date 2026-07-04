@@ -1,4 +1,5 @@
 #include "woody.h"
+#include "lde.h"
 
 static int fetch(const uint8_t *buf, size_t len, size_t pos, int off)
 {
@@ -214,6 +215,13 @@ fallback:
 		fprintf(stderr, "  fallback @ %zu (op0=0x%02x rex_len=%d)\n", pos, op0, rex_len);
 	*ilen = 1;
 	return (-1);
+}
+
+int lde_bit_at_pos(size_t pos)
+{
+    if (pos >= 8192)
+        return (-1);
+    return (lde_bit_by_pos[pos]);
 }
 
 /*
