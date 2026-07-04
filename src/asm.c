@@ -870,5 +870,24 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
             patch_disp32_buf(a.out->e.buf, a.fixups[i].off, d);
         }
     }
+	/* ── verification LDE : bloque la generation si le scan runtime
+    ** ne pourrait pas retrouver la cle depuis le stub genere ── */
+    {
+        int64_t ss = sym(&a, "scan_start");
+        int64_t se = sym(&a, "scan_end");
+        if (ss < 0 || se < 0)
+        {
+            fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
+            return (-1);
+        }
+        if (lde_verify(a.out->e.buf, (size_t)ss, (size_t)se,
+                crypto->key, crypto->key_len) < 0)
+        {
+            fprintf(stderr,
+                "asm: ECHEC lde_verify — le stub genere ne permettra pas "
+                "une extraction correcte de la cle par le LDE runtime\n");
+            return (-1);
+        }
+    }
     return 0;
 }

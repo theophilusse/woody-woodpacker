@@ -398,6 +398,16 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 		free(res.e.buf);
 		return (NULL);
 	}
+
+    int64_t scan_start = sym_lookup(out, "scan_start");  /* adapte selon ton API de labels */
+    int64_t scan_end   = sym_lookup(out, "scan_end");
+
+    if (lde_verify(out->e.buf, scan_start, scan_end, crypto->key, crypto->key_len) < 0)
+    {
+        fprintf(stderr, "ERREUR: le stub genere ne permettra pas une extraction correcte de la cle.\n");
+        return -1;   /* bloque la génération AVANT de produire un binaire cassé */
+    }
+
 	stub = malloc(sizeof(t_stub));
 	if (!stub)
 	{
