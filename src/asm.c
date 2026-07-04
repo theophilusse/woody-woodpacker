@@ -702,6 +702,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					if (mt == 3) emit_mov_r8_mem_reg(&a->out->e, r1, base);
 					if (mt == 4) emit_mov_r8_mem_disp8(&a->out->e, r1, base, d8);
 					if (mt == 1) emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, 0);
+					emit_and_r32_imm32(&a->out->e, r1, 0xff);
 				} else {
 					/* bit=0 : MOVZX r32(alias), r/m8 — deja reconnu par le LDE */
 					if (mt == 3) emit_movzx_r32_mem_reg(&a->out->e, r1, base);

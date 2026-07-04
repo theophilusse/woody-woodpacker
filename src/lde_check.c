@@ -110,15 +110,38 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 		if (mod == 1) { *ilen = rex_len + 3 + (rm==4?1:0); return (2); }
 	}
 
-	/* 0x8B /r : MOV r32/64,r/m -> bit=1 */
-	if (op == 0x8b)
-	{
-		modrm = fetch(buf, len, pos, rex_len + 1);
-		if (modrm < 0) goto fallback;
-		mod = (modrm >> 6) & 3; rm = modrm & 7;
-		if (mod == 0) { *ilen = rex_len + 2 + (rm==4?1:0); return (2); }
-		if (mod == 1) { *ilen = rex_len + 3 + (rm==4?1:0); return (2); }
-	}
+    /* 0x8B mod=01, pas de SIB, suivi de AND r32,0xFF forme longue (81/4)
+    ** avec le MEME registre destination -> bit=1 (paire _SET bit=1) */
+    if (op == 0x8b)
+    {
+        modrm = fetch(buf, len, pos, rex_len + 1);
+        if (modrm < 0) goto fallback;
+        mod = (modrm >> 6) & 3; rm = modrm & 7;
+
+        if ((mod == 0 || mod == 1) && rm != 4)
+        {
+            int base_len = (mod == 0) ? 2 : 3;      /* 8B seul, sans SIB, sans/avec disp8 */
+            int p = rex_len + base_len;
+            int b0 = fetch(buf, len, pos, p);
+            int rex2_len = (b0 >= 0x40 && b0 <= 0x4f) ? 1 : 0;
+            int op2    = fetch(buf, len, pos, p + rex2_len);
+            int modrm2 = fetch(buf, len, pos, p + rex2_len + 1);
+            int i0 = fetch(buf, len, pos, p + rex2_len + 2);
+            int i1 = fetch(buf, len, pos, p + rex2_len + 3);
+            int i2 = fetch(buf, len, pos, p + rex2_len + 4);
+            int i3 = fetch(buf, len, pos, p + rex2_len + 5);
+
+            if (op2 == 0x81 && (modrm2 & 0xf8) == 0xe0 &&
+                i0 == 0xff && i1 == 0 && i2 == 0 && i3 == 0)
+            {
+                *ilen = p + rex2_len + 6;
+                return (2);
+            }
+        }
+        /* pas de paire détectée -> MOV isolé, chemin générique */
+        if (mod == 0) { *ilen = rex_len + 2 + (rm==4?1:0); return (2); }
+        if (mod == 1) { *ilen = rex_len + 3 + (rm==4?1:0); return (2); }
+    }
 
 	/* 0x8D /r : LEA reg,[reg+0] mod01(bit0) / LEA abs mod00+SIB=0x25(bit0) */
 	if (op == 0x8d)

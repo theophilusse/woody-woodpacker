@@ -436,8 +436,7 @@ int	emit_and_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm)
 	uint8_t b[7]; int n = 0;
 	uint8_t r = mk_rex(0, 0, reg);
 	if (r != 0x40) b[n++] = r;
-	if (reg == REG_RAX) { b[n++] = 0x25; }
-	else { b[n++] = 0x81; b[n++] = MODRM11(4, reg); }
+	b[n++] = 0x81; b[n++] = MODRM11(4, reg);
 	memcpy(b + n, &imm, 4); n += 4;
 	return emit_raw(e, b, n);
 }

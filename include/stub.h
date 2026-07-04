@@ -324,7 +324,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x8A /r : MOV r8, r/m8 → bit=1 (mod00/01, +SIB) ══════════ */
 	"@o_8a:\n"
-	"cmp eax, 0x8a\n" "jne @o_8b\n"
+	"cmp eax, 0x8a\n" "jne @o_8b_and_pair\n"
 	"_SET eax, [rsi+1]\n"
 	"mov edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 	"cmp edx, 0x0\n" "je @o8a_m00\n"
@@ -350,6 +350,82 @@ static const char STUB_SRC[] =
 	"cmp eax, 4\n" "je @adv_8a01_sib\n"
 	"add rsi, 3\n" "jmp @lde_loop\n"
 	"@adv_8a01_sib:\n" "add rsi, 4\n" "jmp @lde_loop\n"
+
+/* 8B /r (mod00 ou mod01, sans SIB) immediatement suivi de
+** AND r32,0xFF forme longue (REX? 81 /4 imm32=0xFF)
+** = paire emise par _SET bit=1 (equivalent semantique a movzx,
+** ne lit qu'1 octet). Detection PUREMENT structurelle (masque
+** mod+reg comme @o_83), aucun registre precis n'est teste. */
+"@o_8b_and_pair:\n"
+"cmp eax, 0x8b\n" "jne @o_8b\n"
+"_SET edi, [rsi+1]\n"                       /* edi = modrm du 8B */
+"mov r8d, edi\n" "and r8d, 0xc0\n"          /* r8d = mod */
+"and edi, 0x7\n"                            /* edi = rm */
+"cmp r8d, 0x0\n"  "je @o8bp_try00\n"
+"cmp r8d, 0x40\n" "je @o8bp_try01\n"
+"jmp @o_8b\n"
+
+/* ── mod=00 : 8B fait 2 octets (opcode+modrm, pas de disp) ── */
+"@o8bp_try00:\n"
+"cmp edi, 4\n" "je @o_8b\n"                 /* rm=100 -> SIB present, non gere ici */
+"_SET edi, [rsi+2]\n"
+"cmp edi, 0x40\n" "jl @o8bp00_norex\n"
+"cmp edi, 0x4f\n" "jg @o8bp00_norex\n"
+"_SET edi, [rsi+3]\n" "cmp edi, 0x81\n" "jne @o_8b\n"
+"_SET edi, [rsi+4]\n" "and edi, 0xf8\n" "cmp edi, 0xe0\n" "jne @o_8b\n"
+"_SET edi, [rsi+5]\n" "cmp edi, 0xff\n" "jne @o_8b\n"
+"_SET edi, [rsi+6]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+7]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+8]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"cmp ecx, 128\n" "jge @o8bp_a1\n"
+"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
+"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+"@o8bp_a1:\n" "add rsi, 9\n" "jmp @lde_loop\n"
+
+"@o8bp00_norex:\n"
+"cmp edi, 0x81\n" "jne @o_8b\n"
+"_SET edi, [rsi+3]\n" "and edi, 0xf8\n" "cmp edi, 0xe0\n" "jne @o_8b\n"
+"_SET edi, [rsi+4]\n" "cmp edi, 0xff\n" "jne @o_8b\n"
+"_SET edi, [rsi+5]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+6]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+7]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"cmp ecx, 128\n" "jge @o8bp_a2\n"
+"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
+"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+"@o8bp_a2:\n" "add rsi, 8\n" "jmp @lde_loop\n"
+
+/* ── mod=01 : 8B fait 3 octets (opcode+modrm+disp8, pas de disp32) ── */
+"@o8bp_try01:\n"
+"cmp edi, 4\n" "je @o_8b\n"
+"_SET edi, [rsi+3]\n"
+"cmp edi, 0x40\n" "jl @o8bp01_norex\n"
+"cmp edi, 0x4f\n" "jg @o8bp01_norex\n"
+"_SET edi, [rsi+4]\n" "cmp edi, 0x81\n" "jne @o_8b\n"
+"_SET edi, [rsi+5]\n" "and edi, 0xf8\n" "cmp edi, 0xe0\n" "jne @o_8b\n"
+"_SET edi, [rsi+6]\n" "cmp edi, 0xff\n" "jne @o_8b\n"
+"_SET edi, [rsi+7]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+8]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+9]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"cmp ecx, 128\n" "jge @o8bp_a3\n"
+"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
+"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+"@o8bp_a3:\n" "add rsi, 10\n" "jmp @lde_loop\n"
+
+"@o8bp01_norex:\n"
+"cmp edi, 0x81\n" "jne @o_8b\n"
+"_SET edi, [rsi+4]\n" "and edi, 0xf8\n" "cmp edi, 0xe0\n" "jne @o_8b\n"
+"_SET edi, [rsi+5]\n" "cmp edi, 0xff\n" "jne @o_8b\n"
+"_SET edi, [rsi+6]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+7]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"_SET edi, [rsi+8]\n" "cmp edi, 0x0\n"  "jne @o_8b\n"
+"cmp ecx, 128\n" "jge @o8bp_a4\n"
+"push rcx\n" "mov edx, ecx\n" "sar edx, 3\n"
+"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+"@o8bp_a4:\n" "add rsi, 9\n" "jmp @lde_loop\n"
 
 	/* ══════════ 0x8B /r : MOV r32/64, r/m → bit=1 (mod00/01, +SIB) ══════════ */
 	"@o_8b:\n"
