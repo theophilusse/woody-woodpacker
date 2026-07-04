@@ -41,8 +41,20 @@ static int64_t	sym(t_asm *a, const char *n)
 
 static void	deflabel(t_asm *a, const char *name)
 {
+	int i;
+
 	if (DEBUG_MODE)
 		printf("deflabel: %s at %zu\n", name, a->out->e.len);
+	for (i = 0; i < a->nlabels; i++)
+	{
+		if (!strcmp(a->labels[i].name, name))
+		{
+			fprintf(stderr, "asm: ERREUR label duplique '%s' "
+				"(premiere def @ %zu, redefinition @ %zu)\n",
+				name, a->labels[i].off, a->out->e.len);
+			exit(1);   /* ou propage une erreur via un flag global si tu préfères éviter exit() ici */
+		}
+	}
 	if (a->nlabels >= MAX_LABELS) return;
 	strncpy(a->labels[a->nlabels].name, name, 63);
 	a->labels[a->nlabels].off = a->out->e.len;
