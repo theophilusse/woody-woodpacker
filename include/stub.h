@@ -528,6 +528,8 @@ static const char STUB_SRC[] =
 
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
 
+	"add rsp, 32\n"     // annule le "sub rsp, 32" du buffer hex
+	"add rsp, 16\n"     // annule le "sub rsp, 16" du buffer key
 	// mprotect(page_vaddr, page_size, PROT_RWX)
 	"mov rdi, prot_addr\n"
 	"mov esi, prot_size\n"
