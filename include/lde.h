@@ -1,6 +1,8 @@
 #ifndef LDE_H
 # define LDE_H
 
+# include "woody.h"
+
 typedef struct {
 	const uint8_t *buf;
 	size_t         pos;
