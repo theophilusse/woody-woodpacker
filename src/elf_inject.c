@@ -65,6 +65,8 @@ int	elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto)
 	stub->load_vaddr = p->p_vaddr + p->p_filesz;
 	stub->original_oep = ctx->ehdr->e_entry;
 	int32_t disp = (int32_t)(stub->original_oep - (stub->load_vaddr + stub->patch_jmp_oep + 4));
+	fprintf(stderr, "original_oep=0x%lx load_vaddr=0x%lx patch_jmp_oep=%zu disp=%d\n",
+			stub->original_oep, stub->load_vaddr, stub->patch_jmp_oep, disp);
 	patch_disp32_buf(stub->bytes, stub->patch_jmp_oep, disp);
 	memcpy(ctx->raw + stub_offset, stub->bytes, stub->len);
 
