@@ -1,0 +1,81 @@
+asm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #17 (_INC ecx, off=257) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 15 00 81 c1 01 00 00 00 48 83 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 3905FC2626361973B050F3B3B7E907C0
+  simulee : 3905FAEFC459DE6D8DF360C79A7F7DBF
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3608 disp=-3885
+chiffrement : vaddr=0x401000 len=353 key[0]=39
+key_value: 3905FC2626361973B050F3B3B7E907C0
+....WOODY....
+39F0FFC9DDDF6B9C871D37FFFEEFFFFF9asm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #19 (_SET eax, off=311) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 00 00 0f b6 46 02 83 f8 00 74 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 62EEB74642A3D9B72CCEDCC090F10430
+  simulee : 62EEBFEB91E236FBBADF66F535DFC81E
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3596 disp=-3873
+chiffrement : vaddr=0x401000 len=353 key[0]=62
+key_value: 62EEB74642A3D9B72CCEDCC090F10430
+....WOODY....
+FF030000000000000000000000000000ÿasm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #18 (_SET eax, off=278) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 00 00 0f b6 46 01 89 c2 81 e2 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 994F03B08FF00C6172A8FE7069006E15
+  simulee : 994FAFC0ECA7B17F0EC3C94BDB7FF49B
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3621 disp=-3898
+chiffrement : vaddr=0x401000 len=353 key[0]=99
+key_value: 994F03B08FF00C6172A8FE7069006E15
+....WOODY....
+F9F3FFFFFFFFFFFFFFFFFFFFFD460100ùasm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #19 (_SET eax, off=315) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 00 00 0f b6 46 02 83 f8 00 74 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 7C103663ED1EB607220243BD90EBD637
+  simulee : 7C10BEF3B1EEFBB36E1F12356AACFE0D
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3586 disp=-3863
+chiffrement : vaddr=0x401000 len=353 key[0]=7C
+key_value: 7C103663ED1EB607220243BD90EBD637
+....WOODY....
+1CC2778F75DFDF6F1F8A8E8DEB7FFEFFasm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #17 (_INC ecx, off=256) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 15 00 81 c1 01 00 00 00 48 83 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 994BF560A00C134F9D7BAA354CEBDE7D
+  simulee : 994BDB4F0CD9BCEC89CF3AEF53B77DB2
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3595 disp=-3872
+chiffrement : vaddr=0x401000 len=353 key[0]=99
+key_value: 994BF560A00C134F9D7BAA354CEBDE7D
+....WOODY....
+C9F2FFFFFFFFFFFFFFFFFFFFFF7B0100Éasm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #17 (_INC ecx, off=247) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 15 00 81 c1 01 00 00 00 48 83 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 46CA5026AFB63D6401A01D705B6BEC6A
+  simulee : 46CADAEAC9B7BDFB3ECA050ADB03FDEE
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3600 disp=-3877
+chiffrement : vaddr=0x401000 len=353 key[0]=46
+key_value: 46CA5026AFB63D6401A01D705B6BEC6A
+....WOODY....
+FF000000000000000000000000000000ÿasm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #19 (_SET eax, off=317) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 00 00 0f b6 46 02 83 f8 00 74 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 6B7F468D47431F1D5564D3D18F02AA68
+  simulee : 6B7FBED4E3E336DD1F7B552B3777BA7F
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3610 disp=-3887
+chiffrement : vaddr=0x401000 len=353 key[0]=6B
+key_value: 6B7F468D47431F1D5564D3D18F02AA68
+....WOODY....
+EBFFFFFFFFFFFFFFFFFFFFFFFF5F7700ëasm_bits=134 lde_bits=128
+PREMIER DESACCORD au call #17 (_INC ecx, off=247) : asm a choisi 0, LDE a lu 1
+  octets a cet offset: 15 00 81 c1 01 00 00 00 48 83 
+asm: MISMATCH cle simulee vs cle reelle
+  reelle  : 497C211874ABF67BD9FDA23E59693033
+  simulee : 497C53A1C17EBBBDF7F765EF5FACFFCC
+original_oep=0x401050 load_vaddr=0x401161 patch_jmp_oep=3605 disp=-3882
+chiffrement : vaddr=0x401000 len=353 key[0]=49
+key_value: 497C211874ABF67BD9FDA23E59693033
+....WOODY....
+29FFFFFFFFFFFFFFFFFFFFFFFF3B0000)
