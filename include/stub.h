@@ -16,7 +16,7 @@ static const char STUB_SRC[] =
     "_ZERO r10\n" //       ; NULL (data)
     "syscall\n"
     //; Si rax == -EPERM (-1), le processus est déjà traçé
-    "cmp eax, -1\n"//"cmp rax, -1\n"
+    //"cmp eax, -1\n"//"cmp rax, -1\n"
     "jmp debugger_not_detected\n" // DEBUG
 	"je debugger_detected\n"
 
