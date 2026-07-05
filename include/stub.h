@@ -570,6 +570,14 @@ static const char STUB_SRC[] =
 	"_SET edx, 7\n"
 	"_SET eax, 10\n"
 	"syscall\n"
+	"cmp rax, 0\n"
+	"jge mprotect_ok\n"
+	"mov rdi, rax\n"           /* code d'erreur negatif dans rdi pour debug */
+	"neg rdi\n"                 /* rend-le positif pour l'affichage hex si besoin */
+	"mov rax, 60\n"
+	"mov rdi, 1\n"              /* code de sortie = 1, pour distinguer d'un exit normal (0) */
+	"syscall\n"
+	"mprotect_ok:\n"
 
 	// S-box sur la pile
 	"sub rsp, 256\n"
