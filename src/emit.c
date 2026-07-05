@@ -1156,3 +1156,35 @@ int emit_add_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
     memcpy(b + 3, &imm, 4);
     return emit_raw(e, b, 7);
 }
+
+/* NEG r8 : F6 /3 */
+int emit_neg_r8(t_emitter *e, t_reg reg)
+{
+    uint8_t b[3]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40 || reg >= 4) b[n++] = r;
+    b[n++] = 0xf6;
+    b[n++] = MODRM11(3, reg);
+    return emit_raw(e, b, n);
+}
+
+/* NEG r32 : F7 /3 */
+int emit_neg_r32(t_emitter *e, t_reg reg)
+{
+    uint8_t b[3]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0xf7;
+    b[n++] = MODRM11(3, reg);
+    return emit_raw(e, b, n);
+}
+
+/* NEG r64 : REX.W F7 /3 */
+int emit_neg_r64(t_emitter *e, t_reg reg)
+{
+    uint8_t b[3];
+    b[0] = mk_rex(1, 0, reg);
+    b[1] = 0xf7;
+    b[2] = MODRM11(3, reg);
+    return emit_raw(e, b, 3);
+}
