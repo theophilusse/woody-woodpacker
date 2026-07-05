@@ -82,6 +82,15 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	/* 5. Patch des Phdr / e_entry */
+	if (elf_patch(ctx, stub, &crypto) != 0)
+	{
+		fprintf(stderr, "error: patching failed\n");
+		stub_free(stub);
+		elf_free(ctx);
+		return (1);
+	}
+
 	{
 		FILE *meta = fopen("./woody_meta.txt", "w");
 		if (meta)
@@ -90,15 +99,6 @@ int	main(int argc, char **argv)
 			fprintf(meta, "load_vaddr=%lu\n", stub->load_vaddr);
 			fclose(meta);
 		}
-	}
-
-	/* 5. Patch des Phdr / e_entry */
-	if (elf_patch(ctx, stub, &crypto) != 0)
-	{
-		fprintf(stderr, "error: patching failed\n");
-		stub_free(stub);
-		elf_free(ctx);
-		return (1);
 	}
 
 	/* 6. Écriture de woody */
