@@ -91,6 +91,16 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	{
+		FILE *meta = fopen("/tmp/woody_meta.txt", "w");
+		if (meta)
+		{
+			fprintf(meta, "patch_jmp_oep=%zu\n", stub->patch_jmp_oep);
+			fprintf(meta, "load_vaddr=%lu\n", stub->load_vaddr);
+			fclose(meta);
+		}
+	}
+
 	/* 6. Écriture de woody */
 	if (elf_write(ctx, "woody") != 0)
 	{

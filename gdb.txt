@@ -2612,3 +2612,1090 @@ Program received signal SIGILL, Illegal instruction.
 Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
 Use 'set logging enabled off'.
 
+Continuing.
+ecx            0x1                 1
+rsi            0x40116e            4198766
+ecx            0x2                 2
+rsi            0x4011ba            4198842
+ecx            0x3                 3
+rsi            0x4011dc            4198876
+ecx            0x4                 4
+rsi            0x40121d            4198941
+ecx            0x5                 5
+rsi            0x401256            4198998
+ecx            0x6                 6
+rsi            0x401268            4199016
+ecx            0x7                 7
+rsi            0x40128c            4199052
+ecx            0x8                 8
+rsi            0x401294            4199060
+ecx            0x0                 0
+rsi            0x4012dc            4199132
+ecx            0x8                 8
+rsi            0x4012dc            4199132
+ecx            0x9                 9
+rsi            0x4012dc            4199132
+ecx            0x1                 1
+rsi            0x401358            4199256
+ecx            0x9                 9
+rsi            0x401358            4199256
+ecx            0xa                 10
+rsi            0x401358            4199256
+ecx            0x2                 2
+rsi            0x40135b            4199259
+ecx            0xa                 10
+rsi            0x40135b            4199259
+ecx            0xb                 11
+rsi            0x40135b            4199259
+ecx            0x3                 3
+rsi            0x40137d            4199293
+ecx            0xb                 11
+rsi            0x40137d            4199293
+ecx            0xc                 12
+rsi            0x40137d            4199293
+ecx            0x4                 4
+rsi            0x401386            4199302
+ecx            0xc                 12
+rsi            0x401386            4199302
+ecx            0xd                 13
+rsi            0x401386            4199302
+ecx            0x5                 5
+rsi            0x401393            4199315
+ecx            0xd                 13
+rsi            0x401393            4199315
+ecx            0xe                 14
+rsi            0x401393            4199315
+ecx            0x6                 6
+rsi            0x4013d4            4199380
+ecx            0xe                 14
+rsi            0x4013d4            4199380
+ecx            0xf                 15
+rsi            0x4013d4            4199380
+ecx            0x7                 7
+rsi            0x4013e4            4199396
+ecx            0xf                 15
+rsi            0x4013e4            4199396
+ecx            0x10                16
+rsi            0x4013e4            4199396
+ecx            0x0                 0
+rsi            0x4013f1            4199409
+ecx            0x10                16
+rsi            0x4013f1            4199409
+ecx            0x11                17
+rsi            0x4013f1            4199409
+ecx            0x1                 1
+rsi            0x4013fe            4199422
+ecx            0x11                17
+rsi            0x4013fe            4199422
+ecx            0x12                18
+rsi            0x4013fe            4199422
+ecx            0x2                 2
+rsi            0x401419            4199449
+ecx            0x12                18
+rsi            0x401419            4199449
+ecx            0x13                19
+rsi            0x401419            4199449
+ecx            0x3                 3
+rsi            0x401480            4199552
+ecx            0x13                19
+rsi            0x401480            4199552
+ecx            0x14                20
+rsi            0x401480            4199552
+ecx            0x15                21
+rsi            0x40149b            4199579
+ecx            0x5                 5
+rsi            0x4014bf            4199615
+ecx            0x15                21
+rsi            0x4014bf            4199615
+ecx            0x16                22
+rsi            0x4014bf            4199615
+ecx            0x17                23
+rsi            0x4014fb            4199675
+ecx            0x7                 7
+rsi            0x40150e            4199694
+ecx            0x17                23
+rsi            0x40150e            4199694
+ecx            0x18                24
+rsi            0x40150e            4199694
+ecx            0x0                 0
+rsi            0x401572            4199794
+ecx            0x18                24
+rsi            0x401572            4199794
+ecx            0x19                25
+rsi            0x401572            4199794
+ecx            0x1                 1
+rsi            0x401596            4199830
+ecx            0x19                25
+rsi            0x401596            4199830
+ecx            0x1a                26
+rsi            0x401596            4199830
+ecx            0x2                 2
+rsi            0x40159e            4199838
+ecx            0x1a                26
+rsi            0x40159e            4199838
+ecx            0x1b                27
+rsi            0x40159e            4199838
+ecx            0x1c                28
+rsi            0x4015d6            4199894
+ecx            0x4                 4
+rsi            0x40161b            4199963
+ecx            0x1c                28
+rsi            0x40161b            4199963
+ecx            0x1d                29
+rsi            0x40161b            4199963
+ecx            0x5                 5
+rsi            0x401652            4200018
+ecx            0x1d                29
+rsi            0x401652            4200018
+ecx            0x1e                30
+rsi            0x401652            4200018
+ecx            0x6                 6
+rsi            0x40165f            4200031
+ecx            0x1e                30
+rsi            0x40165f            4200031
+ecx            0x1f                31
+rsi            0x40165f            4200031
+ecx            0x7                 7
+rsi            0x4016ab            4200107
+ecx            0x1f                31
+rsi            0x4016ab            4200107
+ecx            0x20                32
+rsi            0x4016ab            4200107
+ecx            0x0                 0
+rsi            0x4016e3            4200163
+ecx            0x20                32
+rsi            0x4016e3            4200163
+ecx            0x21                33
+rsi            0x4016e3            4200163
+ecx            0x1                 1
+rsi            0x40171a            4200218
+ecx            0x21                33
+rsi            0x40171a            4200218
+ecx            0x22                34
+rsi            0x40171a            4200218
+ecx            0x2                 2
+rsi            0x401746            4200262
+ecx            0x22                34
+rsi            0x401746            4200262
+ecx            0x23                35
+rsi            0x401746            4200262
+ecx            0x3                 3
+rsi            0x40177b            4200315
+ecx            0x23                35
+rsi            0x40177b            4200315
+ecx            0x24                36
+rsi            0x40177b            4200315
+ecx            0x4                 4
+rsi            0x401788            4200328
+ecx            0x24                36
+rsi            0x401788            4200328
+ecx            0x25                37
+rsi            0x401788            4200328
+ecx            0x5                 5
+rsi            0x4017a3            4200355
+ecx            0x25                37
+rsi            0x4017a3            4200355
+ecx            0x26                38
+rsi            0x4017a3            4200355
+ecx            0x6                 6
+rsi            0x4017c6            4200390
+ecx            0x26                38
+rsi            0x4017c6            4200390
+ecx            0x27                39
+rsi            0x4017c6            4200390
+ecx            0x7                 7
+rsi            0x401832            4200498
+ecx            0x27                39
+rsi            0x401832            4200498
+ecx            0x28                40
+rsi            0x401832            4200498
+ecx            0x0                 0
+rsi            0x40184d            4200525
+ecx            0x28                40
+rsi            0x40184d            4200525
+ecx            0x29                41
+rsi            0x40184d            4200525
+ecx            0x1                 1
+rsi            0x40187d            4200573
+ecx            0x29                41
+rsi            0x40187d            4200573
+ecx            0x2a                42
+rsi            0x40187d            4200573
+ecx            0x2                 2
+rsi            0x4018b2            4200626
+ecx            0x2a                42
+rsi            0x4018b2            4200626
+ecx            0x2b                43
+rsi            0x4018b2            4200626
+ecx            0x3                 3
+rsi            0x4018db            4200667
+ecx            0x2b                43
+rsi            0x4018db            4200667
+ecx            0x2c                44
+rsi            0x4018db            4200667
+ecx            0x4                 4
+rsi            0x40192c            4200748
+ecx            0x2c                44
+rsi            0x40192c            4200748
+ecx            0x2d                45
+rsi            0x40192c            4200748
+ecx            0x5                 5
+rsi            0x401942            4200770
+ecx            0x2d                45
+rsi            0x401942            4200770
+ecx            0x2e                46
+rsi            0x401942            4200770
+ecx            0x6                 6
+rsi            0x401952            4200786
+ecx            0x2e                46
+rsi            0x401952            4200786
+ecx            0x2f                47
+rsi            0x401952            4200786
+ecx            0x7                 7
+rsi            0x40195f            4200799
+ecx            0x2f                47
+rsi            0x40195f            4200799
+ecx            0x30                48
+rsi            0x40195f            4200799
+ecx            0x31                49
+rsi            0x401988            4200840
+ecx            0x1                 1
+rsi            0x4019b9            4200889
+ecx            0x31                49
+rsi            0x4019b9            4200889
+ecx            0x32                50
+rsi            0x4019b9            4200889
+ecx            0x2                 2
+rsi            0x4019ee            4200942
+ecx            0x32                50
+rsi            0x4019ee            4200942
+ecx            0x33                51
+rsi            0x4019ee            4200942
+ecx            0x3                 3
+rsi            0x401a17            4200983
+ecx            0x33                51
+rsi            0x401a17            4200983
+ecx            0x34                52
+rsi            0x401a17            4200983
+ecx            0x4                 4
+rsi            0x401a3b            4201019
+ecx            0x34                52
+rsi            0x401a3b            4201019
+ecx            0x35                53
+rsi            0x401a3b            4201019
+ecx            0x5                 5
+rsi            0x401a43            4201027
+ecx            0x35                53
+rsi            0x401a43            4201027
+ecx            0x36                54
+rsi            0x401a43            4201027
+ecx            0x6                 6
+rsi            0x401a46            4201030
+ecx            0x36                54
+rsi            0x401a46            4201030
+ecx            0x37                55
+rsi            0x401a46            4201030
+ecx            0x7                 7
+rsi            0x401a7b            4201083
+ecx            0x37                55
+rsi            0x401a7b            4201083
+ecx            0x38                56
+rsi            0x401a7b            4201083
+ecx            0x39                57
+rsi            0x401abb            4201147
+ecx            0x3a                58
+rsi            0x401aef            4201199
+ecx            0x2                 2
+rsi            0x401af7            4201207
+ecx            0x3a                58
+rsi            0x401af7            4201207
+ecx            0x3b                59
+rsi            0x401af7            4201207
+ecx            0x3                 3
+rsi            0x401b3a            4201274
+ecx            0x3b                59
+rsi            0x401b3a            4201274
+ecx            0x3c                60
+rsi            0x401b3a            4201274
+ecx            0x4                 4
+rsi            0x401bb2            4201394
+ecx            0x3c                60
+rsi            0x401bb2            4201394
+ecx            0x3d                61
+rsi            0x401bb2            4201394
+ecx            0x3e                62
+rsi            0x401bb5            4201397
+ecx            0x3f                63
+rsi            0x401bf5            4201461
+ecx            0x7                 7
+rsi            0x401cbf            4201663
+ecx            0x3f                63
+rsi            0x401cbf            4201663
+ecx            0x40                64
+rsi            0x401cbf            4201663
+ecx            0x0                 0
+rsi            0x401cf0            4201712
+ecx            0x40                64
+rsi            0x401cf0            4201712
+ecx            0x41                65
+rsi            0x401cf0            4201712
+ecx            0x1                 1
+rsi            0x401d25            4201765
+ecx            0x41                65
+rsi            0x401d25            4201765
+ecx            0x42                66
+rsi            0x401d25            4201765
+ecx            0x2                 2
+rsi            0x401d29            4201769
+ecx            0x42                66
+rsi            0x401d29            4201769
+ecx            0x43                67
+rsi            0x401d29            4201769
+ecx            0x44                68
+rsi            0x401d5f            4201823
+ecx            0x4                 4
+rsi            0x401d91            4201873
+ecx            0x44                68
+rsi            0x401d91            4201873
+ecx            0x45                69
+rsi            0x401d91            4201873
+ecx            0x46                70
+rsi            0x401de7            4201959
+ecx            0x47                71
+rsi            0x401e06            4201990
+ecx            0x7                 7
+rsi            0x401e1a            4202010
+ecx            0x47                71
+rsi            0x401e1a            4202010
+ecx            0x48                72
+rsi            0x401e1a            4202010
+ecx            0x49                73
+rsi            0x401e1d            4202013
+ecx            0x4a                74
+rsi            0x401e36            4202038
+ecx            0x4b                75
+rsi            0x401e64            4202084
+ecx            0x4c                76
+rsi            0x401eb1            4202161
+ecx            0x4                 4
+rsi            0x401ed3            4202195
+ecx            0x4c                76
+rsi            0x401ed3            4202195
+ecx            0x4d                77
+rsi            0x401ed3            4202195
+ecx            0x4e                78
+rsi            0x401f09            4202249
+ecx            0x4f                79
+rsi            0x401f0d            4202253
+ecx            0x50                80
+rsi            0x401f16            4202262
+ecx            0x0                 0
+rsi            0x401f20            4202272
+ecx            0x50                80
+rsi            0x401f20            4202272
+ecx            0x51                81
+rsi            0x401f20            4202272
+ecx            0x1                 1
+rsi            0x401f35            4202293
+ecx            0x51                81
+rsi            0x401f35            4202293
+ecx            0x52                82
+rsi            0x401f35            4202293
+ecx            0x53                83
+rsi            0x401f3e            4202302
+ecx            0x3                 3
+rsi            0x401f53            4202323
+ecx            0x53                83
+rsi            0x401f53            4202323
+ecx            0x54                84
+rsi            0x401f53            4202323
+
+Program received signal SIGINT, Interrupt.
+0x0000000000401f53 in ?? ()
+=> 0x401f53:	mov    eax,DWORD PTR [rsp+rcx*1]
+   0x401f56:	add    dl,al
+   0x401f58:	xchg   BYTE PTR [rsp+rdx*1],al
+   0x401f5b:	mov    BYTE PTR [rsp+rcx*1],al
+   0x401f5e:	add    al,BYTE PTR [rsp+rdx*1]
+   0x401f61:	and    eax,0xff
+   0x401f67:	movzx  eax,BYTE PTR [rsp+rax*1]
+   0x401f6b:	xor    BYTE PTR [rbx+rdi*1],al
+   0x401f6e:	inc    rbx
+   0x401f71:	cmp    ebx,0x161
+   0x401f77:	jl     0x401f51
+   0x401f79:	add    rsp,0x100
+   0x401f80:	add    rsp,0x10
+   0x401f87:	pop    rdx
+   0x401f88:	pop    rbp
+   0x401f89:	jmp    0x401050 <_start>
+   0x401f8e:	rex.RX sub r12b,BYTE PTR [rbx+0x6b]
+   0x401f92:	and    BYTE PTR [rcx+0x6f],bh
+   0x401f95:	jne    0x401fa1
+   0x401f97:	cs cs cs cs push rdi
+   0x401f9c:	rex.WRXB
+   0x401f9d:	rex.WRXB
+   0x401f9e:	rex.R pop rcx
+   0x401fa0:	cs cs cs cs or dh,BYTE PTR [rbp+0x3a]
+   0x401fa7:	(bad)  
+   0x401fa8:	in     al,0xf9
+   0x401faa:	leave  
+   0x401fab:	movs   BYTE PTR es:[rdi],BYTE PTR ds:[rsi]
+   0x401fac:	rex.WB leave 
+   0x401fae:	mov    ecx,0xa91e6960
+   0x401fb3:	test   DWORD PTR [rcx+0x0],0x0
+   0x401fbd:	add    BYTE PTR [rax],al
+   0x401fbf:	add    BYTE PTR [rax],al
+   0x401fc1:	add    BYTE PTR [rax],al
+   0x401fc3:	add    BYTE PTR [rax],al
+   0x401fc5:	add    BYTE PTR [rax],al
+   0x401fc7:	add    BYTE PTR [rax],al
+   0x401fc9:	add    BYTE PTR [rax],al
+   0x401fcb:	add    BYTE PTR [rax],al
+   0x401fcd:	add    BYTE PTR [rax],al
+   0x401fcf:	add    BYTE PTR [rax],al
+   0x401fd1:	add    BYTE PTR [rax],al
+   0x401fd3:	add    BYTE PTR [rax],al
+   0x401fd5:	add    BYTE PTR [rax],al
+   0x401fd7:	add    BYTE PTR [rax],al
+   0x401fd9:	add    BYTE PTR [rax],al
+   0x401fdb:	add    BYTE PTR [rax],al
+   0x401fdd:	add    BYTE PTR [rax],al
+   0x401fdf:	add    BYTE PTR [rax],al
+   0x401fe1:	add    BYTE PTR [rax],al
+Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
+Use 'set logging enabled off'.
+
+Continuing.
+ecx            0x0                 0
+rsi            0x401f97            4202391
+
+ecx            0x1                 1
+rsi            0x40116e            4198766
+
+ecx            0x2                 2
+rsi            0x4011ba            4198842
+
+ecx            0x3                 3
+rsi            0x4011dc            4198876
+
+ecx            0x4                 4
+rsi            0x40121d            4198941
+
+ecx            0x5                 5
+rsi            0x401256            4198998
+
+ecx            0x6                 6
+rsi            0x401268            4199016
+
+ecx            0x7                 7
+rsi            0x40128c            4199052
+
+ecx            0x8                 8
+rsi            0x401294            4199060
+
+ecx            0x0                 0
+rsi            0x4012dc            4199132
+
+ecx            0x8                 8
+rsi            0x4012dc            4199132
+
+ecx            0x9                 9
+rsi            0x4012dc            4199132
+
+ecx            0x1                 1
+rsi            0x401358            4199256
+
+ecx            0x9                 9
+rsi            0x401358            4199256
+
+ecx            0xa                 10
+rsi            0x401358            4199256
+
+ecx            0x2                 2
+rsi            0x40135b            4199259
+
+ecx            0xa                 10
+rsi            0x40135b            4199259
+
+ecx            0xb                 11
+rsi            0x40135b            4199259
+
+ecx            0x3                 3
+rsi            0x40137d            4199293
+
+ecx            0xb                 11
+rsi            0x40137d            4199293
+
+ecx            0xc                 12
+rsi            0x40137d            4199293
+
+ecx            0x4                 4
+rsi            0x401386            4199302
+
+ecx            0xc                 12
+rsi            0x401386            4199302
+
+ecx            0xd                 13
+rsi            0x401386            4199302
+
+ecx            0x5                 5
+rsi            0x401393            4199315
+
+ecx            0xd                 13
+rsi            0x401393            4199315
+
+ecx            0xe                 14
+rsi            0x401393            4199315
+
+ecx            0x6                 6
+rsi            0x4013d4            4199380
+
+ecx            0xe                 14
+rsi            0x4013d4            4199380
+
+ecx            0xf                 15
+rsi            0x4013d4            4199380
+
+ecx            0x7                 7
+rsi            0x4013e4            4199396
+
+ecx            0xf                 15
+rsi            0x4013e4            4199396
+
+ecx            0x10                16
+rsi            0x4013e4            4199396
+
+ecx            0x0                 0
+rsi            0x4013f1            4199409
+
+ecx            0x10                16
+rsi            0x4013f1            4199409
+
+ecx            0x11                17
+rsi            0x4013f1            4199409
+
+ecx            0x1                 1
+rsi            0x4013fe            4199422
+
+ecx            0x11                17
+rsi            0x4013fe            4199422
+
+ecx            0x12                18
+rsi            0x4013fe            4199422
+
+ecx            0x2                 2
+rsi            0x401419            4199449
+
+ecx            0x12                18
+rsi            0x401419            4199449
+
+ecx            0x13                19
+rsi            0x401419            4199449
+
+ecx            0x3                 3
+rsi            0x401480            4199552
+
+ecx            0x13                19
+rsi            0x401480            4199552
+
+ecx            0x14                20
+rsi            0x401480            4199552
+
+ecx            0x15                21
+rsi            0x40149b            4199579
+
+ecx            0x5                 5
+rsi            0x4014bf            4199615
+
+ecx            0x15                21
+rsi            0x4014bf            4199615
+
+ecx            0x16                22
+rsi            0x4014bf            4199615
+
+ecx            0x17                23
+rsi            0x4014fb            4199675
+
+ecx            0x7                 7
+rsi            0x40150e            4199694
+
+ecx            0x17                23
+rsi            0x40150e            4199694
+
+ecx            0x18                24
+rsi            0x40150e            4199694
+
+ecx            0x0                 0
+rsi            0x401572            4199794
+
+ecx            0x18                24
+rsi            0x401572            4199794
+
+ecx            0x19                25
+rsi            0x401572            4199794
+
+ecx            0x1                 1
+rsi            0x401596            4199830
+
+ecx            0x19                25
+rsi            0x401596            4199830
+
+ecx            0x1a                26
+rsi            0x401596            4199830
+
+ecx            0x2                 2
+rsi            0x40159e            4199838
+
+ecx            0x1a                26
+rsi            0x40159e            4199838
+
+ecx            0x1b                27
+rsi            0x40159e            4199838
+
+ecx            0x1c                28
+rsi            0x4015d6            4199894
+
+ecx            0x4                 4
+rsi            0x40161b            4199963
+
+ecx            0x1c                28
+rsi            0x40161b            4199963
+
+ecx            0x1d                29
+rsi            0x40161b            4199963
+
+ecx            0x5                 5
+rsi            0x401652            4200018
+
+ecx            0x1d                29
+rsi            0x401652            4200018
+
+ecx            0x1e                30
+rsi            0x401652            4200018
+
+ecx            0x6                 6
+rsi            0x40165f            4200031
+
+ecx            0x1e                30
+rsi            0x40165f            4200031
+
+ecx            0x1f                31
+rsi            0x40165f            4200031
+
+ecx            0x7                 7
+rsi            0x4016ab            4200107
+
+ecx            0x1f                31
+rsi            0x4016ab            4200107
+
+ecx            0x20                32
+rsi            0x4016ab            4200107
+
+ecx            0x0                 0
+rsi            0x4016e3            4200163
+
+ecx            0x20                32
+rsi            0x4016e3            4200163
+
+ecx            0x21                33
+rsi            0x4016e3            4200163
+
+ecx            0x1                 1
+rsi            0x40171a            4200218
+
+ecx            0x21                33
+rsi            0x40171a            4200218
+
+ecx            0x22                34
+rsi            0x40171a            4200218
+
+ecx            0x2                 2
+rsi            0x401746            4200262
+
+ecx            0x22                34
+rsi            0x401746            4200262
+
+ecx            0x23                35
+rsi            0x401746            4200262
+
+ecx            0x3                 3
+rsi            0x40177b            4200315
+
+ecx            0x23                35
+rsi            0x40177b            4200315
+
+ecx            0x24                36
+rsi            0x40177b            4200315
+
+ecx            0x4                 4
+rsi            0x401788            4200328
+
+ecx            0x24                36
+rsi            0x401788            4200328
+
+ecx            0x25                37
+rsi            0x401788            4200328
+
+ecx            0x5                 5
+rsi            0x4017a3            4200355
+
+ecx            0x25                37
+rsi            0x4017a3            4200355
+
+ecx            0x26                38
+rsi            0x4017a3            4200355
+
+ecx            0x6                 6
+rsi            0x4017c6            4200390
+
+ecx            0x26                38
+rsi            0x4017c6            4200390
+
+ecx            0x27                39
+rsi            0x4017c6            4200390
+
+ecx            0x7                 7
+rsi            0x401832            4200498
+
+ecx            0x27                39
+rsi            0x401832            4200498
+
+ecx            0x28                40
+rsi            0x401832            4200498
+
+ecx            0x0                 0
+rsi            0x40184d            4200525
+
+ecx            0x28                40
+rsi            0x40184d            4200525
+
+ecx            0x29                41
+rsi            0x40184d            4200525
+
+ecx            0x1                 1
+rsi            0x40187d            4200573
+
+ecx            0x29                41
+rsi            0x40187d            4200573
+
+ecx            0x2a                42
+rsi            0x40187d            4200573
+
+ecx            0x2                 2
+rsi            0x4018b2            4200626
+
+ecx            0x2a                42
+rsi            0x4018b2            4200626
+
+ecx            0x2b                43
+rsi            0x4018b2            4200626
+
+ecx            0x3                 3
+rsi            0x4018db            4200667
+
+ecx            0x2b                43
+rsi            0x4018db            4200667
+
+ecx            0x2c                44
+rsi            0x4018db            4200667
+
+ecx            0x4                 4
+rsi            0x40192c            4200748
+
+ecx            0x2c                44
+rsi            0x40192c            4200748
+
+ecx            0x2d                45
+rsi            0x40192c            4200748
+
+ecx            0x5                 5
+rsi            0x401942            4200770
+
+ecx            0x2d                45
+rsi            0x401942            4200770
+
+ecx            0x2e                46
+rsi            0x401942            4200770
+
+ecx            0x6                 6
+rsi            0x401952            4200786
+
+ecx            0x2e                46
+rsi            0x401952            4200786
+
+ecx            0x2f                47
+rsi            0x401952            4200786
+
+ecx            0x7                 7
+rsi            0x40195f            4200799
+
+ecx            0x2f                47
+rsi            0x40195f            4200799
+
+ecx            0x30                48
+rsi            0x40195f            4200799
+
+ecx            0x31                49
+rsi            0x401988            4200840
+
+ecx            0x1                 1
+rsi            0x4019b9            4200889
+
+ecx            0x31                49
+rsi            0x4019b9            4200889
+
+ecx            0x32                50
+rsi            0x4019b9            4200889
+
+ecx            0x2                 2
+rsi            0x4019ee            4200942
+
+ecx            0x32                50
+rsi            0x4019ee            4200942
+
+ecx            0x33                51
+rsi            0x4019ee            4200942
+
+ecx            0x3                 3
+rsi            0x401a17            4200983
+
+ecx            0x33                51
+rsi            0x401a17            4200983
+
+ecx            0x34                52
+rsi            0x401a17            4200983
+
+ecx            0x4                 4
+rsi            0x401a3b            4201019
+
+ecx            0x34                52
+rsi            0x401a3b            4201019
+
+ecx            0x35                53
+rsi            0x401a3b            4201019
+
+ecx            0x5                 5
+rsi            0x401a43            4201027
+
+ecx            0x35                53
+rsi            0x401a43            4201027
+
+ecx            0x36                54
+rsi            0x401a43            4201027
+
+ecx            0x6                 6
+rsi            0x401a46            4201030
+
+ecx            0x36                54
+rsi            0x401a46            4201030
+
+ecx            0x37                55
+rsi            0x401a46            4201030
+
+ecx            0x7                 7
+rsi            0x401a7b            4201083
+
+ecx            0x37                55
+rsi            0x401a7b            4201083
+
+ecx            0x38                56
+rsi            0x401a7b            4201083
+
+ecx            0x39                57
+rsi            0x401abb            4201147
+
+ecx            0x3a                58
+rsi            0x401aef            4201199
+
+ecx            0x2                 2
+rsi            0x401af7            4201207
+
+ecx            0x3a                58
+rsi            0x401af7            4201207
+
+ecx            0x3b                59
+rsi            0x401af7            4201207
+
+ecx            0x3                 3
+rsi            0x401b3a            4201274
+
+ecx            0x3b                59
+rsi            0x401b3a            4201274
+
+ecx            0x3c                60
+rsi            0x401b3a            4201274
+
+ecx            0x4                 4
+rsi            0x401bb2            4201394
+
+ecx            0x3c                60
+rsi            0x401bb2            4201394
+
+ecx            0x3d                61
+rsi            0x401bb2            4201394
+
+ecx            0x3e                62
+rsi            0x401bb5            4201397
+
+ecx            0x3f                63
+rsi            0x401bf5            4201461
+
+ecx            0x7                 7
+rsi            0x401cbf            4201663
+
+ecx            0x3f                63
+rsi            0x401cbf            4201663
+
+ecx            0x40                64
+rsi            0x401cbf            4201663
+
+ecx            0x0                 0
+rsi            0x401cf0            4201712
+
+ecx            0x40                64
+rsi            0x401cf0            4201712
+
+ecx            0x41                65
+rsi            0x401cf0            4201712
+
+ecx            0x1                 1
+rsi            0x401d25            4201765
+
+ecx            0x41                65
+rsi            0x401d25            4201765
+
+ecx            0x42                66
+rsi            0x401d25            4201765
+
+ecx            0x2                 2
+rsi            0x401d29            4201769
+
+ecx            0x42                66
+rsi            0x401d29            4201769
+
+ecx            0x43                67
+rsi            0x401d29            4201769
+
+ecx            0x44                68
+rsi            0x401d5f            4201823
+
+ecx            0x4                 4
+rsi            0x401d91            4201873
+
+ecx            0x44                68
+rsi            0x401d91            4201873
+
+ecx            0x45                69
+rsi            0x401d91            4201873
+
+ecx            0x46                70
+rsi            0x401de7            4201959
+
+ecx            0x47                71
+rsi            0x401e06            4201990
+
+ecx            0x7                 7
+rsi            0x401e1a            4202010
+
+ecx            0x47                71
+rsi            0x401e1a            4202010
+
+ecx            0x48                72
+rsi            0x401e1a            4202010
+
+ecx            0x49                73
+rsi            0x401e1d            4202013
+
+ecx            0x4a                74
+rsi            0x401e36            4202038
+
+ecx            0x4b                75
+rsi            0x401e64            4202084
+
+ecx            0x4c                76
+rsi            0x401eb1            4202161
+
+ecx            0x4                 4
+rsi            0x401ed3            4202195
+
+ecx            0x4c                76
+rsi            0x401ed3            4202195
+
+ecx            0x4d                77
+rsi            0x401ed3            4202195
+
+ecx            0x4e                78
+rsi            0x401f09            4202249
+
+ecx            0x4f                79
+rsi            0x401f0d            4202253
+
+ecx            0x50                80
+rsi            0x401f16            4202262
+
+ecx            0x0                 0
+rsi            0x401f20            4202272
+
+ecx            0x50                80
+rsi            0x401f20            4202272
+
+ecx            0x51                81
+rsi            0x401f20            4202272
+
+ecx            0x1                 1
+rsi            0x401f35            4202293
+
+ecx            0x51                81
+rsi            0x401f35            4202293
+
+ecx            0x52                82
+rsi            0x401f35            4202293
+
+ecx            0x53                83
+rsi            0x401f3e            4202302
+
+ecx            0x3                 3
+rsi            0x401f53            4202323
+
+ecx            0x53                83
+rsi            0x401f53            4202323
+
+ecx            0x54                84
+rsi            0x401f53            4202323
+
+
+Breakpoint 5, 0x0000000000401ee1 in ?? ()
+
+Program received signal SIGINT, Interrupt.
+0x0000000000401f58 in ?? ()
+Num     Type           Disp Enb Address            What
+1       breakpoint     keep y   0x0000000000401161 
+	breakpoint already hit 1 time
+2       breakpoint     keep y   0x0000000000401187 
+	breakpoint already hit 1 time
+3       breakpoint     keep y   0x00000000004011e3 
+	breakpoint already hit 1 time
+4       watchpoint     keep y                      $ecx
+	breakpoint already hit 972 times
+        silent
+        if $rsi >= 0x401161 && $rsi < 0x401161 + 3700
+          i r ecx
+          i r rsi
+          echo \n
+        end
+        continue
+5       breakpoint     keep y   0x0000000000401ee1 
+	breakpoint already hit 1 time
+   0x401ee1:	add    rsp,0x20
+   0x401ee8:	mov    rdi,0x401000
+   0x401eef:	mov    esi,0x1000
+   0x401ef5:	mov    edx,0x7
+   0x401efa:	mov    eax,0xa
+   0x401eff:	syscall 
+   0x401f01:	sub    rsp,0x100
+   0x401f08:	lea    rsi,[rbp+0x0]
+   0x401f0c:	lea    rsi,[rbp+0x0]
+   0x401f10:	and    ecx,0x0
+Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
+Use 'set logging enabled off'.
+

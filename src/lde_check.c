@@ -268,6 +268,11 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
                     pos, buf[pos], r, ilen, bitcount);
         if (r == 1 || r == 2)
         {
+            {
+                static FILE *simf = NULL;
+                if (!simf) simf = fopen("./sim_trace.txt", "w");
+                if (simf) fprintf(simf, "%d %zu\n", bitcount, pos - start);
+            }
             int bit = (r == 2) ? 1 : 0;
             if (pos < 8192)
                 lde_bit_by_pos[pos] = bit;
