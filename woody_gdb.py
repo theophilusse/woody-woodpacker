@@ -1,6 +1,6 @@
 import gdb
 
-def read_meta(path="/tmp/woody_meta.txt"):
+def read_meta(path="./woody_meta.txt"):
     meta = {}
     with open(path) as f:
         for line in f:
@@ -51,7 +51,7 @@ class AutoBreak(gdb.Command):
 
 class WoodySetup(gdb.Command):
     """woodysetup [nbytes] : pose un breakpoint sur load_vaddr (lu depuis
-    /tmp/woody_meta.txt), lance le programme, neutralise l'anti-debug (ptrace),
+    ./woody_meta.txt), lance le programme, neutralise l'anti-debug (ptrace),
     puis pose un watchpoint sur $ecx filtre a la zone scannee par le LDE.
 
     Avec un argument numerique, pose plutot un watchpoint sur $rsi (pas $ecx),
@@ -65,7 +65,7 @@ class WoodySetup(gdb.Command):
         try:
             meta = read_meta()
         except FileNotFoundError:
-            print("woodysetup: /tmp/woody_meta.txt introuvable — lance d'abord une generation")
+            print("woodysetup: ./woody_meta.txt introuvable — lance d'abord une generation")
             return
 
         patch_jmp_oep = int(meta["patch_jmp_oep"])
