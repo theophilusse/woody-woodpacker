@@ -137,16 +137,14 @@ end""")
 
 
 class WoodyCompare(gdb.Command):
-    """woodycompare <sim_trace> <gdb_trace> : compare deux fichiers de trace
-    (format 'valeur position' par ligne, un couple par ligne) et affiche
-    la premiere ligne ou ils divergent, avec du contexte avant/apres."""
+    """woodycompare <sim_trace> <gdb_trace> : compare deux fichiers de trace,
+    en tolerant un ecart de 0 ou 1 sur la position (convention REX pre/post-strip),
+    et ne signale que les VRAIES divergences (ecart >= 2 ou valeur differente)."""
 
     def __init__(self):
         super(WoodyCompare, self).__init__("woodycompare", gdb.COMMAND_USER)
 
     def _dedupe(self, pairs):
-        """Regroupe les lignes consecutives de meme position, ne garde que
-        la derniere valeur (elimine les artefacts push/pop internes)."""
         deduped = []
         i = 0
         while i < len(pairs):
@@ -171,7 +169,6 @@ class WoodyCompare(gdb.Command):
                 for l in f:
                     p = l.split()
                     if len(p) == 2:
-                        # sim: bitcount 0-indexe -> +1 pour comparer a ecx post-increment
                         sim_pairs.append((int(p[0]) + 1, int(p[1])))
 
             gdb_pairs = []
@@ -185,31 +182,34 @@ class WoodyCompare(gdb.Command):
             return
 
         gdb_deduped = self._dedupe(gdb_pairs)
-
         print(f"sim: {len(sim_pairs)} entrees   reel (dedup): {len(gdb_deduped)} entrees")
 
         n = min(len(sim_pairs), len(gdb_deduped))
         first_diff = None
         for k in range(n):
-            if sim_pairs[k] != gdb_deduped[k]:
+            sv, sp = sim_pairs[k]
+            rv, rp = gdb_deduped[k]
+            if sv != rv or rp - sp not in (0, 1):   # tolere l'ecart REX de 0 ou 1
                 first_diff = k
                 break
 
         if first_diff is None:
             if len(sim_pairs) == len(gdb_deduped):
-                print(f"alignement parfait sur les {n} lignes — aucune divergence trouvee")
+                print(f"alignement coherent sur les {n} lignes (ecart REX 0/1 tolere) — aucune vraie divergence")
             else:
-                print(f"alignement parfait sur les {n} premieres lignes, "
-                      f"mais longueur differente (sim={len(sim_pairs)}, reel={len(gdb_deduped)})")
+                print(f"coherent sur les {n} premieres lignes, longueur differente "
+                      f"(sim={len(sim_pairs)}, reel={len(gdb_deduped)})")
             return
 
-        print(f"PREMIERE DIVERGENCE a l'index {first_diff}")
+        print(f"VRAIE DIVERGENCE a l'index {first_diff} (ecart > 1 ou valeur differente)")
         lo = max(0, first_diff - 5)
         hi = min(n, first_diff + 15)
-        print(f"{'idx':>4} {'sim':>14} {'reel':>14}")
+        print(f"{'idx':>4} {'sim':>14} {'reel':>14} {'ecart':>6}")
         for k in range(lo, hi):
+            sv, sp = sim_pairs[k]
+            rv, rp = gdb_deduped[k]
             mark = " <<<" if k == first_diff else ""
-            print(f"{k:>4} {str(sim_pairs[k]):>14} {str(gdb_deduped[k]):>14}{mark}")
+            print(f"{k:>4} {str(sim_pairs[k]):>14} {str(gdb_deduped[k]):>14} {rp-sp:>6}{mark}")
 
 
 AutoBreak()
