@@ -82,6 +82,16 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	{
+		FILE *meta = fopen("./woody_meta.txt", "w");
+		if (meta)
+		{
+			fprintf(meta, "patch_jmp_oep=%zu\n", stub->patch_jmp_oep);
+			fprintf(meta, "load_vaddr=%lu\n", stub->load_vaddr);
+			fclose(meta);
+		}
+	}
+
 	/* 5. Patch des Phdr / e_entry */
 	if (elf_patch(ctx, stub, &crypto) != 0)
 	{
@@ -89,16 +99,6 @@ int	main(int argc, char **argv)
 		stub_free(stub);
 		elf_free(ctx);
 		return (1);
-	}
-
-	{
-		FILE *meta = fopen("/tmp/woody_meta.txt", "w");
-		if (meta)
-		{
-			fprintf(meta, "patch_jmp_oep=%zu\n", stub->patch_jmp_oep);
-			fprintf(meta, "load_vaddr=%lu\n", stub->load_vaddr);
-			fclose(meta);
-		}
 	}
 
 	/* 6. Écriture de woody */
