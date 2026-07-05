@@ -1192,7 +1192,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 			fprintf(stderr, "%02x ", a.out->e.buf[ss + k]);
 		fprintf(stderr, "\n");
 
-		for (size_t k = ss; k < se; k++)
+		for (size_t k = ss; k < (size_t)se; k++)
 			if (a.out->e.buf[k] == 0xCC)
 				fprintf(stderr, "0xCC trouve reellement a offset %zu\n", k);
 
