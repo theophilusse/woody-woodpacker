@@ -545,24 +545,17 @@ static const char STUB_SRC[] =
     "test eax, eax\n"        //; Vérifier si r12 == 0
     "jnz .loop\n"            //; Si non, continuer la boucle
 
-    //; === Écrire le buffer complet (34 octets : "0x" + 32 hex + '\n') ===
-    "_SET rax, 1\n"           //; sys_write
-    "_SET rdi, 1\n"           //; stdout
-    "_SET rsi, r9\n"
-    "_SET rdx, 32\n"
-    "syscall\n"
+    "_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
+	"syscall\n"
 
 	"mov cl, 10\n"
-	"mov [r8], cl\n"
-	"_SET rax, 1\n"
-	"_SET rdi, 1\n"
-	"_SET rsi, r8\n"
+	"mov [r9+32], cl\n"      // écrit le newline DANS le buffer H (à l'offset 32, encore valide puisque H fait 40)
+	"_SET rax, 1\n" "_SET rdi, 1\n"
+	"_SET rsi, r9\n" "add rsi, 32\n"
 	"_SET rdx, 1\n"
 	"syscall\n"
 
-	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
-
-	"add rsp, 32\n"
+	"add rsp, 40\n"
 	// mprotect(page_vaddr, page_size, PROT_RWX)
 	"mov rdi, prot_addr\n"
 	"mov esi, prot_size\n"
