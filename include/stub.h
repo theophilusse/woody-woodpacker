@@ -475,7 +475,7 @@ static const char STUB_SRC[] =
 	////// DEBUG ecx 
 "push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
 "push rcx\n"
-"_SET rax, 1\n" "_SET rdi, 1\n" "lea rsi, [ecx_marker]\n" "_SET rdx, 5\n"
+"_SET rax, 1\n" "_SET rdi, 1\n" "lea rsi, [ecx_marker]\n" "_SET rdx, 4\n"
 "syscall\n"
 "_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, rsp\n" "_SET rdx, 4\n"
 "syscall\n"
@@ -637,9 +637,10 @@ static const char STUB_SRC[] =
 	"add rsp, 16\n"      // ← DÉPLACÉ ICI : libère le buffer clé, seulement maintenant qu'on n'en a plus besoin
 	"pop rdx\n"
 	"pop rbp\n"
-	"jmp @oep\n"
 
 	"scan_end:\n"
+
+	"jmp @oep\n"
 
 	// donnees embarquees apres le code
 	"ecx_marker:\n"
