@@ -75,17 +75,17 @@ static const char STUB_SRC[] =
 	"add rsi, 2\n" "jmp @lde_loop\n"
 
 	"@o_3c:\n"
-	"cmp al, 0x3c\n" "jne @o_24\n"
+	"cmp al, 0x3c\n" "jne @o_cc\n"
 	"add rsi, 2\n" "jmp @lde_loop\n"
 
 	// Batman
-	//"@o_cc:\n"
-	//"cmp al, 0xcc\n" "jne @o_24\n"
-	//"cmp ecx, 128\n" "jge @adv_cc\n"
-	//"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
-	//"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
-	//"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
-	//"@adv_cc:\n" "add rsi, 1\n" "jmp @lde_loop\n"
+	"@o_cc:\n"
+	"cmp al, 0xcc\n" "jne @o_24\n"
+	"cmp ecx, 128\n" "jge @adv_cc\n"
+	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
+	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
+	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+	"@adv_cc:\n" "add rsi, 1\n" "jmp @lde_loop\n"
 
 	"@o_24:\n"
 	"cmp al, 0x24\n" "jne @o_80\n"
