@@ -60,22 +60,22 @@ static const char STUB_SRC[] =
 	** qui suit, sans dupliquer aucun check. Une fois consommé,
 	** rsi pointe directement sur l'opcode réel. ── */
 	"_SET eax, [rsi]\n"
-	"cmp eax, 0x40\n" "jl @lde_no_rex\n"
-	"cmp eax, 0x4f\n" "jg @lde_no_rex\n"
+	"cmp al, 0x40\n" "jl @lde_no_rex\n"
+	"cmp al, 0x4f\n" "jg @lde_no_rex\n"
 	"add rsi, 1\n"
 	"@lde_no_rex:\n"
 	"_SET eax, [rsi]\n"             /* eax = opcode reel */
 
 	/* ══════════ 0x24 ib : AND AL, imm8 (forme courte) → bit=1 ══════════ */
-	"cmp eax, 0xe9\n" "jne @o_3c\n"
+	"cmp al, 0xe9\n" "jne @o_3c\n"
 	"add rsi, 5\n" "jmp @lde_loop\n"
 
 	"@o_3c:\n"
-	"cmp eax, 0x3c\n" "jne @o_24\n"
+	"cmp al, 0x3c\n" "jne @o_24\n"
 	"add rsi, 2\n" "jmp @lde_loop\n"
 
 	"@o_24:\n"
-	"cmp eax, 0x24\n" "jne @o_80\n"
+	"cmp al, 0x24\n" "jne @o_80\n"
 	"_SET eax, [rsi+1]\n" "cmp al, 0x0\n" "jne @adv2_24\n"
 	"cmp ecx, 128\n" "jge @adv2_24\n"
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
@@ -171,7 +171,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x31 /r mod=11 meme registre : XOR reg,reg → bit=0 ══════════ */
 	"@o_31:\n"
-	"cmp eax, 0x31\n" "jne @o_89\n"
+	"cmp al, 0x31\n" "jne @o_89\n"
 	"_SET eax, [rsi+1]\n"
 	"_SET edx, eax\n" "and edx, 0xc0\n" "cmp dl, 0xc0\n" "jne @adv2_31\n"
 	"_SET edx, eax\n" "and edx, 0x38\n" "sar edx, 3\n"
@@ -389,7 +389,7 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0x0F 0xB6 /r : MOVZX → bit=1 (reg-reg mod11) / bit=0 (mem mod00/01) ══════════ */
 	"@o_0f:\n"
-	"cmp eax, 0x0f\n" "jne @o_b8\n"
+	"cmp al, 0x0f\n" "jne @o_b8\n"
 	"_SET eax, [rsi+1]\n" "cmp al, 0xb6\n" "jne @lde_fallback\n"
 	"_SET eax, [rsi+2]\n"
 	"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
@@ -423,8 +423,8 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0xB8-0xBF : MOV r32,imm32 → bit=1 ══════════ */
 	"@o_b8:\n"
-	"cmp eax, 0xb8\n" "jl @o_fe\n"
-	"cmp eax, 0xbf\n" "jg @o_fe\n"
+	"cmp al, 0xb8\n" "jl @o_fe\n"
+	"cmp al, 0xbf\n" "jg @o_fe\n"
 	"_SET edx, [rsi-1]\n"                 /* octet precedent = potentiel REX */
 	"cmp edx, 0x48\n" "jl @o_b8_32\n"
 	"cmp edx, 0x4f\n" "jg @o_b8_32\n"
@@ -446,8 +446,8 @@ static const char STUB_SRC[] =
 
 	/* ══════════ 0xFE/0xFF /0 (INC, bit1) ou /1 (DEC, bit1) ══════════ */
 	"@o_fe:\n"
-	"cmp eax, 0xfe\n" "je @fe_ff_body\n"
-	"cmp eax, 0xff\n" "jne @lde_fallback\n"
+	"cmp al, 0xfe\n" "je @fe_ff_body\n"
+	"cmp al, 0xff\n" "jne @lde_fallback\n"
 	"@fe_ff_body:\n"
 	"_SET eax, [rsi+1]\n" "and eax, 0xf8\n"
 	"cmp eax, 0xc0\n" "je @o_inc\n"
