@@ -1,0 +1,2 @@
+patch_jmp_oep=3703
+load_vaddr=4198753

@@ -1080,6 +1080,10 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
             fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
             return (-1);
         }
+		fprintf(stderr, "buffer reel (asm.c) offsets 0-60: ");
+		for (int k = 0; k < 60; k++)
+			fprintf(stderr, "%02x ", a.out->e.buf[ss + k]);
+		fprintf(stderr, "\n");
         bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
                   lde_bit_log, &lde_bit_log_len);
 
