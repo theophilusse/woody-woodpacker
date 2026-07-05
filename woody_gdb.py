@@ -2,7 +2,7 @@ import gdb
 
 def read_meta():
     meta = {}
-    with open("/tmp/woody_meta.txt") as f:
+    with open("./woody_meta.txt") as f:
         for line in f:
             k, v = line.strip().split("=", 1)
             meta[k] = v
