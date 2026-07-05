@@ -9,3 +9,120 @@ woodysetup: pattern anti-debug (cmp eax,-1) introuvable (deja neutralise dans le
 woodysetup: pret. $scan_start et $scan_end sont definis.
 Utilise 'break *<adresse>', 'stepi', 'x/Ni $pc', etc. librement.
 Aucun watchpoint pose, aucun continue automatique — tu as la main.
+Symbols from "/home/lfs/woody-woodpacker/woody".
+Local exec file:
+	`/home/lfs/woody-woodpacker/woody', file type elf64-x86-64.
+warning: Cannot find section for the entry point of /home/lfs/woody-woodpacker/woody.
+	Entry point: 0x119d
+	0x0000000000000318 - 0x0000000000000334 is .interp
+	0x0000000000000338 - 0x0000000000000358 is .note.gnu.property
+	0x0000000000000358 - 0x000000000000037c is .note.gnu.build-id
+	0x000000000000037c - 0x000000000000039c is .note.ABI-tag
+	0x00000000000003a0 - 0x00000000000003c4 is .gnu.hash
+	0x00000000000003c8 - 0x0000000000000470 is .dynsym
+	0x0000000000000470 - 0x00000000000004ff is .dynstr
+	0x0000000000000500 - 0x000000000000050e is .gnu.version
+	0x0000000000000510 - 0x0000000000000540 is .gnu.version_r
+	0x0000000000000540 - 0x0000000000000600 is .rela.dyn
+	0x0000000000000600 - 0x0000000000000618 is .rela.plt
+	0x0000000000001000 - 0x000000000000101b is .init
+	0x0000000000001020 - 0x0000000000001040 is .plt
+	0x0000000000001040 - 0x0000000000001048 is .plt.got
+	0x0000000000001050 - 0x000000000000118f is .text
+	0x0000000000001190 - 0x000000000000119d is .fini
+	0x0000000000002000 - 0x0000000000002019 is .rodata
+	0x000000000000201c - 0x0000000000002048 is .eh_frame_hdr
+	0x0000000000002048 - 0x00000000000020dc is .eh_frame
+	0x0000000000003de8 - 0x0000000000003df0 is .init_array
+	0x0000000000003df0 - 0x0000000000003df8 is .fini_array
+	0x0000000000003df8 - 0x0000000000003fd8 is .dynamic
+	0x0000000000003fd8 - 0x0000000000004000 is .got
+	0x0000000000004000 - 0x0000000000004020 is .got.plt
+	0x0000000000004020 - 0x0000000000004030 is .data
+	0x0000000000004030 - 0x0000000000004038 is .bss
+Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
+Use 'set logging enabled off'.
+
+rax            0xad                173
+rbx            0x0                 0
+rcx            0x1                 1
+rdx            0xb4                180
+rsi            0x7fffffffe430      140737488348208
+rdi            0x36dc2be24c8f03c7  3953082823871497159
+rbp            0x7fffffffe430      0x7fffffffe430
+rsp            0x7fffffffe330      0x7fffffffe330
+r8             0x7fffffffe430      140737488348208
+r9             0x7fffffffe408      140737488348168
+r10            0x10                16
+r11            0x202               514
+r12            0x55555555519d      93824992235933
+r13            0x7fffffffe450      140737488348240
+r14            0x0                 0
+r15            0x0                 0
+rip            0x555555555f5c      0x555555555f5c
+eflags         0x10202             [ IF RF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+#0  0x0000555555555f5c in ?? ()
+#1  0xaf21762d0fd475a4 in ?? ()
+#2  0xaa3e09ff16596a8c in ?? ()
+#3  0x39c67b244f52d64a in ?? ()
+#4  0xc2482946d137a720 in ?? ()
+#5  0xeab80a3d9265903f in ?? ()
+#6  0x87a296d91f5eade1 in ?? ()
+#7  0x58da5af6ee572744 in ?? ()
+#8  0x230d4297d7855188 in ?? ()
+#9  0x53b98a32c9acdb25 in ?? ()
+#10 0xb1827364b7c50bb6 in ?? ()
+#11 0x12e7cc60a08908b2 in ?? ()
+#12 0x28936fcd136d069c in ?? ()
+#13 0x43797f109eb5b061 in ?? ()
+#14 0x55d3cb5b997e728e in ?? ()
+#15 0x91ebca80fed2018b in ?? ()
+#16 0x7df77750955da369 in ?? ()
+#17 0x2ea5789d3bbdf9fc in ?? ()
+#18 0xc8a1f3bbc1c0a8ef in ?? ()
+#19 0x19ab62331c9fde0c in ?? ()
+#20 0x8441541a7a712ff0 in ?? ()
+#21 0xe486dfec151ebac3 in ?? ()
+#22 0xe03874f5b36bd5ce in ?? ()
+#23 0xfd81e6b4dd68f86c in ?? ()
+#24 0x4dfb7cf21d47d09a in ?? ()
+#25 0x31bc8daed80ef183 in ?? ()
+#26 0x70f49b026e26e935 in ?? ()
+#27 0xa9223a67115c0014 in ?? ()
+#28 0x3056c449e8401805 in ?? ()
+#29 0x4bcf6394a64ebf45 in ?? ()
+#30 0xbee3e566173c0798 in ?? ()
+#31 0x34fa1b5fed2c2a04 in ?? ()
+#32 0x000055555555519d in _fini ()
+#33 0x53929be3a8d6cdc7 in ?? ()
+#34 0x037e3ab930169181 in ?? ()
+#35 0x0000000000000000 in ?? ()
+=> 0x555555555f5c:	xor    %al,(%rbx,%rdi,1)
+   0x555555555f5f:	inc    %rbx
+   0x555555555f62:	cmp    $0x19d,%ebx
+   0x555555555f68:	jl     0x555555555f41
+   0x555555555f6a:	add    $0x100,%rsp
+   0x555555555f71:	add    $0x10,%rsp
+   0x555555555f78:	pop    %rdx
+   0x555555555f79:	pop    %rbp
+   0x555555555f7a:	jmp    0x555555555050 <_start>
+   0x555555555f7f:	rex.RX sub 0x6b(%rbx),%r12b
+   0x555555555f83:	and    %bh,0x6f(%rcx)
+   0x555555555f86:	jne    0x555555555f92
+   0x555555555f88:	cs cs cs cs push %rdi
+   0x555555555f8d:	rex.WRXB
+   0x555555555f8e:	rex.WRXB
+   0x555555555f8f:	rex.R pop %rcx
+   0x555555555f91:	cs cs cs cs or %bh,%al
+   0x555555555f97:	int    $0xd6
+   0x555555555f99:	test   $0xe3,%al
+   0x555555555f9b:	fwait
+Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
+Use 'set logging enabled off'.
+

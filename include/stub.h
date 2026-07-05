@@ -562,7 +562,8 @@ static const char STUB_SRC[] =
 	"lea rax, [pie_base_marker]\n"
 	"mov rdx, pie_base_marker\n"
 	"sub rax, rdx\n"
-	"push rax\n"
+	"mov r15, rax\n"
+	
 	"mov rdi, rax\n"
 	"add rdi, prot_addr\n"
 	"mov esi, prot_size\n"
@@ -602,8 +603,7 @@ static const char STUB_SRC[] =
 	"jnz @ksa_loop\n"
 
 	// PRGA + XOR payload
-	"pop rax\n"
-	"mov rdi, rax\n"
+	"mov rdi, r15\n"
 	"add rdi, text_vaddr\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
 	"_ZERO edx\n"//"xor edx, edx\n"
