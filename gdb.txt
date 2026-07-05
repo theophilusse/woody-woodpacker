@@ -126,3 +126,47 @@ gs             0x0                 0
 Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
 Use 'set logging enabled off'.
 
+=> 0x555555555f3b:	xor    %al,(%rbx,%rdi,1)
+   0x555555555f3e:	inc    %rbx
+   0x555555555f41:	cmp    $0x19d,%ebx
+   0x555555555f47:	jl     0x555555555f23
+   0x555555555f49:	add    $0x100,%rsp
+   0x555555555f50:	add    $0x10,%rsp
+   0x555555555f57:	pop    %rdx
+   0x555555555f58:	pop    %rbp
+   0x555555555f59:	jmp    0x555555555050 <_start>
+   0x555555555f5e:	rex.RX sub 0x6b(%rbx),%r12b
+   0x555555555f62:	and    %bh,0x6f(%rcx)
+   0x555555555f65:	jne    0x555555555f71
+   0x555555555f67:	cs cs cs cs push %rdi
+   0x555555555f6c:	rex.WRXB
+   0x555555555f6d:	rex.WRXB
+   0x555555555f6e:	rex.R pop %rcx
+   0x555555555f70:	cs cs cs cs or -0x23(%rdx),%bh
+   0x555555555f77:	add    $0xdb,%al
+   0x555555555f79:	rex.WRXB stc 
+   0x555555555f7b:	mov    $0xe1,%dh
+rax            0xe3                227
+rbx            0x0                 0
+rcx            0x1                 1
+rdx            0x2d                45
+rsi            0x7fffffffe430      140737488348208
+rdi            0x55555555519d      93824992235933
+rbp            0x7fffffffe430      0x7fffffffe430
+rsp            0x7fffffffe330      0x7fffffffe330
+r8             0x7fffffffe430      140737488348208
+r9             0x7fffffffe408      140737488348168
+r10            0x10                16
+r11            0x202               514
+r12            0x55555555519d      93824992235933
+r13            0x7fffffffe450      140737488348240
+r14            0x0                 0
+r15            0x55555555519d      93824992235933
+rip            0x555555555f3b      0x555555555f3b
+eflags         0x296               [ PF AF SF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0

@@ -164,6 +164,7 @@ int emit_sub_r32_r32(t_emitter *e, t_reg dst, t_reg src);
 int emit_sub_r8_r8(t_emitter *e, t_reg dst, t_reg src);
 int emit_sub_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm);
 int emit_sub_r64_imm32(t_emitter *e, t_reg reg, int32_t imm);
+int emit_add_r64_imm32(t_emitter *e, t_reg reg, int32_t imm);
 
 /* opcodes jcc utiles */
 # define JL   0x7C

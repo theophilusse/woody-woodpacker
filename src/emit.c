@@ -1145,3 +1145,14 @@ int emit_sub_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
     memcpy(b + 3, &imm, 4);
     return emit_raw(e, b, 7);
 }
+
+/* ADD r64, imm32 (sign-extended) : REX.W 81 /0 id */
+int emit_add_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
+{
+    uint8_t b[7];
+    b[0] = mk_rex(1, 0, reg);
+    b[1] = 0x81;
+    b[2] = MODRM11(0, reg);
+    memcpy(b + 3, &imm, 4);
+    return emit_raw(e, b, 7);
+}

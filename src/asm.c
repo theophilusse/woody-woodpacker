@@ -533,7 +533,27 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		return 0;
 	}
 	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
-		{ emit_add_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
+    { emit_add_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
+	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
+	{
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		if (val >= -128 && val <= 127)
+			emit_add_r64_imm8(&a->out->e, r1, (int8_t)val);
+		else
+			emit_add_r64_imm32(&a->out->e, r1, (int32_t)val);
+		return 0;
+	}
+	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
+	{
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		if (val >= -128 && val <= 127)
+			emit_add_r32_imm8(&a->out->e, r1, (int8_t)val);
+		else
+			emit_add_r32_imm32(&a->out->e, r1, (uint32_t)val);
+		return 0;
+	}
 	if (!strcmp(toks[0], "add") && n == 3)
 	{
 		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
