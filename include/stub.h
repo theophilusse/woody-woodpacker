@@ -552,11 +552,12 @@ static const char STUB_SRC[] =
     "_SET rdx, 32\n"
     "syscall\n"
 
-	"mov [r8], 10\n"
+	"mov cl, 10\n"
+	"mov [r8], cl\n"
 	"_SET rax, 1\n"
 	"_SET rdi, 1\n"
 	"_SET rsi, r8\n"
-	"_SET rdx 1\n"
+	"_SET rdx, 1\n"
 	"syscall\n"
 
 	/////////////////////////////////// Decrypt payload (RC4) et jump vers OEP
