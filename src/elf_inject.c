@@ -23,14 +23,11 @@ int	elf_find_injection_point(t_elf_ctx *ctx)
 	return (1);
 }
 
-size_t	padding_available(Elf64_Phdr *p)
+size_t padding_available(Elf64_Phdr *p)
 {
-	size_t	used;
-
-	used = p->p_filesz % p->p_align;
-	if (used == 0)
-		return (0);          // déjà parfaitement aligné, pas de padding gratuit
-	return (p->p_align - used);
+    size_t used = p->p_filesz % p->p_align;
+    if (used == 0) return (0);
+    return (p->p_align - used);
 }
 
 int	elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto)
@@ -38,9 +35,26 @@ int	elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto)
 	Elf64_Phdr	*p;
 	size_t		stub_offset;
 	uint8_t		*tmp;
+	uint64_t	new_align;
 
 	(void)crypto;
 	p = &ctx->phdrs[ctx->target_phdr_idx];
+
+	new_align = 0x4000;
+    if (p->p_align < new_align)
+    {
+        if ((p->p_vaddr % new_align) != (p->p_offset % new_align))
+        {
+            fprintf(stderr, "error: alignement incompatible, p_vaddr/p_offset "
+                "ne correspondent pas modulo 0x%lx (p_align inchange)\n",
+                new_align);
+            /* on continue avec l'ancien p_align plutot que d'echouer */
+        }
+        else
+        {
+            p->p_align = new_align;
+        }
+    }
 
 	if (stub->len > padding_available(p))
 	{
