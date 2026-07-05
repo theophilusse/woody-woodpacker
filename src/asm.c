@@ -529,7 +529,10 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			emit_and_r32_imm32(&a->out->e, r1, (uint32_t)val);
+			if (val >= -128 && val <= 255)
+				emit_and_r32_imm8(&a->out->e, r1, (uint8_t)val);
+			else
+				emit_and_r32_imm32(&a->out->e, r1, (uint32_t)val);
 		}
 		return 0;
 	}
