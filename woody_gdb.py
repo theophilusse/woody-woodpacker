@@ -40,21 +40,34 @@ class AutoBreak(gdb.Command):
         print(f"autobreak: '{label}' -> 0x{addr:x}")
 
 class WoodySetup(gdb.Command):
-    """woodysetup : configure scan_start/scan_end et pose le watchpoint sur $ecx,
-    en filtrant uniquement les positions a l'interieur de la zone scannee par le LDE."""
+    """woodysetup : pose un breakpoint sur load_vaddr (lu depuis /tmp/woody_meta.txt),
+    lance le programme, puis pose un watchpoint sur $ecx filtre a la zone scannee."""
+
     def __init__(self):
         super(WoodySetup, self).__init__("woodysetup", gdb.COMMAND_USER)
 
     def invoke(self, arg, from_tty):
-        meta = read_meta()
+        try:
+            meta = read_meta()
+        except FileNotFoundError:
+            print("woodysetup: /tmp/woody_meta.txt introuvable — lance d'abord une generation")
+            return
+
         patch_jmp_oep = int(meta["patch_jmp_oep"])
-        gdb.execute("starti")
-        load_vaddr = int(gdb.parse_and_eval("$pc"))
+        load_vaddr = int(meta["load_vaddr"])
         scan_end = load_vaddr + patch_jmp_oep + 5
-        print(f"load_vaddr=0x{load_vaddr:x} scan_end=0x{scan_end:x}")
+
+        print(f"woodysetup: load_vaddr=0x{load_vaddr:x} scan_end=0x{scan_end:x} "
+              f"(taille zone scannee = {scan_end - load_vaddr} octets)")
+
+        gdb.execute("delete")
+        gdb.execute(f"break *0x{load_vaddr:x}")
+        gdb.execute("run")
+
         gdb.execute(f"set $scan_start = 0x{load_vaddr:x}")
         gdb.execute(f"set $scan_end = 0x{scan_end:x}")
-        gdb.execute("delete")
+
+        gdb.execute("delete 1")   /* retire le breakpoint sur load_vaddr, on n'en a plus besoin */
         gdb.execute("watch $ecx")
         gdb.execute("""commands
 silent
@@ -63,6 +76,8 @@ if $rsi >= $scan_start && $rsi < $scan_end
 end
 continue
 end""")
+        print("woodysetup: watchpoint pose. Lance 'set logging file ...', "
+              "'set logging on', puis 'continue'.")
 
 AutoBreak()
 WoodySetup()
