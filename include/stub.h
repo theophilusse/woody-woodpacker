@@ -571,9 +571,9 @@ static const char STUB_SRC[] =
 	"mov rdx, pie_base_marker\n"
 	"sub rax, rdx\n"
 	"sub rax, stub_load_vaddr\n" 
-	"mov r15, rax\n"
-	
-	"mov rdi, rax\n"
+	"_SET r15, rax\n"      /* au lieu de "mov r15, rax" */
+
+	"_SET rdi, rax\n"
 	"add rdi, prot_addr\n"
 	"mov esi, prot_size\n"
 	"_SET edx, 7\n"
@@ -581,10 +581,10 @@ static const char STUB_SRC[] =
 	"syscall\n"
 	"cmp rax, 0\n"
 	"jge mprotect_ok\n"
-	"mov rdi, rax\n"           /* code d'erreur negatif dans rdi pour debug */
+	"_SET rdi, rax\n"           /* code d'erreur negatif dans rdi pour debug */
 	"neg rdi\n"                 /* rend-le positif pour l'affichage hex si besoin */
-	"mov rax, 60\n"
-	"mov rdi, 1\n"              /* code de sortie = 1, pour distinguer d'un exit normal (0) */
+	"_SET rax, 60\n"
+	"_SET rdi, 1\n"              /* code de sortie = 1, pour distinguer d'un exit normal (0) */
 	"syscall\n"
 	"mprotect_ok:\n"
 
@@ -620,7 +620,7 @@ static const char STUB_SRC[] =
 	"jnz @ksa_loop\n"
 
 	// PRGA + XOR payload
-	"mov rdi, r15\n"
+	"_SET rdi, r15\n"
 	"add rdi, text_vaddr\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
 	"_ZERO edx\n"//"xor edx, edx\n"
