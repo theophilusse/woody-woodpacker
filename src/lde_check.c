@@ -250,12 +250,11 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
     size_t pos = start;
     int bitcount = 0;
     int fallback_streak = 0;
-    FILE *simf = fopen("./sim_trace.txt", "w");
+    FILE *simf = fopen("./sim_trace.txt", "w");   /* SEULE ouverture */
 
     memset(key_out, 0, 16);
     memset(lde_bit_by_pos, -1, sizeof(lde_bit_by_pos));
-
-    while (pos < end)                          /* MODIFIÉ : ne s'arrête plus à bitcount<128 */
+    while (pos < end)
     {
         int ilen;
         int r = lde_step_c(buf, end, pos, &ilen, verbose);
@@ -275,19 +274,15 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
                     pos, buf[pos], r, ilen, bitcount);
         if (r == 1 || r == 2)
         {
+            if (simf)                              /* MÊME variable, pas de redéclaration */
             {
-                static FILE *simf = NULL;
-                if (!simf) simf = fopen("./sim_trace.txt", "w");
-                if (simf)
-                {
-                    fprintf(simf, "%d %zu\n", bitcount, pos - start);
-                    fflush(simf);   /* AJOUT : force l'écriture immédiate sur disque */
-                }
+                fprintf(simf, "%d %zu\n", bitcount, pos - start);
+                fflush(simf);
             }
             int bit = (r == 2) ? 1 : 0;
             if (pos < 8192)
                 lde_bit_by_pos[pos] = bit;
-            if (bitcount < 128)                /* MODIFIÉ : n'écrit plus la clé au-delà de 128 */
+            if (bitcount < 128)
             {
                 if (bit)
                     key_out[bitcount/8] |= (uint8_t)(1 << (bitcount % 8));
@@ -299,5 +294,5 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
         pos += (size_t)ilen;
     }
     if (simf) fclose(simf);
-    return (bitcount < 128) ? bitcount : 128;   /* retourne 128 si on a bien atteint le seuil */
+    return (bitcount < 128) ? bitcount : 128;
 }
