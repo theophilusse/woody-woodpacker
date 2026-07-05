@@ -25,6 +25,7 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
 	if (op < 0) return (-1);
 
     if (op == 0xe9) { *ilen = rex_len + 5; return (0); }
+    if (op == 0xeb) { *ilen = rex_len + 2; return (0); }
     if (op == 0x3c) { *ilen = rex_len + 2; return (0); }
 
 	/* 0x24 ib : AND AL,0 -> bit=1 */
