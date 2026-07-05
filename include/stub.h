@@ -475,6 +475,7 @@ static const char STUB_SRC[] =
 	/* ══════════ fallback : rien reconnu, avance d'1 octet ══════════ */
 	"@lde_fallback:\n" "add rsi, 1\n" "jmp @lde_loop\n"
 	"@lde_done:\n"
+	"jmp @after_lde\n"
 
 	/////////////////////////////////// write(1, MSG, 14)
 	"@do_write:\n"
