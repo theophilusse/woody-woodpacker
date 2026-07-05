@@ -93,7 +93,7 @@ static const char STUB_SRC[] =
 	"jmp @lde_fallback\n"
 
 	"@o80_and:\n"
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x0\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0x0\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv3_80and\n"
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
@@ -101,13 +101,13 @@ static const char STUB_SRC[] =
 	"@adv3_80and:\n" "add rsi, 3\n" "jmp @lde_loop\n"
 
 	"@o80_add:\n"
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x1\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0x1\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv3_80add\n"
 	"_INC ecx\n"
 	"@adv3_80add:\n" "add rsi, 3\n" "jmp @lde_loop\n"
 
 	"@o80_sub:\n"                                  /* NOUVEAU : SUB r8,1 (_DEC bit=0) */
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x1\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0x1\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv3_80sub\n"
 	"_INC ecx\n"
 	"@adv3_80sub:\n" "add rsi, 3\n" "jmp @lde_loop\n"
@@ -122,7 +122,7 @@ static const char STUB_SRC[] =
 	"jmp @lde_fallback\n"
 
 	"@o81_add:\n"
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x1\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0x1\n" "jne @lde_fallback\n"
 	"_SET eax, [rsi+3]\n" "cmp eax, 0x0\n" "jne @lde_fallback\n"
 	"_SET eax, [rsi+4]\n" "cmp eax, 0x0\n" "jne @lde_fallback\n"
 	"_SET eax, [rsi+5]\n" "cmp eax, 0x0\n" "jne @lde_fallback\n"
@@ -131,7 +131,7 @@ static const char STUB_SRC[] =
 	"@adv6_81add:\n" "add rsi, 6\n" "jmp @lde_loop\n"
 
 	"@o81_and:\n"
-	"_SET eax, [rsi+2]\n" "cmp eax, 0xff\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0xff\n" "jne @lde_fallback\n"
 	"_SET eax, [rsi+3]\n" "cmp eax, 0x0\n"  "jne @lde_fallback\n"
 	"_SET eax, [rsi+4]\n" "cmp eax, 0x0\n"  "jne @lde_fallback\n"
 	"_SET eax, [rsi+5]\n" "cmp eax, 0x0\n"  "jne @lde_fallback\n"
@@ -154,7 +154,7 @@ static const char STUB_SRC[] =
 	"jmp @lde_fallback\n"
 
 	"@o83_and_checkimm:\n"
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x0\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0x0\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv3_83and\n"
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
@@ -162,7 +162,7 @@ static const char STUB_SRC[] =
 	"@adv3_83and:\n" "add rsi, 3\n" "jmp @lde_loop\n"
 
 	"@o83_sub:\n"
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x1\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0x1\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv3_83sub\n"
 	"_INC ecx\n"
 	"@adv3_83sub:\n" "add rsi, 3\n" "jmp @lde_loop\n"
@@ -369,7 +369,7 @@ static const char STUB_SRC[] =
 	"jmp @lde_fallback\n"
 
 	"@o8d_absSIB:\n"                               /* LEA absolue via SIB : mod00 rm=100 SIB=0x25 disp32 */
-	"_SET eax, [rsi+2]\n" "cmp eax, 0x25\n" "jne @lde_fallback\n"
+	"_SET eax, [rsi+2]\n" "cmp al, 0x25\n" "jne @lde_fallback\n"
 	"cmp ecx, 128\n" "jge @adv_8dabs\n"
 	"_INC ecx\n"
 	"@adv_8dabs:\n" "add rsi, 7\n" "jmp @lde_loop\n"
