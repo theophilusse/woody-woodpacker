@@ -353,9 +353,11 @@ static const char STUB_SRC[] =
 
 	"@o8b_m00:\n"
 	"cmp ecx, 128\n" "jge @adv_8b00\n"
+	"push rax\n"
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
 	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+	"pop rax\n"
 	"@adv_8b00:\n"
 	"cmp eax, 4\n" "je @adv_8b00_sib\n"
 	"add rsi, 2\n" "jmp @lde_loop\n"
@@ -363,9 +365,11 @@ static const char STUB_SRC[] =
 
 	"@o8b_m01:\n"
 	"cmp ecx, 128\n" "jge @adv_8b01\n"
+	"push rax\n"
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
 	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+	"pop rax\n"
 	"@adv_8b01:\n"
 	"cmp eax, 4\n" "je @adv_8b01_sib\n"
 	"add rsi, 3\n" "jmp @lde_loop\n"
