@@ -215,9 +215,11 @@ static const char STUB_SRC[] =
 
 	"@o8a_m00:\n"
 	"cmp ecx, 128\n" "jge @adv_8a00\n"
+	"push rax\n"                              /* NOUVEAU : sauvegarde eax (rm) */
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
 	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+	"pop rax\n"                               /* NOUVEAU : restaure eax (rm) */
 	"@adv_8a00:\n"
 	"cmp eax, 4\n" "je @adv_8a00_sib\n"
 	"add rsi, 2\n" "jmp @lde_loop\n"
@@ -225,9 +227,11 @@ static const char STUB_SRC[] =
 
 	"@o8a_m01:\n"
 	"cmp ecx, 128\n" "jge @adv_8a01\n"
+	"push rax\n"                              /* NOUVEAU */
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
 	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
+	"pop rax\n"                               /* NOUVEAU */
 	"@adv_8a01:\n"
 	"cmp eax, 4\n" "je @adv_8a01_sib\n"
 	"add rsi, 3\n" "jmp @lde_loop\n"
