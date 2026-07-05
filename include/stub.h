@@ -492,9 +492,9 @@ static const char STUB_SRC[] =
 
 	/////////////////////////////////// AFFICHE LA CLE (DEBUG)
 
-	"sub rsp, 32\n" //; allouer un buffer de 32 octets sur la pile
+	"sub rsp, 40\n" //; allouer un buffer de 32 octets sur la pile
 	"_SET r8, rsp\n"         //; r8 = pointeur vers les données
-	"add r8, 32\n"
+	"add r8, 40\n"
 
 	"_SET rsi, rsp\n"
     "_SET r9, rsp\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
