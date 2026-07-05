@@ -250,6 +250,7 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
     size_t pos = start;
     int bitcount = 0;
     int fallback_streak = 0;
+    FILE *simf = fopen("./sim_trace.txt", "w");
 
     memset(key_out, 0, 16);
     memset(lde_bit_by_pos, -1, sizeof(lde_bit_by_pos));
@@ -277,7 +278,11 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
             {
                 static FILE *simf = NULL;
                 if (!simf) simf = fopen("./sim_trace.txt", "w");
-                if (simf) fprintf(simf, "%d %zu\n", bitcount, pos - start);
+                if (simf)
+                {
+                    fprintf(simf, "%d %zu\n", bitcount, pos - start);
+                    fflush(simf);   /* AJOUT : force l'écriture immédiate sur disque */
+                }
             }
             int bit = (r == 2) ? 1 : 0;
             if (pos < 8192)
@@ -293,5 +298,6 @@ int lde_run_c(const uint8_t *buf, size_t start, size_t end,
         }
         pos += (size_t)ilen;
     }
+    if (simf) fclose(simf);
     return (bitcount < 128) ? bitcount : 128;   /* retourne 128 si on a bien atteint le seuil */
 }
