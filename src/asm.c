@@ -1191,6 +1191,11 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 		for (int k = 0; k < 60; k++)
 			fprintf(stderr, "%02x ", a.out->e.buf[ss + k]);
 		fprintf(stderr, "\n");
+
+		for (size_t k = ss; k < se; k++)
+			if (a.out->e.buf[k] == 0xCC)
+				fprintf(stderr, "0xCC trouve reellement a offset %zu\n", k);
+
         bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
                   lde_bit_log, &lde_bit_log_len);
 
