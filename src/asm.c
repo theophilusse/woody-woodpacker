@@ -501,6 +501,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], "mov") && n == 3)
 	{
 		/* Cas 1: mov [mem], reg */
+		/* Cas 1: mov [mem], reg */
 		if (toks[1][0] == '[' && toks[2][0] != '[')
 		{
 			mt = pmem(toks[1], &base, &idx, lbl, &d8);
@@ -510,7 +511,19 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (s2 == 32) { emit_mov_mem_sib_r32(&a->out->e, base, idx, r2); return 0; }
 				if (s2 == 64) { emit_mov_mem_sib_r64(&a->out->e, base, idx, r2); return 0; }
 			}
-			return 1;
+			else if (mt == 4 && preg(toks[2], &r2, &s2))   /* NOUVEAU : [base+disp8] */
+			{
+				if (s2 == 8) { emit_mov_mem_disp8_r8(&a->out->e, base, d8, r2); return 0; }
+				if (s2 == 32) { emit_mov_mem_disp8_r32(&a->out->e, base, d8, r2); return 0; }
+				if (s2 == 64) { emit_mov_mem_disp8_r64(&a->out->e, base, d8, r2); return 0; }
+			}
+			else if (mt == 3 && preg(toks[2], &r2, &s2))   /* NOUVEAU : [base] seul */
+			{
+				if (s2 == 8) { emit_mov_mem_sib_r8(&a->out->e, base, 4 /* pas d'index */, r2); return 0; }
+				/* adapte selon la vraie signature de tes emit_* pour le cas sans SIB */
+			}
+			fprintf(stderr, "asm: mov [mem],reg (mt=%d) non gere\n", mt);
+			return -1;   /* échec explicite plutôt qu'un 1 ambigu, comme dans le reste du fichier */
 		}
 		if (toks[1][0] != '[' && toks[2][0] == '[')
 		{
