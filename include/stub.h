@@ -471,10 +471,12 @@ static const char STUB_SRC[] =
 	/* ══════════ fallback : rien reconnu, avance d'1 octet ══════════ */
 	"@lde_fallback:\n" "add rsi, 1\n" "jmp @lde_loop\n"
 	"@lde_done:\n"
-	"@lde_done:\n"
-	// PRINT ECX
+
+	////// DEBUG ecx 
 "push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
 "push rcx\n"
+"_SET rax, 1\n" "_SET rdi, 1\n" "lea rsi, [ecx_marker]\n" "_SET rdx, 5\n"
+"syscall\n"
 "_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, rsp\n" "_SET rdx, 4\n"
 "syscall\n"
 "pop rcx\n"
@@ -640,6 +642,8 @@ static const char STUB_SRC[] =
 	"scan_end:\n"
 
 	// donnees embarquees apres le code
+	"ecx_marker:\n"
+	".ascii \"ECX:\"\n"
     "evasion_msg:\n"
     ".evasion_msg\n"
 	"msg:\n"

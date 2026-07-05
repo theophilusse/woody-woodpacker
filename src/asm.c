@@ -89,6 +89,15 @@ static int	tokenize(const char *line, char toks[][64], int max)
 		while (*p == ' ' || *p == '\t') p++;
 		if (!*p || *p == ';' || *p == '\n') break;
 		if (*p == ',') { p++; continue; }
+		if (*p == '"')
+		{
+			char tmp[64]; i = 0; tmp[i++] = '"'; p++;
+			while (*p && *p != '"' && i < 62) tmp[i++] = *p++;
+			if (*p == '"') { tmp[i++] = '"'; p++; }
+			tmp[i] = '\0';
+			if (n < max) { strncpy(toks[n++], tmp, 63); }
+			continue;
+		}
 		if (*p == '[')
 		{
 			char tmp[64]; i = 0; tmp[i++] = '['; p++;
@@ -701,7 +710,34 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{ emit_raw(&a->out->e, (const uint8_t *)WOODY_MSG, WOODY_MSG_LEN); return 0; }
 	if (!strcmp(toks[0], ".key"))
 		{ emit_raw(&a->out->e, a->crypto->key, a->crypto->key_len); return 0; }
+	if (!strcmp(toks[0], ".ascii") && n == 2)
+	{
+		const char *s = toks[1];
+		int len = (int)strlen(s);
+		if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+		{
+			emit_raw(&a->out->e, (const uint8_t *)(s + 1), (size_t)(len - 2));
+			return 0;
+		}
+		fprintf(stderr, "asm: .ascii attend une chaine entre guillemets\n");
+		return -1;
+	}
+	if (!strcmp(toks[0], ".string") && n == 2)
+	{
+		const char *s = toks[1];
+		int len = (int)strlen(s);
+		if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+		{
+			emit_raw(&a->out->e, (const uint8_t *)(s + 1), (size_t)(len - 2));
+			uint8_t zero = 0;
+			emit_raw(&a->out->e, &zero, 1);   /* .string ajoute un octet nul final, contrairement a .ascii */
+			return 0;
+		}
+		fprintf(stderr, "asm: .string attend une chaine entre guillemets\n");
+		return -1;
+	}
 
+	/* macrodefinitions obfuscation polymorphe */
 	if (!strcmp(toks[0], "_zero") && n == 2)
 	{
 		if (!preg(toks[1], &r1, &s1)) return -1;
