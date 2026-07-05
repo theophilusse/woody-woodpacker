@@ -557,7 +557,13 @@ static const char STUB_SRC[] =
 
 	"add rsp, 40\n"
 	// mprotect(page_vaddr, page_size, PROT_RWX)
-	"mov rdi, prot_addr\n"
+	"pie_base_marker:\n"
+	"lea rax, [pie_base_marker]\n"
+	"mov rdx, pie_base_marker\n"
+	"sub rax, rdx\n"
+	"push rax\n"
+	"mov rdi, rax\n"
+	"add rdi, prot_addr\n"
 	"mov esi, prot_size\n"
 	"_SET edx, 7\n"
 	"_SET eax, 10\n"
@@ -595,7 +601,9 @@ static const char STUB_SRC[] =
 	"jnz @ksa_loop\n"
 
 	// PRGA + XOR payload
-	"mov rdi, text_vaddr\n"
+	"pop rax\n"
+	"mov rdi, rax\n"
+	"add rdi, text_vaddr\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
 	"_ZERO edx\n"//"xor edx, edx\n"
 	"_ZERO ebx\n"//"xor ebx, ebx\n"

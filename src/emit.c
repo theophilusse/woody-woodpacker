@@ -1090,3 +1090,58 @@ int emit_mov_mem_disp8_r64(t_emitter *e, t_reg base, int8_t disp, t_reg src)
     b[3] = (uint8_t)disp;
     return emit_raw(e, b, 4);
 }
+
+/* SUB r64, r64 : REX.W 29 /r */
+int emit_sub_r64_r64(t_emitter *e, t_reg dst, t_reg src)
+{
+    uint8_t b[3];
+    b[0] = mk_rex(1, src, dst);
+    b[1] = 0x29;
+    b[2] = MODRM11(src, dst);
+    return emit_raw(e, b, 3);
+}
+
+/* SUB r32, r32 : 29 /r */
+int emit_sub_r32_r32(t_emitter *e, t_reg dst, t_reg src)
+{
+    uint8_t b[3]; int n = 0;
+    uint8_t r = mk_rex(0, src, dst);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x29;
+    b[n++] = MODRM11(src, dst);
+    return emit_raw(e, b, n);
+}
+
+/* SUB r8, r8 : 28 /r */
+int emit_sub_r8_r8(t_emitter *e, t_reg dst, t_reg src)
+{
+    uint8_t b[3]; int n = 0;
+    uint8_t r = mk_rex(0, src, dst);
+    if (r != 0x40 || src >= 4 || dst >= 4) b[n++] = r;
+    b[n++] = 0x28;
+    b[n++] = MODRM11(src, dst);
+    return emit_raw(e, b, n);
+}
+
+/* SUB r32, imm32 : 81 /5 id (forme longue, pour valeurs hors [-128,127]) */
+int emit_sub_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm)
+{
+    uint8_t b[7]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x81;
+    b[n++] = MODRM11(5, reg);
+    memcpy(b + n, &imm, 4); n += 4;
+    return emit_raw(e, b, n);
+}
+
+/* SUB r64, imm32 (sign-extended) : REX.W 81 /5 id */
+int emit_sub_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
+{
+    uint8_t b[7];
+    b[0] = mk_rex(1, 0, reg);
+    b[1] = 0x81;
+    b[2] = MODRM11(5, reg);
+    memcpy(b + 3, &imm, 4);
+    return emit_raw(e, b, 7);
+}

@@ -285,8 +285,75 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		else if (s1 == 32) emit_dec_r32(&a->out->e, r1);
 		else               emit_dec_r64(&a->out->e, r1);
 	}
-	if (!strcmp(toks[0], "sub") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
-		{ emit_sub_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
+	if (!strcmp(toks[0], "sub") && n == 3)
+	{
+		/* sub rsp, imm32 (cas historique, forme dediee) */
+		if (preg(toks[1], &r1, &s1) && r1 == REG_RSP && !preg(toks[2], &r2, &s2))
+		{
+			emit_sub_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0));
+			return 0;
+		}
+
+		/* sub r64, r64 */
+		if (preg(toks[1], &r1, &s1) && s1 == 64 &&
+			preg(toks[2], &r2, &s2) && s2 == 64)
+		{
+			emit_sub_r64_r64(&a->out->e, r1, r2);
+			return 0;
+		}
+
+		/* sub r32, r32 */
+		if (preg(toks[1], &r1, &s1) && s1 == 32 &&
+			preg(toks[2], &r2, &s2) && s2 == 32)
+		{
+			emit_sub_r32_r32(&a->out->e, r1, r2);
+			return 0;
+		}
+
+		/* sub r8, r8 */
+		if (preg(toks[1], &r1, &s1) && s1 == 8 &&
+			preg(toks[2], &r2, &s2) && s2 == 8)
+		{
+			emit_sub_r8_r8(&a->out->e, r1, r2);
+			return 0;
+		}
+
+		/* sub r64, imm (tout registre 64 bits, pas seulement rsp) */
+		if (preg(toks[1], &r1, &s1) && s1 == 64 && !preg(toks[2], &r2, &s2))
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (val >= -128 && val <= 127)
+				emit_sub_r64_imm8(&a->out->e, r1, (uint8_t)val);
+			else
+				emit_sub_r64_imm32(&a->out->e, r1, (int32_t)val);
+			return 0;
+		}
+
+		/* sub r32, imm */
+		if (preg(toks[1], &r1, &s1) && s1 == 32 && !preg(toks[2], &r2, &s2))
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (val >= -128 && val <= 127)
+				emit_sub_r32_imm8(&a->out->e, r1, (uint8_t)val);
+			else
+				emit_sub_r32_imm32(&a->out->e, r1, (uint32_t)val);
+			return 0;
+		}
+
+		/* sub r8, imm */
+		if (preg(toks[1], &r1, &s1) && s1 == 8 && !preg(toks[2], &r2, &s2))
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			emit_sub_r8_imm8(&a->out->e, r1, (uint8_t)val);
+			return 0;
+		}
+
+		fprintf(stderr, "asm: sub %s,%s non gere\n", toks[1], toks[2]);
+		return -1;
+	}
 	if (!strcmp(toks[0], "xor") && n == 3)
 	{
 		/* Cas 1: xor [mem], reg8 (nouveau cas) */
