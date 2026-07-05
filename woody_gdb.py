@@ -67,7 +67,7 @@ class WoodySetup(gdb.Command):
         gdb.execute(f"set $scan_start = 0x{load_vaddr:x}")
         gdb.execute(f"set $scan_end = 0x{scan_end:x}")
 
-        gdb.execute("delete 1")   /* retire le breakpoint sur load_vaddr, on n'en a plus besoin */
+        gdb.execute("delete 1")
         gdb.execute("watch $ecx")
         gdb.execute("""commands
 silent
