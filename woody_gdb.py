@@ -58,14 +58,16 @@ class WoodySetup(gdb.Command):
         load_vaddr = int(meta["load_vaddr"])
         scan_end = load_vaddr + patch_jmp_oep + 5
 
-        gdb.execute(f"x/60xb 0x{load_vaddr:x}")
-
         print(f"woodysetup: load_vaddr=0x{load_vaddr:x} scan_end=0x{scan_end:x} "
               f"(taille zone scannee = {scan_end - load_vaddr} octets)")
 
         gdb.execute("delete breakpoints")
         gdb.execute(f"break *0x{load_vaddr:x}")
         gdb.execute("run")
+
+        print("woodysetup: dump des 60 premiers octets du buffer LDE :")
+        output = gdb.execute(f"x/60xb 0x{load_vaddr:x}", to_string=True)
+        print(output)
 
         gdb.execute(f"set $scan_start = 0x{load_vaddr:x}")
         gdb.execute(f"set $scan_end = 0x{scan_end:x}")
