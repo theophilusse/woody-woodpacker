@@ -479,3 +479,57 @@ Continuing.
 
 Program received signal SIGINT, Interrupt.
 0x0000000000401fbe in ?? ()
+Continuing.
+rsi=0 rip=0x4011f0
+rsi=1 rip=0x401dbb
+rsi=2 rip=0x401dbb
+rsi=3 rip=0x401dbb
+rsi=4 rip=0x401dbb
+rsi=5 rip=0x401dbb
+rsi=6 rip=0x401dbb
+rsi=7 rip=0x401dbb
+rsi=8 rip=0x401dbb
+rsi=9 rip=0x401dbb
+rsi=10 rip=0x401dbb
+rsi=11 rip=0x401dbb
+rsi=12 rip=0x401dbb
+rsi=13 rip=0x401dbb
+rsi=18 rip=0x401d0e
+rsi=19 rip=0x401dbb
+rsi=20 rip=0x401dbb
+rsi=21 rip=0x401dbb
+rsi=22 rip=0x401dbb
+rsi=23 rip=0x401dbb
+rsi=26 rip=0x4014c0
+rsi=27 rip=0x401dbb
+rsi=28 rip=0x401dbb
+rsi=29 rip=0x401dbb
+rsi=30 rip=0x401dbb
+rsi=31 rip=0x401dbb
+rsi=32 rip=0x401dbb
+rsi=33 rip=0x401dbb
+rsi=34 rip=0x401dbb
+rsi=35 rip=0x401dbb
+rsi=36 rip=0x401dbb
+rsi=37 rip=0x401dbb
+rsi=40 rip=0x4014c0
+rsi=41 rip=0x401dbb
+rsi=42 rip=0x401dbb
+rsi=45 rip=0x4014f2
+rsi=46 rip=0x401dbb
+rsi=47 rip=0x401dbb
+rsi=48 rip=0x401dbb
+rsi=49 rip=0x401dbb
+rsi=50 rip=0x401dbb
+rsi=51 rip=0x401dbb
+rsi=52 rip=0x401dbb
+rsi=53 rip=0x401dbb
+rsi=54 rip=0x401dbb
+rsi=55 rip=0x401dbb
+rsi=56 rip=0x401dbb
+rsi=57 rip=0x401dbb
+rsi=58 rip=0x401dbb
+rsi=59 rip=0x401dbb
+
+Program received signal SIGINT, Interrupt.
+0x0000000000401222 in ?? ()

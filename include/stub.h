@@ -426,8 +426,8 @@ static const char STUB_SRC[] =
 	"cmp al, 0xb8\n" "jl @o_fe\n"
 	"cmp al, 0xbf\n" "jg @o_fe\n"
 	"_SET edx, [rsi-1]\n"                 /* octet precedent = potentiel REX */
-	"cmp edx, 0x48\n" "jl @o_b8_32\n"
-	"cmp edx, 0x4f\n" "jg @o_b8_32\n"
+	"cmp dl, 0x48\n" "jl @o_b8_32\n"
+	"cmp dl, 0x4f\n" "jg @o_b8_32\n"
 	"and edx, 0x08\n" "cmp edx, 0x08\n" "jne @o_b8_32\n"
 
 	"@o_b8_64:\n"                          /* REX.W present -> imm64, 8 octets */
