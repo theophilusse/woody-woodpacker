@@ -40,8 +40,9 @@ class AutoBreak(gdb.Command):
         print(f"autobreak: '{label}' -> 0x{addr:x}")
 
 class WoodySetup(gdb.Command):
-    """woodysetup : pose un breakpoint sur load_vaddr (lu depuis /tmp/woody_meta.txt),
-    lance le programme, puis pose un watchpoint sur $ecx filtre a la zone scannee."""
+    """woodysetup : pose un breakpoint sur load_vaddr, lance le programme,
+    neutralise le check anti-debug (ptrace), puis pose le watchpoint sur $ecx
+    filtre a la zone scannee par le LDE."""
 
     def __init__(self):
         super(WoodySetup, self).__init__("woodysetup", gdb.COMMAND_USER)
@@ -60,14 +61,31 @@ class WoodySetup(gdb.Command):
         print(f"woodysetup: load_vaddr=0x{load_vaddr:x} scan_end=0x{scan_end:x} "
               f"(taille zone scannee = {scan_end - load_vaddr} octets)")
 
-        gdb.execute("delete")
+        gdb.execute("delete breakpoints")
         gdb.execute(f"break *0x{load_vaddr:x}")
         gdb.execute("run")
 
         gdb.execute(f"set $scan_start = 0x{load_vaddr:x}")
         gdb.execute(f"set $scan_end = 0x{scan_end:x}")
 
-        gdb.execute("delete 1")
+        # ── Neutralisation de l'anti-debug ──
+        # Cherche l'instruction "syscall" du ptrace (juste avant le cmp eax,-1)
+        # dans la zone scannee, en partant de load_vaddr.
+        sig_ptrace_syscall = [0x0f, 0x05]  # opcode syscall, generique
+        # on cherche plutot la sequence "cmp eax,-1" = 83 F8 FF (forme courte imm8)
+        sig_cmp_eax_neg1 = [0x83, 0xf8, 0xff]
+        addr = find_signature(load_vaddr, scan_end, sig_cmp_eax_neg1)
+        if addr is None:
+            print("woodysetup: signature anti-debug (cmp eax,-1) introuvable, "
+                  "anti-debug NON neutralise — le programme risque de se terminer immediatement")
+        else:
+            gdb.execute(f"break *0x{addr:x}")
+            gdb.execute("continue")
+            gdb.execute("set $eax = 0")
+            gdb.execute(f"clear *0x{addr:x}")
+            print(f"woodysetup: anti-debug neutralise a 0x{addr:x} (eax force a 0)")
+
+        gdb.execute("delete breakpoints")
         gdb.execute("watch $ecx")
         gdb.execute("""commands
 silent
