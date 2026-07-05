@@ -472,17 +472,6 @@ static const char STUB_SRC[] =
 	"@lde_fallback:\n" "add rsi, 1\n" "jmp @lde_loop\n"
 	"@lde_done:\n"
 
-	////// DEBUG ecx 
-"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
-"push rcx\n"
-"_SET rax, 1\n" "_SET rdi, 1\n" "lea rsi, [ecx_marker]\n" "_SET rdx, 4\n"
-"syscall\n"
-"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, rsp\n" "_SET rdx, 4\n"
-"syscall\n"
-"pop rcx\n"
-"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
-"jmp @after_lde\n"
-
 	/////////////////////////////////// write(1, MSG, 14)
 	"@do_write:\n"
 	"_SET eax, 1\n" //"mov eax, 1\n"
@@ -501,14 +490,6 @@ static const char STUB_SRC[] =
 	"sub rsp, 32\n" //; allouer un buffer de 32 octets sur la pile
 	"_SET r8, rsp\n"         //; r8 = pointeur vers les données
 	"add r8, 32\n"
-
-/* ── DEBUG TEMPORAIRE : dump rbp directement, avant tout calcul ── */
-"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
-"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, rbp\n" "_SET rdx, 16\n"
-"syscall\n"
-"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
-/* ── FIN DEBUG ── */
-
 
 	"_SET rsi, rsp\n"
     "_SET r9, rsp\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
@@ -643,8 +624,6 @@ static const char STUB_SRC[] =
 	"jmp @oep\n"
 
 	// donnees embarquees apres le code
-	"ecx_marker:\n"
-	".ascii \"ECX:\"\n"
     "evasion_msg:\n"
     ".evasion_msg\n"
 	"msg:\n"

@@ -1,0 +1,9 @@
+sim: 196 entrees   reel (dedup): 129 entrees
+VRAIE DIVERGENCE a l'index 128 (ecart > 1 ou valeur differente)
+ idx            sim           reel  ecart
+ 123    (124, 2540)    (124, 2540)      0
+ 124    (125, 2553)    (125, 2553)      0
+ 125    (126, 2557)    (126, 2557)      0
+ 126    (127, 2621)    (127, 2621)      0
+ 127    (128, 2642)    (128, 2642)      0
+ 128    (129, 2670) (4201864, 3627)    957 <<<
