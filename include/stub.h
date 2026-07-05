@@ -9,15 +9,15 @@ static const char STUB_SRC[] =
 
     //////////////////////////// ANTI_DEBUG ////////////////////////////
     //; Appel syscall ptrace(PTRACE_TRACEME, 0, 1, 0)
-    "_SET rax, 101\n" //       ; sys_ptrace
-    "_SET rdi, 0\n" //         ; PTRACE_TRACEME
-    "_ZERO rsi\n" //       ; NULL (pid du parent)
-    "_SET rdx, 1\n" //         ; NULL (addr)
-    "_ZERO r10\n" //       ; NULL (data)
-    "syscall\n"
+    //"_SET rax, 101\n" //       ; sys_ptrace
+    //"_SET rdi, 0\n" //         ; PTRACE_TRACEME
+    //"_ZERO rsi\n" //       ; NULL (pid du parent)
+    //"_SET rdx, 1\n" //         ; NULL (addr)
+    //"_ZERO r10\n" //       ; NULL (data)
+    //"syscall\n"
     //; Si rax == -EPERM (-1), le processus est déjà traçé
-    "cmp eax, -1\n"//"cmp rax, -1\n"
-    "je debugger_detected\n"
+    //"cmp eax, -1\n"//"cmp rax, -1\n"
+    //"je debugger_detected\n"
 
     "jmp debugger_not_detected\n"
 
