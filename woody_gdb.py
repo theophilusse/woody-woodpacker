@@ -52,11 +52,11 @@ class AutoBreak(gdb.Command):
 
 class WoodySetup(gdb.Command):
     """woodysetup [nbytes] : lance le programme via 'start' (compatible PIE/ASLR),
-    neutralise l'anti-debug (ptrace), puis pose un watchpoint sur $ecx filtre
-    a la zone scannee par le LDE.
+    neutralise l'anti-debug (ptrace) si present, puis S'ARRETE LA — aucun
+    watchpoint pose, aucun continue automatique. Rend la main pour debug libre.
 
-    Avec un argument numerique, bascule en mode fin (watch $rsi + $rip,
-    limite aux <nbytes> premiers octets)."""
+    Avec un argument numerique, pose quand meme le watchpoint fin sur $rsi/$rip
+    (comportement de diagnostic), pour compatibilite avec l'usage precedent."""
 
     def __init__(self):
         super(WoodySetup, self).__init__("woodysetup", gdb.COMMAND_USER)
@@ -72,7 +72,7 @@ class WoodySetup(gdb.Command):
 
         gdb.execute("set disable-randomization on")
         gdb.execute("delete breakpoints")
-        gdb.execute("start")   # s'arrete au vrai point d'entree, ASLR deja applique
+        gdb.execute("start")
 
         load_vaddr = int(gdb.parse_and_eval("$pc"))
         scan_end = load_vaddr + patch_jmp_oep + 5
@@ -84,12 +84,12 @@ class WoodySetup(gdb.Command):
         gdb.execute(f"set $scan_start = 0x{load_vaddr:x}")
         gdb.execute(f"set $scan_end = 0x{scan_end:x}")
 
-        # ── Neutralisation de l'anti-debug ──
+        # ── Neutralisation de l'anti-debug, si le pattern existe encore ──
         sig_cmp_eax_neg1 = [0x83, 0xf8, 0xff]
         addr = find_signature(load_vaddr, scan_end, sig_cmp_eax_neg1)
         if addr is None:
-            print("woodysetup: signature anti-debug (cmp eax,-1) introuvable, "
-                  "anti-debug NON neutralise")
+            print("woodysetup: pattern anti-debug (cmp eax,-1) introuvable "
+                  "(deja neutralise dans le stub, ou absent) — rien a faire")
         else:
             gdb.execute(f"break *0x{addr:x}")
             gdb.execute("continue")
@@ -115,17 +115,12 @@ if $rsi >= $scan_start && $rsi < $scan_limit
 end
 continue
 end""")
-            print(f"woodysetup: watchpoint fin pose sur $rsi, limite aux {nbytes} premiers octets.")
+            print(f"woodysetup: watchpoint fin pose sur $rsi, limite aux {nbytes} "
+                  f"premiers octets. Lance 'continue' toi-meme quand tu es pret.")
         else:
-            gdb.execute("watch $ecx")
-            gdb.execute("""commands
-silent
-if $rsi >= $scan_start && $rsi < $scan_end
-  printf "%d %ld\\n", $ecx, $rsi - $scan_start
-end
-continue
-end""")
-            print("woodysetup: watchpoint pose sur $ecx.")
+            print("woodysetup: pret. $scan_start et $scan_end sont definis.")
+            print("Utilise 'break *<adresse>', 'stepi', 'x/Ni $pc', etc. librement.")
+            print("Aucun watchpoint pose, aucun continue automatique — tu as la main.")
 
 
 class WoodyCompare(gdb.Command):
