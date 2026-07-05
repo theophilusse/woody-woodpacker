@@ -1,46 +1,11 @@
-0x401161:	Cannot access memory at address 0x401161
-woodysetup: load_vaddr=0x401161 scan_end=0x401f8d (taille zone scannee = 3628 octets)
-Breakpoint 1 at 0x401161
+Temporary breakpoint 1 at 0x1140
 [Thread debugging using libthread_db enabled]
 Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
 
-Breakpoint 1, 0x0000000000401161 in ?? ()
-Breakpoint 2 at 0x401186
-
-Breakpoint 2, 0x0000000000401186 in ?? ()
-woodysetup: anti-debug neutralise a 0x401186 (eax force a 0)
-Watchpoint 3: $rsi
-woodysetup: watchpoint fin pose sur $rsi, limite aux 60 premiers octets de la zone scannee. Lance 'set logging file ...', 'set logging on', puis 'continue'.
-0x401161:	0x52	0x55	0x48	0x8d	0x04	0x25	0x65	0x00
-0x401169:	0x00	0x00	0x48	0x8d	0x3c	0x25	0x00	0x00
-0x401171:	0x00	0x00	0x48	0x31	0xf6	0x48	0xba	0x01
-0x401179:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x49
-0x401181:	0x83	0xe2	0x00	0x0f	0x05	0x83	0xf8	0xff
-0x401189:	0x75	0x05	0xe9	0x05	0x00	0x00	0x00	0xe9
-0x401191:	0x30	0x00	0x00	0x00	0x48	0x8d	0x04	0x25
-0x401199:	0x01	0x00	0x00	0x00
-Continuing.
-rsi=0 rip=0x4011ee
-rsi=1 rip=0x401d5b
-rsi=2 rip=0x401d5b
-rsi=3 rip=0x40121c
-rsi=10 rip=0x401b07
-rsi=11 rip=0x40121c
-rsi=18 rip=0x401b07
-rsi=19 rip=0x40121c
-rsi=21 rip=0x401527
-rsi=22 rip=0x40121c
-rsi=31 rip=0x401c83
-rsi=32 rip=0x40121c
-rsi=35 rip=0x4014a3
-rsi=36 rip=0x401d5b
-rsi=37 rip=0x401d5b
-rsi=40 rip=0x4014d1
-rsi=41 rip=0x401d5b
-rsi=42 rip=0x401d5b
-rsi=47 rip=0x40122b
-rsi=52 rip=0x40122b
-rsi=53 rip=0x40121c
-
-Program received signal SIGINT, Interrupt.
-0x00000000004019e3 in ?? ()
+Program received signal SIGSEGV, Segmentation fault.
+0x0000555555555f5c in ?? ()
+woodysetup: load_vaddr (reel, post-ASLR)=0x555555555f5c scan_end=0x555555556d3f (taille zone scannee = 3555 octets)
+woodysetup: pattern anti-debug (cmp eax,-1) introuvable (deja neutralise dans le stub, ou absent) — rien a faire
+woodysetup: pret. $scan_start et $scan_end sont definis.
+Utilise 'break *<adresse>', 'stepi', 'x/Ni $pc', etc. librement.
+Aucun watchpoint pose, aucun continue automatique — tu as la main.
