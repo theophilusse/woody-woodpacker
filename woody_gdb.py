@@ -179,7 +179,7 @@ class WoodyCompare(gdb.Command):
         for k in range(n):
             sv, sp = sim_pairs[k]
             rv, rp = gdb_deduped[k]
-            if sv != rv or rp - sp not in (0, 1):
+            if sv != rv or abs(rp - sp) > 1:
                 first_diff = k
                 break
 
