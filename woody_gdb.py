@@ -51,17 +51,12 @@ class AutoBreak(gdb.Command):
 
 
 class WoodySetup(gdb.Command):
-    """woodysetup [nbytes] : pose un breakpoint sur load_vaddr (lu depuis
-    ./woody_meta.txt), lance le programme, neutralise l'anti-debug (ptrace),
-    puis pose un watchpoint sur $ecx filtre a la zone scannee par le LDE.
+    """woodysetup [nbytes] : lance le programme via 'start' (compatible PIE/ASLR),
+    neutralise l'anti-debug (ptrace), puis pose un watchpoint sur $ecx filtre
+    a la zone scannee par le LDE.
 
-    Avec un argument numerique, pose plutot un watchpoint sur $rsi (pas $ecx),
-    loguant $rsi et $rip a chaque changement, limite aux <nbytes> premiers
-    octets de la zone scannee — utile pour localiser precisement un blocage
-    tres tot dans le scan.
-    Usage: woodysetup          -> watch $ecx (mode normal)
-           woodysetup 60       -> watch $rsi, limite aux 60 premiers octets
-    """
+    Avec un argument numerique, bascule en mode fin (watch $rsi + $rip,
+    limite aux <nbytes> premiers octets)."""
 
     def __init__(self):
         super(WoodySetup, self).__init__("woodysetup", gdb.COMMAND_USER)
@@ -70,29 +65,31 @@ class WoodySetup(gdb.Command):
         try:
             meta = read_meta()
         except FileNotFoundError:
-            print("woodysetup: ./woody_meta.txt introuvable — lance d'abord une generation")
+            print("woodysetup: /tmp/woody_meta.txt introuvable — lance d'abord une generation")
             return
 
         patch_jmp_oep = int(meta["patch_jmp_oep"])
-        load_vaddr = int(meta["load_vaddr"])
+
+        gdb.execute("set disable-randomization on")
+        gdb.execute("delete breakpoints")
+        gdb.execute("start")   # s'arrete au vrai point d'entree, ASLR deja applique
+
+        load_vaddr = int(gdb.parse_and_eval("$pc"))
         scan_end = load_vaddr + patch_jmp_oep + 5
 
-        print(f"woodysetup: load_vaddr=0x{load_vaddr:x} scan_end=0x{scan_end:x} "
+        print(f"woodysetup: load_vaddr (reel, post-ASLR)=0x{load_vaddr:x} "
+              f"scan_end=0x{scan_end:x} "
               f"(taille zone scannee = {scan_end - load_vaddr} octets)")
-
-        gdb.execute("delete breakpoints")
-        gdb.execute(f"break *0x{load_vaddr:x}")
-        gdb.execute("run")
 
         gdb.execute(f"set $scan_start = 0x{load_vaddr:x}")
         gdb.execute(f"set $scan_end = 0x{scan_end:x}")
 
-        # ── Neutralisation de l'anti-debug (cmp eax,-1 apres le syscall ptrace) ──
+        # ── Neutralisation de l'anti-debug ──
         sig_cmp_eax_neg1 = [0x83, 0xf8, 0xff]
         addr = find_signature(load_vaddr, scan_end, sig_cmp_eax_neg1)
         if addr is None:
             print("woodysetup: signature anti-debug (cmp eax,-1) introuvable, "
-                  "anti-debug NON neutralise — le programme risque de se terminer immediatement")
+                  "anti-debug NON neutralise")
         else:
             gdb.execute(f"break *0x{addr:x}")
             gdb.execute("continue")
@@ -104,7 +101,6 @@ class WoodySetup(gdb.Command):
 
         args = arg.split()
         if args:
-            # ── Mode fin : watch $rsi + $rip, limite aux N premiers octets ──
             try:
                 nbytes = int(args[0])
             except ValueError:
@@ -112,18 +108,15 @@ class WoodySetup(gdb.Command):
                 return
             gdb.execute(f"set $scan_limit = $scan_start + {nbytes}")
             gdb.execute("watch $rsi")
-            gdb.execute(f"""commands
+            gdb.execute("""commands
 silent
 if $rsi >= $scan_start && $rsi < $scan_limit
   printf "rsi=%ld rip=0x%lx\\n", $rsi - $scan_start, $rip
 end
 continue
 end""")
-            print(f"woodysetup: watchpoint fin pose sur $rsi, limite aux {nbytes} "
-                  f"premiers octets de la zone scannee. Lance 'set logging file ...', "
-                  f"'set logging on', puis 'continue'.")
+            print(f"woodysetup: watchpoint fin pose sur $rsi, limite aux {nbytes} premiers octets.")
         else:
-            # ── Mode normal : watch $ecx sur toute la zone scannee ──
             gdb.execute("watch $ecx")
             gdb.execute("""commands
 silent
@@ -132,8 +125,7 @@ if $rsi >= $scan_start && $rsi < $scan_end
 end
 continue
 end""")
-            print("woodysetup: watchpoint pose sur $ecx. Lance 'set logging file ...', "
-                  "'set logging on', puis 'continue'.")
+            print("woodysetup: watchpoint pose sur $ecx.")
 
 
 class WoodyCompare(gdb.Command):
