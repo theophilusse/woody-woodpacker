@@ -470,7 +470,16 @@ static const char STUB_SRC[] =
 
 	/* ══════════ fallback : rien reconnu, avance d'1 octet ══════════ */
 	"@lde_fallback:\n" "add rsi, 1\n" "jmp @lde_loop\n"
-	"@lde_done:\n" "jmp @after_lde\n"
+	"@lde_done:\n"
+	"@lde_done:\n"
+	// PRINT ECX
+"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
+"push rcx\n"
+"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, rsp\n" "_SET rdx, 4\n"
+"syscall\n"
+"pop rcx\n"
+"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
+"jmp @after_lde\n"
 
 	/////////////////////////////////// write(1, MSG, 14)
 	"@do_write:\n"
