@@ -39,6 +39,7 @@ static int64_t	sym(t_asm *a, const char *n)
 	if (!strcmp(n,"text_vaddr"))  return (int64_t)a->crypto->text_vaddr;
 	if (!strcmp(n,"text_len"))    return (int64_t)a->crypto->text_len;
 	if (!strcmp(n,"key_mask"))    return (int64_t)(a->crypto->key_len - 1);
+	if (!strcmp(n, "stub_load_vaddr")) return (int64_t)a->crypto->stub_load_vaddr;
 	for (i = 0; i < a->nlabels; i++)
 		if (!strcmp(a->labels[i].name, n)) return (int64_t)a->labels[i].off;
 	return -1;

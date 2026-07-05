@@ -38,6 +38,7 @@ typedef struct s_crypto_ctx
 	uint8_t		*encrypted_text;
 	size_t		text_len;
 	uint64_t	text_vaddr;
+	uint64_t    stub_load_vaddr;
 }	t_crypto_ctx;
 
 typedef struct s_stub

@@ -73,6 +73,10 @@ int	main(int argc, char **argv)
 	printf("chiffrement : vaddr=0x%lx len=%zu key[0]=%02X\n",
 		crypto.text_vaddr, crypto.text_len, crypto.key[0]);
 
+	{
+		Elf64_Phdr *p_pred = &ctx->phdrs[ctx->target_phdr_idx];
+		crypto.stub_load_vaddr = p_pred->p_vaddr + p_pred->p_filesz;
+	}
 	/* 4. Construction du stub (forme unique) */
 	stub = stub_build(ctx, &crypto);
 	if (!stub)

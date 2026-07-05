@@ -562,6 +562,7 @@ static const char STUB_SRC[] =
 	"lea rax, [pie_base_marker]\n"
 	"mov rdx, pie_base_marker\n"
 	"sub rax, rdx\n"
+	"sub rax, stub_load_vaddr\n" 
 	"mov r15, rax\n"
 	
 	"mov rdi, rax\n"
