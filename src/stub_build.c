@@ -1,11 +1,10 @@
 #include "woody.h"
 
-t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto)
+t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_stub_opts *opts)
 {
 	t_asm_result	res;
 	t_stub			*stub;
 
-	(void)STUB_SRC_NO_KEY;
     char *src = build_stub_source(opts);
     if (!src)
         return (NULL);

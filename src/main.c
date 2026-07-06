@@ -63,7 +63,12 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
 {
     t_stub *stub;
 
-    stub = stub_build(ctx, crypto);
+	struct s_stub_opts opts;
+
+	opts.use_antidebug = 1;
+    opts.use_int3_trap = 1;
+    opts.use_lde = 1;
+    stub = stub_build(ctx, crypto, &opts);
     if (!stub)
     {
         fprintf(stderr, "error: stub generation failed\n");
