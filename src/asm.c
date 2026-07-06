@@ -859,9 +859,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				emit_xor_r64_r64(&a->out->e, r1, r1);  // XOR r64, r64
 		}
 	    snprintf(g_bit_log_name[g_bit_log_len], 32, "_ZERO %s", toks[1]);
-		fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-				g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-				a->out->e.len - off_before);
 		g_bit_log_off[g_bit_log_len] = off_before;
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
@@ -1252,7 +1249,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
 					break;
 				}
 			}
-			if (mismatch_at < 0)
+			if (opts->verbose && mismatch_at < 0)
 				fprintf(stderr, "asm: alignement parfait position-a-position sur les %d premiers appels\n",
 						g_bit_log_len);
 		}
