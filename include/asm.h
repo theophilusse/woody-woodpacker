@@ -3,6 +3,7 @@
 
 # include <ctype.h>
 # include "emit.h"
+# include "opts.h"
 # include "woody.h"
 
 #define MAX_LABELS 512
