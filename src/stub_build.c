@@ -12,7 +12,7 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_stub_opts *opts
 	memset(&res, 0, sizeof(res));
 	if (asm_build(src, crypto, &res) < 0)
 	{
-        free(src)
+        free(src);
 		free(res.e.buf);
 		return (NULL);
 	}
