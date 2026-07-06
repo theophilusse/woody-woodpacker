@@ -543,6 +543,12 @@ static const char STUB_DEBUG_HEXBUF_SETUP[] =
 "add r8, 40\n"
 "_SET rsi, rsp\n"
 "_SET r9, rsp\n"
+	/* DEBUG TEMPORAIRE : dump [r9..r9+39] avant la boucle */
+	"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
+	"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 40\n"
+	"syscall\n"
+	"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
+	/* FIN DEBUG */
 "_ZERO r10\n"
 "_ZERO r11\n"
 "_SET eax, 16\n"
