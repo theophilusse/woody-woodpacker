@@ -4,15 +4,6 @@
 # include "woody.h"
 # include <getopt.h>
 
-typedef struct s_opts
-{
-    int     verbose;
-    int     use_antidebug;
-    int     use_int3_trap;
-    int     use_lde;
-    char    *file;
-}   t_opts;
-
 struct option long_opts[] = {
     { "help",   no_argument, 0, '?' },
     { "verbose", no_argument, 0, 'v' },

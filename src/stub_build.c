@@ -1,5 +1,4 @@
 #include "woody.h"
-#include "opts.h"
 
 t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_opts *opts)
 {

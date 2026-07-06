@@ -1,5 +1,4 @@
 #include "woody.h"
-#include "opts.h"
 
 char *build_stub_source(const t_opts *opts)
 {
