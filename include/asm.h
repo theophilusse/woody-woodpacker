@@ -39,6 +39,6 @@ typedef struct
 	size_t			key_index;
 }	t_asm;
 
-int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_stub_opts *opts);
+int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts);
 
 #endif

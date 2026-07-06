@@ -1,6 +1,6 @@
 #include "woody.h"
 
-char *build_stub_source(const t_stub_opts *opts)
+char *build_stub_source(const t_opts *opts)
 {
     size_t      total_len;
     char        *result;
