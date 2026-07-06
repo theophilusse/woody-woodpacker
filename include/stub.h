@@ -39,7 +39,7 @@ static const char STUB_EVASION_FAIL[] =
 	"syscall\n"
     "_SET rax, 60\n" //      ; sys_exit (numéro du syscall)
     "_SET rdi, 0\n" //        ; code de sortie (0 = succès)
-    "syscall\n"
+    "syscall\n";
 
 static const char STUB_EVASION_COMPLETE[] =
 	"evasion_complete:\n";
