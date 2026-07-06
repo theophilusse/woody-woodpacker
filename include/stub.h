@@ -29,7 +29,7 @@ static const char STUB_DEBUGGER_DETECTED[] =
 
 static const char STUB_NO_ANTIDEBUG[] =
 	"debugger_not_detected:\n"
-	"jmp evasion_complete";
+	"jmp evasion_complete\n";
 
 static const char STUB_EVASION_FAIL[] =
 	"evasion_fail:\n"
