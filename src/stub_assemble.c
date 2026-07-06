@@ -59,6 +59,7 @@ char *build_stub_source(const t_opts *opts)
     blocks[n++] = STUB_MPROTECT;
     blocks[n++] = STUB_KSA;
     blocks[n++] = STUB_PRGA;
+    blocks[n++] = STUB_FOOTER;
 
     /* ── Données embarquées ── */
     if (opts->use_antidebug)
