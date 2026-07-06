@@ -242,62 +242,33 @@ int	emit_mov_r64_imm64(t_emitter *e, t_reg dst, uint64_t imm)
 
 int emit_mov_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
-    uint8_t b[5]; int n = 0;
-    uint8_t r = mk_rex(0, src, base);   /* attention aussi a l'ajout du REX pour idx si >=8 */
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(0, src, base);
     if (r != 0x40 || src >= 4 || base >= 4) b[n++] = r;
     b[n++] = 0x88;
-    if ((base & 0x07) == 5)   /* RBP ou R13 : mod=00 interdit, forcer mod=01 disp8=0 */
-    {
-        b[n++] = 0x40 | ((src & 0x07) << 3) | 0x04;  /* mod=01, reg=src, rm=100(SIB) */
-        b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
-        b[n++] = 0x00;  /* disp8 = 0 */
-    }
-    else
-    {
-        b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
-        b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
-    }
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
+    b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
     return emit_raw(e, b, n);
 }
 
-/* MOV [base+idx], r32 */
 int emit_mov_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
-    uint8_t b[6]; int n = 0;
+    uint8_t b[5]; int n = 0;
     uint8_t r = mk_rex(0, src, base);
     if (r != 0x40) b[n++] = r;
     b[n++] = 0x89;
-    if ((base & 0x07) == 5)
-    {
-        b[n++] = 0x40 | ((src & 0x07) << 3) | 0x04;
-        b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
-        b[n++] = 0x00;
-    }
-    else
-    {
-        b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
-        b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
-    }
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
+    b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
     return emit_raw(e, b, n);
 }
 
-/* MOV [base+idx], r64 */
 int emit_mov_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg src)
 {
-    uint8_t b[6]; int n = 0;
+    uint8_t b[5]; int n = 0;
     b[n++] = mk_rex(1, src, base);
     b[n++] = 0x89;
-    if ((base & 0x07) == 5)
-    {
-        b[n++] = 0x40 | ((src & 0x07) << 3) | 0x04;
-        b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
-        b[n++] = 0x00;
-    }
-    else
-    {
-        b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
-        b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
-    }
+    b[n++] = 0x00 | ((src & 0x07) << 3) | 0x04;
+    b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
     return emit_raw(e, b, n);
 }
 
