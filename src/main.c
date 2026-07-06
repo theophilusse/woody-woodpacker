@@ -29,7 +29,7 @@ static t_elf_ctx *load_and_validate(const char *path)
 }
 
 /* Étape 2 : génération de la clé + chiffrement RC4 en place dans ctx->raw */
-static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto)
+static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto, t_opts *opts)
 {
     Elf64_Phdr *p;
 
@@ -46,8 +46,9 @@ static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto)
     rc4_apply(ctx->raw + p->p_offset, crypto->text_len,
         crypto->key, crypto->key_len);
 
-    printf("chiffrement : vaddr=0x%lx len=%zu key[0]=%02X\n",
-        crypto->text_vaddr, crypto->text_len, crypto->key[0]);
+	if (opts->verbose)
+	    printf("chiffrement : vaddr=0x%lx len=%zu key[0]=%02X\n",
+    	    crypto->text_vaddr, crypto->text_len, crypto->key[0]);
     return (0);
 }
 
@@ -105,7 +106,7 @@ int main(int argc, char **argv)
         return (1);
 
     memset(&crypto, 0, sizeof(crypto));
-    if (setup_crypto(ctx, &crypto) != 0)
+    if (setup_crypto(ctx, &crypto, &opts) != 0)
     {
         elf_free(ctx);
         return (1);
