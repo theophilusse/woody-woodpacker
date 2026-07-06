@@ -1,7 +1,8 @@
 #ifndef OPTS_H
 # define OPTS_H
 
-#include <getopt.h>
+# include "woody.h"
+# include <getopt.h>
 
 typedef struct s_opts
 {
