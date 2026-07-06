@@ -537,6 +537,17 @@ static const char STUB_WRITE_WOODY[] =
 static const char STUB_AFTER_LDE[] =
 	"@after_lde:\n";
 
+static const char STUB_WRITE_KEY[] =
+	/////////////////////////////////// write(1, MSG, 14)
+	"@do_write:\n"
+	"_SET eax, 1\n" //"mov eax, 1\n"
+	"_SET edi, 1\n" //"mov edi, 1\n"
+	//"mov eax, 1\n"
+	//"mov edi, 1\n"
+	"lea rsi, rsp\n"
+	"_SET edx, 16\n"
+	"syscall\n";
+
 
 static const char STUB_MPROTECT_KSA_PRGA[] =
 	"sub rsp, 40\n" //; allouer un buffer de 32 octets sur la pile

@@ -50,6 +50,8 @@ char *build_stub_source(const t_opts *opts)
 
     blocks[n++] = STUB_WRITE_WOODY;
     blocks[n++] = STUB_AFTER_LDE;
+    //
+    blocks[n++] = STUB_WRITE_KEY;
     blocks[n++] = STUB_MPROTECT_KSA_PRGA;
     blocks[n++] = STUB_FREE;
     blocks[n++] = STUB_FOOTER;
