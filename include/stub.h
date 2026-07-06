@@ -32,6 +32,7 @@ static const char STUB_NO_ANTIDEBUG[] =
 	"jmp evasion_complete";
 
 static const char STUB_EVASION_FAIL[] =
+	"evasion_fail:\n"
     "_SET eax, 1\n"
 	"_SET edi, 1\n"
 	"lea rsi, [evasion_msg]\n"
