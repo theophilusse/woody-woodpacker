@@ -29,7 +29,7 @@ t_opts  parse_args(int argc, char **argv)
     int     longindex;
 
 	opts = default_opts();
-    while ((opt = getopt_long(argc, argv, "i:d:l:?v", long_opts, &longindex)) != -1)
+    while ((opt = getopt_long(argc, argv, "vd:i:l:?", long_opts, &longindex)) != -1)
     {
 		switch (opt)
         {
