@@ -78,7 +78,7 @@ int			crypto_generate_key(t_crypto_ctx *crypto);
 void		rc4_apply(uint8_t *data, size_t len, const uint8_t *key, size_t key_len);
 
 /* stub_build.c */
-t_stub		*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto);
+t_stub		*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_stub_opts *opts);
 char		*build_stub_source(const t_stub_opts *opts);
 void		stub_free(t_stub *stub);
 
