@@ -65,3 +65,8 @@ gs             0x0                 0
 Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
 Use 'set logging enabled off'.
 
+0x7fffffffe430:	0x38	0xa2	0x74	0x56	0xb2	0xd5	0xc1	0xdb
+0x7fffffffe438:	0x7b	0x09	0x4d	0x85	0x16	0x28	0x8b	0x9d
+Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
+Use 'set logging enabled off'.
+

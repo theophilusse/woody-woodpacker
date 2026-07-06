@@ -548,6 +548,7 @@ static const char STUB_DEBUG_HEXBUF_SETUP[] =
 "_SET eax, 16\n"
 "jmp .loop_start\n"
 ".loop:\n"
+"_ZERO ebx\n"
 "_SET bl, [r8+r10]\n"
 "_SET ecx, ebx\n"
 "shr ecx, 4\n"
