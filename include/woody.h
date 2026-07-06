@@ -50,17 +50,11 @@ typedef struct s_stub
 	size_t		patch_jmp_oep;
 }	t_stub;
 
-typedef struct s_stub_opts
-{
-    int use_antidebug;
-    int use_int3_trap;
-    int use_lde;
-}   t_stub_opts;
-
 # include "emit.h"
 # include "asm.h"
 # include "stub.h"
 # include "lde.h"
+# include "opts.h"
 
 /* elf_parser.c */
 t_elf_ctx	*elf_load(const char *path);

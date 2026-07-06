@@ -59,16 +59,11 @@ static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto)
 
 /* Étape 3 : construction du stub + patch ELF + écriture du binaire final */
 static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
-        const char *out_path)
+        const char *out_path, t_opts *opts)
 {
     t_stub *stub;
 
-	struct s_stub_opts opts;
-
-	opts.use_antidebug = 1;
-    opts.use_int3_trap = 1;
-    opts.use_lde = 1;
-    stub = stub_build(ctx, crypto, &opts);
+    stub = stub_build(ctx, crypto, opts);
     if (!stub)
     {
         fprintf(stderr, "error: stub generation failed\n");
@@ -93,7 +88,7 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
 /* Étape 4 : affichage final de la clé */
 static void print_key(t_crypto_ctx *crypto)
 {
-    printf("key_value: ");
+    //printf("key_value: ");
     for (size_t i = 0; i < crypto->key_len; i++)
         printf("%02X", crypto->key[i]);
     printf("\n");
@@ -106,6 +101,7 @@ int main(int argc, char **argv)
 
     if (argc != 2)
         return (usage(argv[0]));
+	opts = parse_args(argc, argv);
 
     ctx = load_and_validate(argv[1]);
     if (!ctx)
@@ -118,7 +114,7 @@ int main(int argc, char **argv)
         return (1);
     }
 
-    if (build_and_patch(ctx, &crypto, "woody") != 0)
+    if (build_and_patch(ctx, &crypto, "woody", opts) != 0)
     {
         elf_free(ctx);
         return (1);

@@ -1125,7 +1125,7 @@ void dump_all_blocks(t_asm *a)
 }
 
 /* ── entree publique ────────────────────────────────────────────── */
-int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
+int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_stub_opts *opts)
 {
     t_asm   a;
     char    toks[8][64];
@@ -1176,7 +1176,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
     }
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
-	dump_all_blocks(&a); // debug
+	if (opts->use_lde)
     {
         int64_t ss = sym(&a, "scan_start");
         int64_t se = sym(&a, "scan_end");
@@ -1187,16 +1187,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
             fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
             return (-1);
         }
-		fprintf(stderr, "buffer reel (asm.c) offsets 0-60: ");
-		for (int k = 0; k < 60; k++)
-			fprintf(stderr, "%02x ", a.out->e.buf[ss + k]);
-		fprintf(stderr, "\n");
-
-		for (size_t k = ss; k < (size_t)se; k++)
-			if (a.out->e.buf[k] == 0xCC)
-				fprintf(stderr, "0xCC trouve reellement a offset %zu\n", k);
-
-        bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, 1,
+        bits = lde_run_c(a.out->e.buf, (size_t)ss, (size_t)se, simulated, opts->verbose,
                   lde_bit_log, &lde_bit_log_len);
 
 		{
@@ -1217,33 +1208,30 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
 				else
 				{
 					phantom_count++;
-					fprintf(stderr, "asm: BIT FANTOME a pos=%ld (bit=%d, bloc=%s) — "
-							"aucun appel macro enregistre a cette position !\n",
-							(long)p, bit, nearest_label(&a, (size_t)p));
+					if (opts->verbose)
+						fprintf(stderr, "asm: BIT FANTOME a pos=%ld (bit=%d, bloc=%s) — "
+								"aucun appel macro enregistre a cette position !\n",
+								(long)p, bit, nearest_label(&a, (size_t)p));
 
-					/* ── AJOUT : dump hexadecimal autour de la position fantome ── */
-					fprintf(stderr, "  octets a pos=%ld: ", (long)p);
-					for (int k = -6; k < 12; k++)
+					if (opts->verbose)
 					{
-						long addr = p + k;
-						if (addr >= 0 && (size_t)addr < a.out->e.len)
-							fprintf(stderr, "%02x ", a.out->e.buf[addr]);
-						else
-							fprintf(stderr, "?? ");
+						fprintf(stderr, "  octets a pos=%ld: ", (long)p);
+						for (int k = -6; k < 12; k++)
+						{
+							long addr = p + k;
+							if (addr >= 0 && (size_t)addr < a.out->e.len)
+								fprintf(stderr, "%02x ", a.out->e.buf[addr]);
+							else
+								fprintf(stderr, "?? ");
+						}
+						fprintf(stderr, "\n");
 					}
-					fprintf(stderr, "\n");
-					/* ── FIN AJOUT ── */
 				}
 			}
-			fprintf(stderr, "asm: %d bits attendus retrouves, %d bits fantomes detectes\n",
-					expected_count, phantom_count);
+			if (opts->verbose && phantom_count > 0)
+				fprintf(stderr, "asm: %d bits attendus retrouves, %d bits fantomes detectes\n",
+						expected_count, phantom_count);
 		}
-        fprintf(stderr, "asm_bits=%d lde_bits=%d\n", g_bit_log_len, lde_bit_log_len);
-		
-		// debug
-		for (int i = 70; i <= 80 && i < g_bit_log_len; i++)
-			fprintf(stderr, "  call#%d (%s) recorded_off=%zu\n",
-					i, g_bit_log_name[i], g_bit_log_off[i]);
         {
 			int mismatch_at = -1;
 			for (int i = 0; i < g_bit_log_len; i++)
@@ -1280,19 +1268,22 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out)
         if (bits < 128)
         {
             fprintf(stderr, "asm: LDE simule n'a extrait que %d/128 bits\n", bits);
-            //return (-1);
+            return (-1);
         }
         if (memcmp(simulated, crypto->key, 16) != 0)
         {
             fprintf(stderr, "asm: MISMATCH cle simulee vs cle reelle\n");
+			if (opts->verbose)
+			{
+				fprintf(stderr, "  reelle  : ");
+				for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", crypto->key[i]);
+				fprintf(stderr, "\n");
+				fprintf(stderr, "  simulee : ");
+				for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", simulated[i]);
+				fprintf(stderr, "\n");
+			}
+			return (-1);
 		}
-		fprintf(stderr, "  reelle  : ");
-        for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", crypto->key[i]);
-		fprintf(stderr, "\n");
-		fprintf(stderr, "  simulee : ");
-		for (int i = 0; i < 16; i++) fprintf(stderr, "%02X", simulated[i]);
-		fprintf(stderr, "\n");
-		//return (-1);
     }
     return 0;
 }
