@@ -50,6 +50,15 @@ typedef struct s_stub
 	size_t		patch_jmp_oep;
 }	t_stub;
 
+typedef struct s_opts
+{
+    int     verbose;
+    int     use_antidebug;
+    int     use_int3_trap;
+    int     use_lde;
+    char    *file;
+}   t_opts;
+
 # include "opts.h"
 # include "emit.h"
 # include "asm.h"

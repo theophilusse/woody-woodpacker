@@ -47,8 +47,6 @@ static int64_t	sym(t_asm *a, const char *n)
 
 static void	deflabel(t_asm *a, const char *name)
 {
-	if (DEBUG_MODE)
-		printf("deflabel: %s at %zu\n", name, a->out->e.len);
 	if (a->nlabels >= MAX_LABELS)
 	{
 		fprintf(stderr, "asm: ERREUR MAX_LABELS (%d) depasse a la definition de '%s'\n",
@@ -223,12 +221,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	int8_t d8 = 0;
 	uint8_t op;
 
-	if (DEBUG_MODE)
-	{
-		for (int i = 0; i < n; i++)
-			printf("%s ", toks[i]);
-		printf("\n");
-	}
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
 	lsb_value = a->crypto->key[(a->key_index / 8) % a->crypto->key_len] & (0x01 << (a->key_index % 8));
