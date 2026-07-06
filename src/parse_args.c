@@ -1,7 +1,7 @@
 #include "woody.h"
 
 static struct option long_opts[] = {
-    { "help",   no_argument, 0, '?' },
+    { "help",   no_argument, 0, 'h' },
     { "verbose", no_argument, 0, 'v' },
     { "antidebug",    required_argument, 0, 'd'  },
     { "int3trap",   required_argument, 0, 'i'   },
@@ -29,7 +29,7 @@ t_opts  parse_args(int argc, char **argv)
     int     longindex;
 
 	opts = default_opts();
-    while ((opt = getopt_long(argc, argv, "vd:i:l:?", long_opts, &longindex)) != -1)
+	while ((opt = getopt_long(argc, argv, "vd:i:l:", long_opts, &longindex)) != -1)
     {
 		switch (opt)
         {
@@ -62,7 +62,7 @@ t_opts  parse_args(int argc, char **argv)
 				break;
 			case '?':
 				usage(argv[0]);
-				exit(0);
+				exit(1);
 				break;
         }
     }
