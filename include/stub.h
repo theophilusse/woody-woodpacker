@@ -531,7 +531,7 @@ static const char STUB_WRITE_WOODY[] =
 	//"mov edi, 1\n"
 	"lea rsi, [msg]\n"
 	"_SET edx, 14\n"
-	//"syscall\n"
+	"syscall\n"
 	"jmp @run_lde\n";
 
 static const char STUB_AFTER_LDE[] =
