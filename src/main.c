@@ -95,7 +95,7 @@ int main(int argc, char **argv)
     t_crypto_ctx    crypto;
 	struct s_opts	opts;
 
-    if (argc != 2)
+    if (argc < 2)
 	{
         return (usage(argv[0]));
 	}
