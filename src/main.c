@@ -63,7 +63,7 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
         fprintf(stderr, "error: stub generation failed\n");
         return (-1);
     }
-    if (elf_patch(ctx, stub, crypto) != 0)
+    if (elf_patch(ctx, stub, crypto, opts) != 0)
     {
         fprintf(stderr, "error: patching failed\n");
         stub_free(stub);
