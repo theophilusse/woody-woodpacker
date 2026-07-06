@@ -51,10 +51,12 @@ char *build_stub_source(const t_opts *opts)
     blocks[n++] = STUB_WRITE_WOODY;
     blocks[n++] = STUB_AFTER_LDE;
     
-    blocks[n++] = STUB_DEBUG_HEXBUF_SETUP;
     if (opts->debug_display)
+    {
+        blocks[n++] = STUB_DEBUG_HEXBUF_SETUP;
         blocks[n++] = STUB_DEBUG_HEXBUF_WRITE;
-    blocks[n++] = STUB_DEBUG_HEXBUF_TEARDOWN;
+        blocks[n++] = STUB_DEBUG_HEXBUF_TEARDOWN;
+    }
     blocks[n++] = STUB_PIE_BASE_CALC;
     blocks[n++] = STUB_MPROTECT;
     blocks[n++] = STUB_KSA;
