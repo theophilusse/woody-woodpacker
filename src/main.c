@@ -105,7 +105,9 @@ int main(int argc, char **argv)
 	struct s_opts	opts;
 
     if (argc != 2)
+	{
         return (usage(argv[0]));
+	}
 	opts = parse_args(argc, argv);
 
     ctx = load_and_validate(opts.file);
