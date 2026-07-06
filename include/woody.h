@@ -52,10 +52,9 @@ typedef struct s_stub
 
 typedef struct s_stub_opts
 {
-    int use_antidebug;      /* bloc ptrace + evasion */
-    int use_int3_trap;      /* @o_cc dans le LDE */
-    int use_debug_display;  /* affichage hex de la cle */
-    int use_pie_support;    /* calcul base_aslr */
+    int use_antidebug;
+    int use_int3_trap;
+    int use_lde;
 }   t_stub_opts;
 
 # include "emit.h"
