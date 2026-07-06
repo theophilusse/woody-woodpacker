@@ -1,9 +1,10 @@
 #ifndef OPTS_H
 # define OPTS_H
 
+# include "woody.h"
 # include <getopt.h>
 
-struct option long_opts[] = {
+static struct option long_opts[] = {
     { "help",   no_argument, 0, '?' },
     { "verbose", no_argument, 0, 'v' },
     { "antidebug",    required_argument, 0, 'd'  },

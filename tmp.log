@@ -1,0 +1,11 @@
+/usr/bin/ld: obj/crypto_rc4.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/elf_inject.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/elf_parser.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/lde_check.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/main.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/parse_args.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/stub_assemble.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/stub_build.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+/usr/bin/ld: obj/ussage.o:(.data.rel.local+0x0): multiple definition of `long_opts'; obj/asm.o:(.data.rel.local+0x0): first defined here
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:24: woody-woodpacker] Error 1
