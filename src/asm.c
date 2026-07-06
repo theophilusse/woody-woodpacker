@@ -888,9 +888,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 					if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 				}
 				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-					g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-					a->out->e.len - off_before);
 				g_bit_log_off[g_bit_log_len] = off_before;
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
@@ -907,9 +904,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 			}
 			snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-			fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-				g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-				a->out->e.len - off_before);
 			g_bit_log_off[g_bit_log_len] = off_before;
 			g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 			a->key_index++;
@@ -925,9 +919,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				else
 					emit_lea_r64_reg0(&a->out->e, r1, r2);       /* 48 8D mod=01 disp8=0 */
 				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-					g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-					a->out->e.len - off_before);
 				g_bit_log_off[g_bit_log_len] = off_before;
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
@@ -942,9 +933,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				else
 					emit_lea_r32_reg0(&a->out->e, r1, r2);      /* 8D mod=01 disp8=0, nouvelle fonction */
 				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-					g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-					a->out->e.len - off_before);
 				g_bit_log_off[g_bit_log_len] = off_before;
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
@@ -958,9 +946,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				else
 					emit_and_r32_imm32(&a->out->e, r1, 0xff);
 				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-					g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-					a->out->e.len - off_before);
 				g_bit_log_off[g_bit_log_len] = off_before;
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
@@ -975,9 +960,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				else
 					emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val); /* B8+r id, zero-extend */
 				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-					g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-					a->out->e.len - off_before);
 				g_bit_log_off[g_bit_log_len] = off_before;
 				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 				a->key_index++;
@@ -1001,18 +983,8 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
 			}
-			/*
-			fprintf(stderr, "_SET imm call#%d reg=%s val=%ld s1=%d lsb=%d bytes=",
-					g_bit_log_len, toks[1], val, s1, lsb_value);
-			for (size_t k = off_before; k < a->out->e.len; k++)
-				fprintf(stderr, "%02x ", a->out->e.buf[k]);
-			fprintf(stderr, "\n");
-			*/
 		}
 		snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-		fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-				g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-				a->out->e.len - off_before);
 		g_bit_log_off[g_bit_log_len] = off_before;
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
@@ -1036,9 +1008,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				emit_add_r32_imm32_long(&a->out->e, r1, 1);
 		}
 		snprintf(g_bit_log_name[g_bit_log_len], 32, "_INC %s", toks[1]);
-		fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-				g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-				a->out->e.len - off_before);
 		g_bit_log_off[g_bit_log_len] = off_before;
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
@@ -1062,9 +1031,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			else               emit_sub_r64_imm8(&a->out->e, r1, 1);
 		}
 		snprintf(g_bit_log_name[g_bit_log_len], 32, "_DEC %s", toks[1]);
-		fprintf(stderr, "  DEBUG call#%d (%s %s) off_before=%zu len_apres=%zu (delta=%zu)\n",
-				g_bit_log_len, toks[0], toks[1], off_before, a->out->e.len,
-				a->out->e.len - off_before);
 		g_bit_log_off[g_bit_log_len] = off_before;
 		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
 		a->key_index++;
