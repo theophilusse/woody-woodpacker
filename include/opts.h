@@ -10,7 +10,7 @@ typedef struct s_opts
     int     use_int3_trap;
     int     use_lde;
     char    *file;
-}   s_opts;
+}   t_opts;
 
 static struct option long_opts[] = {
     { "help",   no_argument, 0, '?' },
