@@ -50,11 +50,11 @@ typedef struct s_stub
 	size_t		patch_jmp_oep;
 }	t_stub;
 
+# include "opts.h"
 # include "emit.h"
 # include "asm.h"
 # include "stub.h"
 # include "lde.h"
-# include "opts.h"
 
 /* elf_parser.c */
 t_elf_ctx	*elf_load(const char *path);
