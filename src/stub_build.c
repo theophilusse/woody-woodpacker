@@ -8,8 +8,9 @@ t_stub	*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_stub_opts *opts
     char *src;
     src = build_stub_source(opts);
     if (!src)
+    {
         return (NULL);
-
+    }
 
 	memset(&res, 0, sizeof(res));
 	if (asm_build(src, crypto, &res) < 0)
