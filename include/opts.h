@@ -4,18 +4,14 @@
 # include "woody.h"
 # include <getopt.h>
 
-struct s_opts default_opts(void)
+typedef struct s_opts
 {
-	struct s_opts opts;
-
-	memset(&opts, 0, sizeof(opts));
-	opts.verbose = 0;
-	opts.use_antidebug = 1;
-    opts.use_int3_trap = 1;
-    opts.use_lde = 1;
-	opts.file = NULL;
-	return opts;
-}
+    int     verbose;
+    int     use_antidebug;
+    int     use_int3_trap;
+    int     use_lde;
+    char    *file;
+}   t_opts;
 
 struct option long_opts[] = {
     { "help",   no_argument, 0, '?' },
