@@ -577,7 +577,14 @@ static const char STUB_DEBUG_HEXBUF_SETUP[] =
 "_DEC eax\n"
 ".loop_start:\n"
 "test eax, eax\n"
-"jnz .loop\n";
+"jnz .loop\n"
+////////////////
+/* DEBUG TEMPORAIRE : dump brut de [r9..r9+31] avant toute conversion supplémentaire */
+"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
+"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
+"syscall\n"
+"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n";
+/* FIN DEBUG — ce write est un DOUBLON temporaire du vrai write qui suit */
 
 static const char STUB_DEBUG_HEXBUF_WRITE[] =
 "_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
