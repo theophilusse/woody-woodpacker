@@ -75,7 +75,7 @@ void		elf_free(t_elf_ctx *ctx);
 /* elf_inject.c */
 int			elf_find_injection_point(t_elf_ctx *ctx);
 size_t			padding_available(Elf64_Phdr *p);
-int			elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto);
+int			elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts);
 int			elf_write(t_elf_ctx *ctx, const char *out_path);
 
 /* crypto_rc4.c */
