@@ -65,6 +65,8 @@ typedef struct s_opts
 # include "stub.h"
 # include "lde.h"
 
+int usage(const char *prog);
+
 /* elf_parser.c */
 t_elf_ctx	*elf_load(const char *path);
 int			elf_validate(t_elf_ctx *ctx);

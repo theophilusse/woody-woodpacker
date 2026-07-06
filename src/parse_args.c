@@ -31,7 +31,7 @@ t_opts  parse_args(int argc, char **argv)
 				opts.use_int3_trap = atoi(optarg);
 				if (opts.use_int3_trap != 0 && opts.use_int3_trap != 1)
 				{
-					fprintf(stderr, "woody-woodpacker: invalid argument: '%s' (0-1)\n", optarg);
+					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
 					exit(1);
 				}
 				break;
@@ -39,7 +39,7 @@ t_opts  parse_args(int argc, char **argv)
 				opts.use_antidebug = atoi(optarg);
 				if (opts.use_antidebug != 0 && opts.use_antidebug != 1)
 				{
-					fprintf(stderr, "woody-woodpacker: invalid argument: '%s' (0-1)\n", optarg);
+					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
 					exit(1);
 				}
 				break;
@@ -47,12 +47,12 @@ t_opts  parse_args(int argc, char **argv)
 				opts.use_lde = atoi(optarg);
 				if (opts.use_lde != 0 && opts.use_lde != 1)
 				{
-					fprintf(stderr, "woody-woodpacker: invalid argument: '%s' (0-1)\n", optarg);
+					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
 					exit(1);
 				}
 				break;
 			case '?':
-				print_usage();
+				usage(argv[0]);
 				exit(0);
 				break;
         }
