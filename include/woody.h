@@ -50,6 +50,14 @@ typedef struct s_stub
 	size_t		patch_jmp_oep;
 }	t_stub;
 
+typedef struct s_stub_opts
+{
+    int use_antidebug;      /* bloc ptrace + evasion */
+    int use_int3_trap;      /* @o_cc dans le LDE */
+    int use_debug_display;  /* affichage hex de la cle */
+    int use_pie_support;    /* calcul base_aslr */
+}   t_stub_opts;
+
 # include "emit.h"
 # include "asm.h"
 # include "stub.h"
@@ -72,6 +80,7 @@ void		rc4_apply(uint8_t *data, size_t len, const uint8_t *key, size_t key_len);
 
 /* stub_build.c */
 t_stub		*stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto);
+char		*build_stub_source(const t_stub_opts *opts);
 void		stub_free(t_stub *stub);
 
 #endif

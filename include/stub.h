@@ -1,12 +1,13 @@
 #ifndef STUB_H
 # define STUB_H
 
-static const char STUB_SRC[] =
+static const char STUB_HEADER[] =
 	// preserves _dl_fini que le kernel passe dans rdx
 	"scan_start:\n"
 	"push rdx\n"
-	"push rbp\n"
+	"push rbp\n";
 
+static const char STUB_ANTIDEBUG_1[] =
     //////////////////////////// ANTI_DEBUG ////////////////////////////
     //; Appel syscall ptrace(PTRACE_TRACEME, 0, 1, 0)
     "_SET rax, 101\n" //       ; sys_ptrace
@@ -17,11 +18,20 @@ static const char STUB_SRC[] =
     "syscall\n"
     //; Si rax == -EPERM (-1), le processus est déjà traçé
     "cmp eax, -1\n"//"cmp rax, -1\n"
-	"je debugger_detected\n"
+	"je debugger_detected\n";
 
-    "jmp debugger_not_detected\n"
+static const char STUB_ANTIDEBUG_PROLOGUE[] =
+    "jmp debugger_not_detected\n";
 
+static const char STUB_DEBUGGER_DETECTED[] =
     "debugger_detected:\n"
+	"jmp evasion_fail\n";
+
+static const char STUB_NO_ANTIDEBUG[] =
+	"debugger_not_detected:\n"
+	"jmp evasion_complete";
+
+static const char STUB_EVASION_FAIL[] =
     "_SET eax, 1\n"
 	"_SET edi, 1\n"
 	"lea rsi, [evasion_msg]\n"
@@ -30,9 +40,11 @@ static const char STUB_SRC[] =
     "_SET rax, 60\n" //      ; sys_exit (numéro du syscall)
     "_SET rdi, 0\n" //        ; code de sortie (0 = succès)
     "syscall\n"
-    ////////////////////////////////////////////////////////////////////
 
-    "debugger_not_detected:\n"
+static const char STUB_EVASION_COMPLETE[] =
+	"evasion_complete:\n";
+
+static const char STUB_ZERO_KEY[] =
 	"sub rsp, 16\n"
 	"_ZERO eax\n"//"xor eax, eax\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
@@ -42,51 +54,64 @@ static const char STUB_SRC[] =
 	"cmp ecx, 16\n"
 	"jl @zero_key\n"
 	"_SET rbp, rsp\n"//"mov rbp, rsp\n"
-	"jmp @do_write\n"
+	"jmp @do_write\n";
 
+static const char STUB_ZERO_KEY_NOLDE[] =
+	"sub rsp, 16\n"
+	"_SET rbp, rsp\n"
+	"lea rsi, [key]\n"
+	"_ZERO ecx\n"
+	"@copy_key_plain:\n"
+	"_SET al, [rsi+rcx]\n"
+	"mov [rbp+rcx], al\n"
+	"_INC ecx\n"
+	"cmp ecx, 16\n"
+	"jl @copy_key_plain\n"
+	"jmp @do_write\n";
+
+
+static const char STUB_RUN_LDE_BYPASS[] =
+	"@run_lde:\n"
+	"jmp @lde_done\n";   /* rbp deja rempli en amont, saute tout le scan */
+
+static const char STUB_RUN_LDE_ACTIVE[] =
 "@run_lde:\n"
-	/* ── setup ───────────────────────────────────────────── */
-	"_ZERO ecx\n"          /* bit_index = 0 */
-	"lea rsi, [scan_start]\n"
-	"lea rbx, [scan_end]\n"
+    /* ── setup ───────────────────────────────────────────── */
+"_ZERO ecx\n"          /* bit_index = 0 */
+"lea rsi, [scan_start]\n"
+"lea rbx, [scan_end]\n"
+"@lde_loop:\n"
+"cmp rsi, rbx\n"
+"jb @lde_continue\n"
+"jmp @lde_done\n"
+"@lde_continue:\n"
+"_SET eax, [rsi]\n"
+"cmp al, 0x40\n" "jl @lde_no_rex\n"
+"cmp al, 0x4f\n" "jg @lde_no_rex\n"
+"add rsi, 1\n"
+"@lde_no_rex:\n"
+"_SET eax, [rsi]\n"
+"cmp al, 0xe9\n" "jne @o_eb\n"
+"add rsi, 5\n" "jmp @lde_loop\n"
+"@o_eb:\n"
+"cmp al, 0xeb\n" "jne @o_3c\n"
+"add rsi, 2\n" "jmp @lde_loop\n"
+"@o_3c:\n"
+"cmp al, 0x3c\n" "jne @o_3c_break\n"
+"add rsi, 2\n" "jmp @lde_loop\n"
+"@o_3c_break:\n";
 
-	"@lde_loop:\n"
-	"cmp rsi, rbx\n"
-	"jb @lde_continue\n"
-	"jmp @lde_done\n"
-
-	"@lde_continue:\n"
-	/* ── strip REX générique : couvre r8-r15 pour TOUTE la chaine
-	** qui suit, sans dupliquer aucun check. Une fois consommé,
-	** rsi pointe directement sur l'opcode réel. ── */
-	"_SET eax, [rsi]\n"
-	"cmp al, 0x40\n" "jl @lde_no_rex\n"
-	"cmp al, 0x4f\n" "jg @lde_no_rex\n"
-	"add rsi, 1\n"
-	"@lde_no_rex:\n"
-	"_SET eax, [rsi]\n"             /* eax = opcode reel */
-
-	/* ══════════ 0x24 ib : AND AL, imm8 (forme courte) → bit=1 ══════════ */
-	"cmp al, 0xe9\n" "jne @o_eb\n"
-	"add rsi, 5\n" "jmp @lde_loop\n"
-
-	"@o_eb:\n"
-	"cmp al, 0xeb\n" "jne @o_3c\n"
-	"add rsi, 2\n" "jmp @lde_loop\n"
-
-	"@o_3c:\n"
-	"cmp al, 0x3c\n" "jne @o_cc\n"
-	"add rsi, 2\n" "jmp @lde_loop\n"
-
-	// Batman
+static const char STUB_LDE_INT3_TRAP[] =
 	"@o_cc:\n"
-	"cmp al, 0xcc\n" "jne @o_24\n"
+	"cmp al, 0xcc\n" "jne @o_cc_break\n"
 	"cmp ecx, 128\n" "jge @adv_cc\n"
 	"push rcx\n" "_SET edx, ecx\n" "sar edx, 3\n"
 	"and ecx, 7\n" "mov al, 1\n" "shl al, cl\n"
 	"pop rcx\n" "or [rbp+rdx], al\n" "_INC ecx\n"
 	"@adv_cc:\n" "add rsi, 1\n" "jmp @lde_loop\n"
+	"@o_cc_break:\n";
 
+static const char STUB_LDE_CORE_EPILOGUE[] =
 	"@o_24:\n"
 	"cmp al, 0x24\n" "jne @o_80\n"
 	"_SET eax, [rsi+1]\n" "cmp al, 0x0\n" "jne @adv2_24\n"
@@ -490,10 +515,13 @@ static const char STUB_SRC[] =
 	"@adv2_dec:\n" "add rsi, 2\n" "jmp @lde_loop\n"
 
 	/* ══════════ fallback : rien reconnu, avance d'1 octet ══════════ */
-	"@lde_fallback:\n" "add rsi, 1\n" "jmp @lde_loop\n"
-	"@lde_done:\n"
-	"jmp @after_lde\n"
+	"@lde_fallback:\n" "add rsi, 1\n" "jmp @lde_loop\n";
 
+static const char STUB_LDE_DONE[] =
+	"@lde_done:\n"
+	"jmp @after_lde\n";
+
+static const char STUB_WRITE_WOODY[] =
 	/////////////////////////////////// write(1, MSG, 14)
 	"@do_write:\n"
 	"_SET eax, 1\n" //"mov eax, 1\n"
@@ -503,12 +531,13 @@ static const char STUB_SRC[] =
 	"lea rsi, [msg]\n"
 	"_SET edx, 14\n"
 	"syscall\n"
-	"jmp @run_lde\n"
+	"jmp @run_lde\n";
 
-	"@after_lde:\n"
+static const char STUB_AFTER_LDE[] =
+	"@after_lde:\n";
 
-	/////////////////////////////////// AFFICHE LA CLE (DEBUG)
 
+static const char STUB_MPROTECT_KSA_PRGA[] =
 	"sub rsp, 40\n" //; allouer un buffer de 32 octets sur la pile
 	"_SET r8, rsp\n"         //; r8 = pointeur vers les données
 	"add r8, 40\n"
@@ -645,22 +674,28 @@ static const char STUB_SRC[] =
 	"xor [rdi+rbx], al\n"
 	"_INC rbx\n"
 	"cmp ebx, text_len\n"
-	"jl @prga_loop\n"
+	"jl @prga_loop\n";
 
+static const char STUB_FREE[] =
 	"add rsp, 256\n"     // libère le S-box
 	"add rsp, 16\n"      // ← DÉPLACÉ ICI : libère le buffer clé, seulement maintenant qu'on n'en a plus besoin
 	"pop rdx\n"
-	"pop rbp\n"
+	"pop rbp\n";
 
+static const char STUB_FOOTER[] =
 	"scan_end:\n"
+	"jmp @oep\n";
 
-	"jmp @oep\n"
-
+static const char STUB_DATA_EVAMSG[] =
 	// donnees embarquees apres le code
     "evasion_msg:\n"
-    ".evasion_msg\n"
+    ".evasion_msg\n";
+
+static const char STUB_DATA_WOODYMSG[] =
 	"msg:\n"
-	".msg\n"
+	".msg\n";
+
+static const char STUB_DATA_CLEARKEY[] =
 	"key:\n"
 	".key\n";
 

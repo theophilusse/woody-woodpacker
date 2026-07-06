@@ -1,125 +1,125 @@
 #include "woody.h"
 
-static int	usage(const char *prog)
+static int usage(const char *prog)
 {
-	fprintf(stderr, "usage: %s <binaire_ELF64_x86_64>\n", prog);
-	return (1);
+    fprintf(stderr, "usage: %s <binaire_ELF64_x86_64>\n", prog);
+    return (1);
 }
 
-int	main(int argc, char **argv)
+/* Étape 1 : chargement + validation + localisation du point d'injection */
+static t_elf_ctx *load_and_validate(const char *path)
 {
-	int		debug;
-	t_elf_ctx		*ctx;
-	t_crypto_ctx	crypto;
-	t_stub			*stub;
+    t_elf_ctx *ctx;
+    int err;
 
-	if (argc != 2)
-		return (usage(argv[0]));
+    ctx = elf_load(path);
+    if (!ctx)
+    {
+        fprintf(stderr, "error: cannot load %s\n", path);
+        return (NULL);
+    }
+    if ((err = elf_validate(ctx)) != 0)
+    {
+        fprintf(stderr, "error: file architecture not supported, "
+                "x86_64 only (error %d)\n", err);
+        elf_free(ctx);
+        return (NULL);
+    }
+    if (elf_find_injection_point(ctx) != 0)
+    {
+        fprintf(stderr, "error: no suitable injection point found\n");
+        elf_free(ctx);
+        return (NULL);
+    }
+    return (ctx);
+}
 
-	/* 1. Parsing + validation */
-	ctx = elf_load(argv[1]);
-	if (!ctx)
-	{
-		fprintf(stderr, "error: cannot load %s\n", argv[1]);
-		return (1);
-	}
-	if ((debug = elf_validate(ctx)) != 0)
-	{
-		fprintf(stderr, "Filr architecture not supported. x86_64 only (error %d)\n", debug);
-		elf_free(ctx);
-		return (1);
-	}
+/* Étape 2 : génération de la clé + chiffrement RC4 en place dans ctx->raw */
+static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto)
+{
+    Elf64_Phdr *p;
 
-	/* 2. Localisation du point d'injection */
-	if (elf_find_injection_point(ctx) != 0)
-	{
-		fprintf(stderr, "error: no suitable injection point found\n");
-		elf_free(ctx);
-		return (1);
-	}
+    if (crypto_generate_key(crypto) != 0)
+    {
+        fprintf(stderr, "error: key generation failed\n");
+        return (-1);
+    }
+    p = &ctx->phdrs[ctx->target_phdr_idx];
+    crypto->text_vaddr = p->p_vaddr;
+    crypto->text_len   = p->p_filesz;       /* p_filesz ORIGINAL, avant injection */
+    crypto->stub_load_vaddr = p->p_vaddr + p->p_filesz;
 
-	/* 3. Clé + chiffrement RC4 de .text */
-	if (crypto_generate_key(&crypto) != 0)
-	{
-		fprintf(stderr, "error: key generation failed\n");
-		elf_free(ctx);
-		return (1);
-	}
-	// remplir crypto.text_vaddr / crypto.text_len depuis ctx,
-	// copier .text dans crypto.encrypted_text, puis rc4_apply() en place
-	// localiser .text dans le segment cible
-	/*
-	Elf64_Shdr *shdrs = (Elf64_Shdr *)(ctx->raw + ctx->ehdr->e_shoff);
-	for (int i = 0; i < ctx->ehdr->e_shnum; i++)
-	{
-		if (shdrs[i].sh_flags & SHF_EXECINSTR)
-		{
-			crypto.text_vaddr = shdrs[i].sh_addr;
-			crypto.text_len   = shdrs[i].sh_size;
-			crypto.encrypted_text = ctx->raw + shdrs[i].sh_offset;
-			rc4_apply(crypto.encrypted_text, crypto.text_len, crypto.key, crypto.key_len);
-		}
-	}
-	*/
-	Elf64_Phdr *p = &ctx->phdrs[ctx->target_phdr_idx];
+    rc4_apply(ctx->raw + p->p_offset, crypto->text_len,
+        crypto->key, crypto->key_len);
 
-	crypto.text_vaddr = p->p_vaddr;
-	crypto.text_len   = p->p_filesz;       /* p_filesz ORIGINAL, avant injection */
+    printf("chiffrement : vaddr=0x%lx len=%zu key[0]=%02X\n",
+        crypto->text_vaddr, crypto->text_len, crypto->key[0]);
+    return (0);
+}
 
-	/* chiffrement EN PLACE dans ctx->raw */
-	rc4_apply(ctx->raw + p->p_offset, crypto.text_len,
-		crypto.key, crypto.key_len);
+/* Étape 3 : construction du stub + patch ELF + écriture du binaire final */
+static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
+        const char *out_path)
+{
+    t_stub *stub;
 
-	printf("chiffrement : vaddr=0x%lx len=%zu key[0]=%02X\n",
-		crypto.text_vaddr, crypto.text_len, crypto.key[0]);
+    stub = stub_build(ctx, crypto);
+    if (!stub)
+    {
+        fprintf(stderr, "error: stub generation failed\n");
+        return (-1);
+    }
+    if (elf_patch(ctx, stub, crypto) != 0)
+    {
+        fprintf(stderr, "error: patching failed\n");
+        stub_free(stub);
+        return (-1);
+    }
+    if (elf_write(ctx, out_path) != 0)
+    {
+        fprintf(stderr, "error: write failed\n");
+        stub_free(stub);
+        return (-1);
+    }
+    stub_free(stub);
+    return (0);
+}
 
-	{
-		Elf64_Phdr *p_pred = &ctx->phdrs[ctx->target_phdr_idx];
-		crypto.stub_load_vaddr = p_pred->p_vaddr + p_pred->p_filesz;
-	}
-	/* 4. Construction du stub (forme unique) */
-	stub = stub_build(ctx, &crypto);
-	if (!stub)
-	{
-		fprintf(stderr, "error: stub generation failed\n");
-		elf_free(ctx);
-		return (1);
-	}
+/* Étape 4 : affichage final de la clé */
+static void print_key(t_crypto_ctx *crypto)
+{
+    printf("key_value: ");
+    for (size_t i = 0; i < crypto->key_len; i++)
+        printf("%02X", crypto->key[i]);
+    printf("\n");
+}
 
-	/* 5. Patch des Phdr / e_entry */
-	if (elf_patch(ctx, stub, &crypto) != 0)
-	{
-		fprintf(stderr, "error: patching failed\n");
-		stub_free(stub);
-		elf_free(ctx);
-		return (1);
-	}
+int main(int argc, char **argv)
+{
+    t_elf_ctx       *ctx;
+    t_crypto_ctx    crypto;
 
-	{
-		FILE *meta = fopen("./woody_meta.txt", "w");
-		if (meta)
-		{
-			fprintf(meta, "patch_jmp_oep=%zu\n", stub->patch_jmp_oep);
-			fprintf(meta, "load_vaddr=%lu\n", stub->load_vaddr);
-			fclose(meta);
-		}
-	}
+    if (argc != 2)
+        return (usage(argv[0]));
 
-	/* 6. Écriture de woody */
-	if (elf_write(ctx, "woody") != 0)
-	{
-		fprintf(stderr, "error: write failed\n");
-		stub_free(stub);
-		elf_free(ctx);
-		return (1);
-	}
+    ctx = load_and_validate(argv[1]);
+    if (!ctx)
+        return (1);
 
-	printf("key_value: ");
-	for (size_t i = 0; i < crypto.key_len; i++)
-		printf("%02X", crypto.key[i]);
-	printf("\n");
+    memset(&crypto, 0, sizeof(crypto));
+    if (setup_crypto(ctx, &crypto) != 0)
+    {
+        elf_free(ctx);
+        return (1);
+    }
 
-	stub_free(stub);
-	elf_free(ctx);
-	return (0);
+    if (build_and_patch(ctx, &crypto, "woody") != 0)
+    {
+        elf_free(ctx);
+        return (1);
+    }
+
+    print_key(&crypto);
+    elf_free(ctx);
+    return (0);
 }
