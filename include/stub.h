@@ -602,15 +602,15 @@ static const char STUB_MPROTECT_KSA_PRGA[] =
     "test eax, eax\n"        //; Vérifier si r12 == 0
     "jnz .loop\n"            //; Si non, continuer la boucle
 
-    "_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
-	"syscall\n"
+    //"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
+	//"syscall\n"
 
-	"mov cl, 10\n"
-	"mov [r9+32], cl\n"      // écrit le newline DANS le buffer H (à l'offset 32, encore valide puisque H fait 40)
-	"_SET rax, 1\n" "_SET rdi, 1\n"
-	"_SET rsi, r9\n" "add rsi, 32\n"
-	"_SET rdx, 1\n"
-	"syscall\n"
+	//"mov cl, 10\n"
+	//"mov [r9+32], cl\n"      // écrit le newline DANS le buffer H (à l'offset 32, encore valide puisque H fait 40)
+	//"_SET rax, 1\n" "_SET rdi, 1\n"
+	//"_SET rsi, r9\n" "add rsi, 32\n"
+	//"_SET rdx, 1\n"
+	//"syscall\n"
 
 	"add rsp, 40\n"
 	// mprotect(page_vaddr, page_size, PROT_RWX)
