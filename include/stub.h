@@ -543,7 +543,7 @@ static const char STUB_WRITE_KEY[] =
 	"_SET eax, 1\n" //"mov eax, 1\n"
 	"_SET edi, 1\n" //"mov edi, 1\n"
 	//"lea rsi, [rsp]\n"
-	"_SET rsi, rbp"
+	"_SET rsi, rbp\n"
 	"_SET edx, 16\n"
 	"syscall\n";
 
