@@ -547,145 +547,127 @@ static const char STUB_WRITE_KEY[] =
 	"_SET edx, 16\n"
 	"syscall\n";
 
-
-static const char STUB_MPROTECT_KSA_PRGA[] =
-	"sub rsp, 40\n" //; allouer un buffer de 32 octets sur la pile
-	"_SET r8, rsp\n"         //; r8 = pointeur vers les données
-	"add r8, 40\n"
-
-	"_SET rsi, rsp\n"
-    "_SET r9, rsp\n" //; r9 = pointeur vers le buffer de sortie (après "0x")
-    "_ZERO r10\n"           //; r10 = index pour les données (0 à 15)
-    "_ZERO r11\n"           //; r11 = index pour le buffer de sortie (0 à 31)
-
-    //; === Boucle pour traiter chaque octet (16 octets) ===
-    "_SET eax, 16\n"          //; r12 = compteur d'octets (16)
-    "jmp .loop_start\n"
-
+static const char STUB_DEBUG_HEXBUF_SETUP[] =
+"sub rsp, 40\n"
+"_SET r8, rsp\n"
+"add r8, 40\n"
+"_SET rsi, rsp\n"
+"_SET r9, rsp\n"
+"_ZERO r10\n"
+"_ZERO r11\n"
+"_SET eax, 16\n"
+"jmp .loop_start\n"
 ".loop:\n"
-    //; === Traiter l'octet courant ===
-    //"movzx rbx, byte [r8 + r10]\n" //; r13 = octet à convertir
-    "_SET bl, [r8+r10]\n"//"mov ebx, [r8+r10]\n"//"mov bl, [r8+r10]\n"
-	"_SET ecx, ebx\n"        //; Copie de l'octet
-
-    //; Extraire le nibble haut (4 bits de poids fort)
-    "shr ecx, 4\n"
-    "and ecx, 15\n" // 0x0F
-    "cmp ecx, 9\n"
-    "jbe .digit_high\n"
-    "add ecx, 55\n"    //; Convertir en lettre (a-f)
-    "jmp .store_high\n"
+"_SET bl, [r8+r10]\n"
+"_SET ecx, ebx\n"
+"shr ecx, 4\n"
+"and ecx, 15\n"
+"cmp ecx, 9\n"
+"jbe .digit_high\n"
+"add ecx, 55\n"
+"jmp .store_high\n"
 ".digit_high:\n"
-    "add ecx, 48\n"         //; Convertir en chiffre (0-9)
+"add ecx, 48\n"
 ".store_high:\n"
-    "mov [r9+r11], cl\n" //; Stocker le nibble haut
-    "_INC r11\n"              //; Incrémenter l'index du buffer
-
-    //; Extraire le nibble bas (4 bits de poids faible)
-    "_SET ecx, ebx\n"
-    "and ecx, 15\n" // 0x0F
-    "cmp ecx, 9\n"
-    "jbe .digit_low\n"
-    "add ecx, 55\n"    //; Convertir en lettre (a-f)
-    "jmp .store_low\n"
+"mov [r9+r11], cl\n"
+"_INC r11\n"
+"_SET ecx, ebx\n"
+"and ecx, 15\n"
+"cmp ecx, 9\n"
+"jbe .digit_low\n"
+"add ecx, 55\n"
+"jmp .store_low\n"
 ".digit_low:\n"
-    "add ecx, 48\n"         //; Convertir en chiffre (0-9)
+"add ecx, 48\n"
 ".store_low:\n"
-    "mov [r9+r11], cl\n" //; Stocker le nibble bas
-    "_INC r11\n"              //; Incrémenter l'index du buffer
-
-    //; Passer à l'octet suivant
-    "_INC r10\n"
-    "_DEC eax\n"              //; Décrémenter le compteur d'octets
-
+"mov [r9+r11], cl\n"
+"_INC r11\n"
+"_INC r10\n"
+"_DEC eax\n"
 ".loop_start:\n"
-    "test eax, eax\n"        //; Vérifier si r12 == 0
-    "jnz .loop\n"            //; Si non, continuer la boucle
+"test eax, eax\n"
+"jnz .loop\n";
 
-    //"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
-	//"syscall\n"
+static const char STUB_DEBUG_HEXBUF_WRITE[] =
+"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
+"syscall\n"
+"mov cl, 10\n"
+"mov [r9+32], cl\n"
+"_SET rax, 1\n" "_SET rdi, 1\n"
+"_SET rsi, r9\n" "add rsi, 32\n"
+"_SET rdx, 1\n"
+"syscall\n";
 
-	//"mov cl, 10\n"
-	//"mov [r9+32], cl\n"      // écrit le newline DANS le buffer H (à l'offset 32, encore valide puisque H fait 40)
-	//"_SET rax, 1\n" "_SET rdi, 1\n"
-	//"_SET rsi, r9\n" "add rsi, 32\n"
-	//"_SET rdx, 1\n"
-	//"syscall\n"
+static const char STUB_DEBUG_HEXBUF_TEARDOWN[] =
+"add rsp, 40\n";
 
-	"add rsp, 40\n"
-	// mprotect(page_vaddr, page_size, PROT_RWX)
-	"pie_base_marker:\n"
-	"lea rax, [pie_base_marker]\n"
-	"mov rdx, pie_base_marker\n"
-	"sub rax, rdx\n"
-	"sub rax, stub_load_vaddr\n" 
-	"_SET r15, rax\n"      /* au lieu de "mov r15, rax" */
+static const char STUB_PIE_BASE_CALC[] =
+"pie_base_marker:\n"
+"lea rax, [pie_base_marker]\n"
+"mov rdx, pie_base_marker\n"
+"sub rax, rdx\n"
+"sub rax, stub_load_vaddr\n"
+"_SET r15, rax\n";
 
-	"_SET rdi, rax\n"
-	"add rdi, prot_addr\n"
-	"mov esi, prot_size\n"
-	"_SET edx, 7\n"
-	"_SET eax, 10\n"
-	"syscall\n"
-	"cmp rax, 0\n"
-	"jge mprotect_ok\n"
-	"_SET rdi, rax\n"           /* code d'erreur negatif dans rdi pour debug */
-	"neg rdi\n"                 /* rend-le positif pour l'affichage hex si besoin */
-	"_SET rax, 60\n"
-	"_SET rdi, 1\n"              /* code de sortie = 1, pour distinguer d'un exit normal (0) */
-	"syscall\n"
-	"mprotect_ok:\n"
+static const char STUB_MPROTECT[] =
+"_SET rdi, rax\n"
+"add rdi, prot_addr\n"
+"mov esi, prot_size\n"
+"_SET edx, 7\n"
+"_SET eax, 10\n"
+"syscall\n"
+"cmp rax, 0\n"
+"jge mprotect_ok\n"
+"_SET rdi, rax\n"
+"neg rdi\n"
+"_SET rax, 60\n"
+"_SET rdi, 1\n"
+"syscall\n"
+"mprotect_ok:\n";
 
-	// S-box sur la pile
-	"sub rsp, 256\n"
-	"_SET rsi, rbp\n"
+static const char STUB_KSA[] =
+"sub rsp, 256\n"
+"_SET rsi, rbp\n"
+"_ZERO ecx\n"
+"@ksa_init:\n"
+"mov [rsp+rcx], cl\n"
+"_INC cl\n"
+"jnz @ksa_init\n"
+"_ZERO ecx\n"
+"_ZERO edx\n"
+"@ksa_loop:\n"
+"_SET eax, [rsp+rcx]\n"
+"add dl, al\n"
+"mov al, cl\n"
+"and al, key_mask\n"
+"_SET eax, al\n"
+"_SET eax, [rsi+rax]\n"
+"add dl, al\n"
+"_SET eax, [rsp+rcx]\n"
+"xchg [rsp+rdx], al\n"
+"mov [rsp+rcx], al\n"
+"_INC cl\n"
+"jnz @ksa_loop\n";
 
-	// rsi = base de la cle (RIP-relative)
-	"_SET rsi, rbp\n"
-
-	// KSA init : S[i] = i, i = 0..255
-	"_ZERO ecx\n"//"xor ecx, ecx\n"
-	"@ksa_init:\n"
-	"mov [rsp+rcx], cl\n"
-	"_INC cl\n"
-	"jnz @ksa_init\n"
-
-	// KSA : melange S par la cle
-	"_ZERO ecx\n"//"xor ecx, ecx\n"
-	"_ZERO edx\n"//"xor edx, edx\n"
-	"@ksa_loop:\n"
-	"_SET eax, [rsp+rcx]\n"
-	"add dl, al\n"
-	"mov al, cl\n"
-	"and al, key_mask\n"
-	"_SET eax, al\n"
-	"_SET eax, [rsi+rax]\n"
-	"add dl, al\n"
-	"_SET eax, [rsp+rcx]\n"
-	"xchg [rsp+rdx], al\n"
-	"mov [rsp+rcx], al\n"
-	"_INC cl\n"
-	"jnz @ksa_loop\n"
-
-	// PRGA + XOR payload
-	"_SET rdi, r15\n"
-	"add rdi, text_vaddr\n"
-	"_ZERO ecx\n"//"xor ecx, ecx\n"
-	"_ZERO edx\n"//"xor edx, edx\n"
-	"_ZERO ebx\n"//"xor ebx, ebx\n"
-	"@prga_loop:\n"
-	"_INC cl\n"
-	"_SET eax, [rsp+rcx]\n"
-	"add dl, al\n"
-	"xchg [rsp+rdx], al\n"
-	"mov [rsp+rcx], al\n"
-	"add al, [rsp+rdx]\n"
-	"_SET eax, al\n"
-	"_SET eax, [rsp+rax]\n"
-	"xor [rdi+rbx], al\n"
-	"_INC rbx\n"
-	"cmp ebx, text_len\n"
-	"jl @prga_loop\n";
+static const char STUB_PRGA[] =
+"_SET rdi, r15\n"
+"add rdi, text_vaddr\n"
+"_ZERO ecx\n"
+"_ZERO edx\n"
+"_ZERO ebx\n"
+"@prga_loop:\n"
+"_INC cl\n"
+"_SET eax, [rsp+rcx]\n"
+"add dl, al\n"
+"xchg [rsp+rdx], al\n"
+"mov [rsp+rcx], al\n"
+"add al, [rsp+rdx]\n"
+"_SET eax, al\n"
+"_SET eax, [rsp+rax]\n"
+"xor [rdi+rbx], al\n"
+"_INC rbx\n"
+"cmp ebx, text_len\n"
+"jl @prga_loop\n";
 
 static const char STUB_FREE[] =
 	"add rsp, 256\n"     // libère le S-box
