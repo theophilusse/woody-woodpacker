@@ -108,7 +108,7 @@ int main(int argc, char **argv)
         return (usage(argv[0]));
 	opts = parse_args(argc, argv);
 
-    ctx = load_and_validate(opts->file);
+    ctx = load_and_validate(opts.file);
     if (!ctx)
         return (1);
 
