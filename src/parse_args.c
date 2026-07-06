@@ -20,7 +20,7 @@ t_opts  parse_args(int argc, char **argv)
     int     longindex;
 
 	opts = default_opts();
-    while ((opt = getopt_long(argc, argv, "vi:m:p:s:q:N:t:l:?", long_opts, &longindex)) != -1)
+    while ((opt = getopt_long(argc, argv, "vi:d:l:?", long_opts, &longindex)) != -1)
     {
 		switch (opt)
         {
