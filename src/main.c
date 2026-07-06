@@ -2,8 +2,12 @@
 
 static int usage(const char *prog)
 {
-    fprintf(stderr, "usage: %s <binaire_ELF64_x86_64>\n", prog);
-    return (1);
+    printf("usage: %s [options] <binaire_ELF64_x86_64>\n", prog);
+    printf(" -v        verbose\n", prog);
+	printf(" -d        use antidebugger\n", prog);
+    printf(" -i        use int3 trap\n", prog);
+    printf(" -l        use LDE\n", prog);
+	return (1);
 }
 
 /* Étape 1 : chargement + validation + localisation du point d'injection */
@@ -98,12 +102,13 @@ int main(int argc, char **argv)
 {
     t_elf_ctx       *ctx;
     t_crypto_ctx    crypto;
+	struct s_opts	opts;
 
     if (argc != 2)
         return (usage(argv[0]));
 	opts = parse_args(argc, argv);
 
-    ctx = load_and_validate(argv[1]);
+    ctx = load_and_validate(opts->file);
     if (!ctx)
         return (1);
 
@@ -114,7 +119,7 @@ int main(int argc, char **argv)
         return (1);
     }
 
-    if (build_and_patch(ctx, &crypto, "woody", opts) != 0)
+    if (build_and_patch(ctx, &crypto, "woody", &opts) != 0)
     {
         elf_free(ctx);
         return (1);
