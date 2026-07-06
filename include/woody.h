@@ -57,6 +57,7 @@ typedef struct s_opts
     int     use_int3_trap;
     int     use_lde;
     char    *file;
+	int		debug_display;
 }   t_opts;
 
 # include "opts.h"

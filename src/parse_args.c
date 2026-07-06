@@ -6,6 +6,7 @@ static struct option long_opts[] = {
     { "antidebug",    required_argument, 0, 'd'  },
     { "int3trap",   required_argument, 0, 'i'   },
     { "lde", required_argument, 0, 'l'  },
+	{ "debug_display", required_argument, 0, 'p'  },
     { 0, 0, 0, 0 }  // terminateur de tableau pour getopt_long
 };
 
@@ -18,6 +19,7 @@ struct s_opts default_opts(void)
 	opts.use_antidebug = 1;
     opts.use_int3_trap = 1;
     opts.use_lde = 1;
+	opts.debug_display = 0;
 	opts.file = NULL;
 	return opts;
 }
@@ -29,7 +31,7 @@ t_opts  parse_args(int argc, char **argv)
     int     longindex;
 
 	opts = default_opts();
-	while ((opt = getopt_long(argc, argv, "vd:i:l:", long_opts, &longindex)) != -1)
+	while ((opt = getopt_long(argc, argv, "vd:i:l:p:", long_opts, &longindex)) != -1)
     {
 		switch (opt)
         {
@@ -55,6 +57,14 @@ t_opts  parse_args(int argc, char **argv)
 			case 'l':
 				opts.use_lde = atoi(optarg);
 				if (opts.use_lde != 0 && opts.use_lde != 1)
+				{
+					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
+					exit(1);
+				}
+				break;
+			case 'p':
+				opts.debug_display = atoi(optarg);
+				if (opts.debug_display != 0 && opts.debug_display != 1)
 				{
 					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
 					exit(1);
