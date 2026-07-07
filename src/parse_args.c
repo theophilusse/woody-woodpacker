@@ -27,9 +27,9 @@ struct s_opts default_opts(void)
 
 static struct s_opts copy_pattern(struct s_opts opts)
 {
-	if (strlen(optarg) > 16 || strlen(optarg) % 2 != 0) // verify length hex
+	if (strlen(optarg) != 32 || strlen(optarg) % 2 != 0) // verify length hex
 	{
-		fprintf(stderr, "ft_ping: invalid custom_key: '%s'\n", optarg);
+		fprintf(stderr, "error: invalid custom_key: '%s'\n", optarg);
 		exit(1);
 	}
 	for (int i = 0; optarg[i]; i++) // verify hex symbols
@@ -38,7 +38,7 @@ static struct s_opts copy_pattern(struct s_opts opts)
 			(optarg[i] >= 'a' && optarg[i] <= 'f') ||
 			(optarg[i] >= 'A' && optarg[i] <= 'F')))
 		{
-			fprintf(stderr, "ft_ping: invalid custom_key: '%s'\n", optarg);
+			fprintf(stderr, "error: invalid custom_key: '%s'\n", optarg);
 			exit(1);
 		}
 	}
