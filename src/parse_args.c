@@ -29,7 +29,7 @@ static struct s_opts copy_pattern(struct s_opts opts)
 {
 	char key[KEY_LEN * 2 + 1];
 
-	if ((strlen(optarg) != KEY_LEN * 2 && strlen(optarg) != KEY_LEN / 2) || strlen(optarg) % 2 != 0) // verify length hex
+	if ((strlen(optarg) != KEY_LEN * 2 && strlen(optarg) != KEY_LEN) || strlen(optarg) % 2 != 0) // verify length hex
 	{
 		fprintf(stderr, "error: invalid custom_key (need 128bits): '%s'\n", optarg);
 		exit(1);
@@ -56,7 +56,7 @@ static struct s_opts copy_pattern(struct s_opts opts)
 			opts.custom_key[j] = (uint8_t)strtol(byte, NULL, 16);
 		}
 	}
-	if (strlen(optarg) == KEY_LEN / 2)
+	if (strlen(optarg) == KEY_LEN)
 	{
 		strncpy(opts.custom_key, optarg, KEY_LEN / 2);
 	}
