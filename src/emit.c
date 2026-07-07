@@ -1317,3 +1317,14 @@ int emit_mov_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, int8_t disp, 
     b[n++] = (uint8_t)disp;
     return emit_raw(e, b, n);
 }
+
+/* LEA r64, [base+disp8] : REX.W 8D /r mod=01 */
+int emit_lea_r64_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
+{
+    uint8_t b[4];
+    b[0] = mk_rex(1, dst, base);
+    b[1] = 0x8D;
+    b[2] = MODRM01(dst, base);
+    b[3] = (uint8_t)disp;
+    return emit_raw(e, b, 4);
+}
