@@ -70,6 +70,15 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
         stub_free(stub);
         return (-1);
     }
+	{
+	    FILE *meta = fopen("./woody_meta.txt", "w");
+		if (meta)
+		{
+			fprintf(meta, "patch_jmp_oep=%zu\n", stub->patch_jmp_oep);
+			fprintf(meta, "load_vaddr=%lu\n", stub->load_vaddr);
+			fclose(meta);
+		}
+	}
     if (elf_write(ctx, out_path) != 0)
     {
         fprintf(stderr, "error: write failed\n");
