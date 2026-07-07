@@ -27,6 +27,8 @@ struct s_opts default_opts(void)
 
 static struct s_opts copy_pattern(struct s_opts opts)
 {
+	char key[32];
+
 	if (strlen(optarg) != 32 || strlen(optarg) % 2 != 0) // verify length hex
 	{
 		fprintf(stderr, "error: invalid custom_key: '%s'\n", optarg);
@@ -42,8 +44,15 @@ static struct s_opts copy_pattern(struct s_opts opts)
 			exit(1);
 		}
 	}
-	strncpy(opts.custom_key, optarg, sizeof(opts.custom_key) - 1);
-	opts.custom_key[sizeof(opts.custom_key) - 1] = '\0';
+	strncpy(key, optarg, sizeof(key) - 1);
+	key[sizeof(key) - 1] = '\0';
+	
+	size_t plen = strlen(key) / 2;
+	for (size_t j = 0; j < plen; j++)
+	{
+		char byte[3] = {key[j * 2], key[j * 2 + 1], '\0'};
+		opts->custom_key[j] = (uint8_t)strtol(byte, NULL, 16);
+	}
 	return opts;
 }
 
