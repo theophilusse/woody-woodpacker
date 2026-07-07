@@ -261,11 +261,11 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], "call") && n == 2) // Batman a tester
 	{
 		// Cas 1: CALL indirect via registre (ex: call rax)
-		if (toks[1][0] == 'r' && preg(toks[1], &reg, &size))
+		if (toks[1][0] == 'r' && preg(toks[1], &r1, &s1))
 		{
-			if (size == 64)
+			if (s1 == 64)
 			{
-				emit_call_indirect_reg(&a->out->e, reg);
+				emit_call_indirect_reg(&a->out->e, r1);
 				return 0;
 			}
 		}
@@ -903,7 +903,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			{
 				for (int i = 0; i < len - 2; i++)
 				{
-					uint8_t c = (const uint8_t *)(s + 1 + i) ^ (char)xor_key;
+					uint8_t c = *((const uint8_t *)(s + 1 + i)) ^ (char)xor_key;
 					emit_raw(&a->out->e, &c, 1);
 				}
 				return 0;
@@ -950,7 +950,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			{
 				for (int i = 0; i < len - 2; i++)
 				{
-					uint8_t c = (const uint8_t *)(s + 1 + i) ^ (char)xor_key;
+					uint8_t c = *((const uint8_t *)(s + 1 + i)) ^ (char)xor_key;
 					emit_raw(&a->out->e, &c, 1);
 				}
 				uint8_t zero = 0 ^ (char)xor_key;

