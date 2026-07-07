@@ -10,6 +10,8 @@ char *build_stub_source(const t_opts *opts)
 
     n = 0;
     blocks[n++] = STUB_AV_DETECT;
+    blocks[n++] = STUB_FOOTER;
+    blocks[n++] = STUB_AV_DATA;
     if (0)
     {
         blocks[n++] = STUB_HEADER;

