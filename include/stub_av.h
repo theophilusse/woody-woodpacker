@@ -183,7 +183,8 @@ static const char STUB_AV_DETECT[] =
 static const char STUB_AV_DATA[] =
 //"section .data\n"
     "msg_clear:\n"
-        ".string \"Clear\n\"\n"
+        ".string \"Clear\"\n"
+        "db 10\n"
     //; Liste des processus interdits (terminés par un NULL)
     "forbidden_list:\n"
         ".string 42 \"gdb\"\n"
