@@ -51,8 +51,8 @@ class AutoBreak(gdb.Command):
 
 class WoodySetup(gdb.Command):
     """woodysetup [nbytes] : pose un breakpoint sur load_vaddr (lu depuis
-    ./woody_meta.txt), lance le programme, neutralise l'anti-debug (ptrace),
-    puis pose un watchpoint sur $ecx filtre a la zone scannee par le LDE.
+    /tmp/woody_meta.txt), lance le programme, puis pose un watchpoint sur
+    $ecx filtre a la zone scannee par le LDE.
 
     Avec un argument numerique, pose plutot un watchpoint sur $rsi (pas $ecx),
     loguant $rsi et $rip a chaque changement, limite aux <nbytes> premiers
@@ -65,7 +65,7 @@ class WoodySetup(gdb.Command):
         try:
             meta = read_meta()
         except FileNotFoundError:
-            print("woodysetup: ./woody_meta.txt introuvable — lance d'abord une generation")
+            print("woodysetup: /tmp/woody_meta.txt introuvable — lance d'abord une generation")
             return
 
         patch_jmp_oep = int(meta["patch_jmp_oep"])
@@ -75,27 +75,12 @@ class WoodySetup(gdb.Command):
         print(f"woodysetup: load_vaddr=0x{load_vaddr:x} scan_end=0x{scan_end:x} "
               f"(taille zone scannee = {scan_end - load_vaddr} octets)")
 
-        gdb.execute("delete breakpoints")
+        gdb.execute("delete")
         gdb.execute(f"break *0x{load_vaddr:x}")
         gdb.execute("run")
 
         gdb.execute(f"set $scan_start = 0x{load_vaddr:x}")
         gdb.execute(f"set $scan_end = 0x{scan_end:x}")
-
-        # ── Neutralisation de l'anti-debug (cmp eax,-1 apres le syscall ptrace) ──
-        sig_cmp_eax_neg1 = [0x83, 0xf8, 0xff]
-        addr = find_signature(load_vaddr, scan_end, sig_cmp_eax_neg1)
-        if addr is None:
-            print("woodysetup: signature anti-debug (cmp eax,-1) introuvable, "
-                  "anti-debug NON neutralise")
-        else:
-            gdb.execute(f"break *0x{addr:x}")
-            gdb.execute("continue")
-            gdb.execute("set $eax = 0")
-            gdb.execute(f"clear *0x{addr:x}")
-            print(f"woodysetup: anti-debug neutralise a 0x{addr:x} (eax force a 0)")
-
-        gdb.execute("delete breakpoints")
 
         args = arg.split()
         if args:
@@ -113,7 +98,7 @@ if $rsi >= $scan_start && $rsi < $scan_limit
 end
 continue
 end""")
-            print(f"woodysetup: watchpoint fin pose sur $rsi, limite aux {nbytes} premiers octets.")
+            print(f"woodysetup: watchpoint pose sur $rsi, limite aux {nbytes} premiers octets.")
         else:
             gdb.execute("watch $ecx")
             gdb.execute("""commands
