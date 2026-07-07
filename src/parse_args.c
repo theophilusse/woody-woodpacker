@@ -31,7 +31,7 @@ static struct s_opts copy_pattern(struct s_opts opts)
 
 	if ((strlen(optarg) != KEY_LEN * 2 && strlen(optarg) != KEY_LEN) || strlen(optarg) % 2 != 0) // verify length hex
 	{
-		fprintf(stderr, "error: invalid custom_key (need 128bits): '%s'\n", optarg);
+		fprintf(stderr, "error: invalid custom_key (need %d bytes): '%s'\n", KEY_LEN, optarg);
 		exit(1);
 	}
 	if (strlen(optarg) == KEY_LEN * 2)
