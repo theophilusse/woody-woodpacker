@@ -1328,3 +1328,16 @@ int emit_lea_r64_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp)
     b[3] = (uint8_t)disp;
     return emit_raw(e, b, 4);
 }
+
+/* CMP [base+disp8], imm8 : 80 /7 ib */
+int emit_cmp_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm)
+{
+    uint8_t b[5]; int n = 0;
+    uint8_t r = mk_rex(0, 0, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x80;
+    b[n++] = MODRM01(7, base);
+    b[n++] = (uint8_t)disp;
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}

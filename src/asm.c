@@ -780,6 +780,24 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		return 1;
 	}
+	if (!strcmp(toks[0], "cmp") && n == 3 && toks[1][0] == '[')
+	{
+		mt = pmem(toks[1], &base, &idx, lbl, &d8);
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		if (mt == 3)   /* [base] seul, disp implicite = 0 */
+		{
+			emit_cmp_mem_disp8_imm8(&a->out->e, base, 0, (uint8_t)val);
+			return 0;
+		}
+		if (mt == 4)   /* [base+disp8], disp reel (positif ou negatif via pmem) */
+		{
+			emit_cmp_mem_disp8_imm8(&a->out->e, base, d8, (uint8_t)val);
+			return 0;
+		}
+		fprintf(stderr, "asm: cmp [mem],imm (mt=%d) non gere\n", mt);
+		return -1;
+	}
 	if (!strcmp(toks[0], "cmp") && n == 3 && preg(toks[1], &r1, &s1))
 	{
 		if (s1 == 8)

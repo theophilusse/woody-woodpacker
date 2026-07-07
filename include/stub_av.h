@@ -80,7 +80,7 @@ static const char STUB_AV_DETECT[] =
 
     //; Passer au prochain élément de la liste
     "add rsi, 1\n"
-    "cmp byte [rsi-1], 0\n"
+    "cmp [rsi-1], 0\n"
     "jne check_forbidden\n"
 
 "next_entry:\n"
@@ -167,7 +167,7 @@ static const char STUB_AV_DETECT[] =
 "strlen:\n"
     "xor rax, rax\n"
 "strlen_loop:\n"
-    "cmp byte [rsi + rax], 0\n"
+    "cmp [rsi + rax], 0\n"
     "je strlen_done\n"
     "inc rax\n"
     "jmp strlen_loop\n"

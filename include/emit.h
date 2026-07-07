@@ -175,6 +175,7 @@ int emit_call_indirect_sib(t_emitter *e, t_reg base, t_reg idx, int scale, int32
 int emit_movzx_r32_mem16(t_emitter *e, t_reg dst, t_reg base);
 int emit_mov_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, int8_t disp, t_reg src);
 int emit_lea_r64_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp);
+int emit_cmp_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 
 /* opcodes jcc utiles */
 # define JL   0x7C
