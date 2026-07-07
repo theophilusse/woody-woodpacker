@@ -99,6 +99,20 @@ static const char STUB_AV_DETECT[] =
 "_SET [rsi], al\n"
 "strip_done:\n"
 
+    /* ── DEBUG : affiche le nom de processus tel que lu, avant comparaison ── */
+"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n" "push rcx\n"
+"lea rsi, [buffer]\n"
+"call strlen\n"
+"mov rdx, rax\n"
+"mov rax, 1\n" "mov rdi, 1\n"
+"lea rsi, [buffer]\n"
+"syscall\n"
+"mov rax, 1\n" "mov rdi, 1\n"
+"lea rsi, [newline]\n" "mov rdx, 1\n"
+"syscall\n"
+"pop rcx\n" "pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
+    /* ── FIN DEBUG ── */
+
     //; Vérifier contre la liste interdite
 "lea rsi, [forbidden_list]\n"
 "check_forbidden:\n"
@@ -109,6 +123,16 @@ static const char STUB_AV_DETECT[] =
     //; Passer au prochain élément de la liste
 "add rsi, 1\n"
 "cmp [rsi-1], 0\n"
+
+/* ── DEBUG : newline entre chaque entree de forbidden_list testee ── */
+"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
+"mov rax, 1\n" "mov rdi, 1\n"
+"lea rsi, [newline]\n" "mov rdx, 1\n"
+"syscall\n"
+"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
+    /* ── FIN DEBUG ── */
+
+
 "jne check_forbidden\n"
 "next_entry:\n"
     //; Passer à l'entrée suivante
@@ -170,6 +194,24 @@ static const char STUB_AV_DETECT[] =
 "_SET al, [rdi+rcx]\n"
 "_SET bl, [rsi+rcx]\n"
 "xor bl, 42\n"
+
+
+/* ── DEBUG : affiche al et bl avant comparaison ── */
+"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
+"push rax\n"                    /* sauvegarde al sur la pile pour l'écrire */
+"mov rax, 1\n" "mov rdi, 1\n"
+"mov rsi, rsp\n" "mov rdx, 1\n"
+"syscall\n"                     /* write(1, &al, 1) */
+"pop rax\n"
+"push rbx\n"
+"mov rax, 1\n" "mov rdi, 1\n"
+"mov rsi, rsp\n" "mov rdx, 1\n"
+"syscall\n"                     /* write(1, &bl, 1) */
+"pop rbx\n"
+"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
+    /* ── FIN DEBUG ── */
+
+
 "cmp al, bl\n"
 "jne strcmp_not_equal\n"
 "test al, al\n"
