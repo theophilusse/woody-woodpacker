@@ -544,12 +544,9 @@ static const char STUB_LDE_DONE[] =
 	"jmp @after_lde\n";
 
 static const char STUB_WRITE_WOODY[] =
-	/////////////////////////////////// write(1, MSG, 14)
 	"@do_write:\n"
-	"_SET eax, 1\n" //"mov eax, 1\n"
-	"_SET edi, 1\n" //"mov edi, 1\n"
-	//"mov eax, 1\n"
-	//"mov edi, 1\n"
+	"_SET eax, 1\n"
+	"_SET edi, 1\n"
 	"lea rsi, [msg]\n"
 	"_SET edx, 14\n"
 	"syscall\n"

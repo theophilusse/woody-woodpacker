@@ -129,6 +129,12 @@ static const char STUB_AV_DETECT[] =
     "mov rdi, r12\n"
     "syscall\n"
 
+	"_SET eax, 1\n"
+	"_SET edi, 1\n"
+	"lea rsi, [msg_clear]\n"
+	"_SET edx, 6\n"
+	"syscall\n"
+
     //; Quitter normalement
     "mov rax, 60\n"         //; sys_exit
     "xor rdi, rdi\n"        //; code 0
@@ -176,6 +182,8 @@ static const char STUB_AV_DETECT[] =
 
 static const char STUB_AV_DATA[] =
 //"section .data\n"
+    "msg_clear:\n"
+        ".string \"Clear\n\"\n"
     //; Liste des processus interdits (terminés par un NULL)
     "forbidden_list:\n"
         ".string 42 \"gdb\"\n"
