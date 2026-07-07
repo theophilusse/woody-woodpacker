@@ -258,6 +258,66 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		return 0;
 	}
+	if (!strcmp(toks[0], "call") && n == 2) // Batman a tester
+	{
+		// Cas 1: CALL indirect via registre (ex: call rax)
+		if (toks[1][0] == 'r' && preg(toks[1], &reg, &size))
+		{
+			if (size == 64)
+			{
+				emit_call_indirect_reg(&a->out->e, reg);
+				return 0;
+			}
+		}
+		// Cas 2: CALL indirect via mémoire (ex: call [rip + disp] ou [reg])
+		else if (toks[1][0] == '[')
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			if (mt == 1)  // SIB (base + idx*scale + disp)
+			{
+				emit_call_indirect_sib(&a->out->e, base, idx, 1, 0);  // scale=1, disp=0 par défaut
+				return 0;
+			}
+			else if (mt == 2)  // [label] RIP-relative
+			{
+				emit_call_indirect_mem(&a->out->e, 0);  // disp sera calculé par le linker
+				return 0;
+			}
+			else if (mt == 3)  // [base] seul
+			{
+				emit_call_indirect_sib(&a->out->e, base, 4 /* pas d'index */, 1, 0);
+				return 0;
+			}
+			else if (mt == 4)  // [base + disp8]
+			{
+				emit_call_indirect_sib(&a->out->e, base, 4, 1, d8);
+				return 0;
+			}
+		}
+		else // Cas 1: CALL direct (rel32)
+		{
+			// Adresse symbolique (ex: $label)
+			int64_t lval = sym(a, toks[1]);  // +1 pour sauter le '$'
+			if (lval >= 0)
+			{
+				int64_t disp = lval - (int64_t)(a->out->e.len + 5);
+				emit_call_direct(&a->out->e, (int32_t)disp);
+			}
+			else
+			{
+				// Forward reference: utiliser un trampoline
+				uint8_t bytes[2] = {0xEB, 0};  // JMP rel8 (placeholder)
+				emit_raw(&a->out->e, bytes, 2);
+				size_t dummy;
+				emit_jmp_rel32(&a->out->e, &dummy);  // JMP rel32 (pour le trampoline)
+				addfixup(a, toks[1] + 1, dummy, dummy + 4, 0);  // is_rel8 = 0
+			}
+			return 0;
+		}
+		fprintf(stderr, "asm: call %s non gere\n", toks[1]);
+		return -1;
+	}
+
 	if (!strcmp(toks[0], "push") && n == 2 && preg(toks[1], &r1, &s1))
 		{ emit_push_r64(&a->out->e, r1); return 0; }
 
@@ -809,31 +869,175 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		{ emit_raw(&a->out->e, (const uint8_t *)WOODY_MSG, WOODY_MSG_LEN); return 0; }
 	if (!strcmp(toks[0], ".key"))
 		{ emit_raw(&a->out->e, a->crypto->key, a->crypto->key_len); return 0; }
-	if (!strcmp(toks[0], ".ascii") && n == 2)
+	if (!strcmp(toks[0], ".ascii") && (n == 2 || n == 3))
 	{
-		const char *s = toks[1];
-		int len = (int)strlen(s);
-		if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+		if (n == 2)
 		{
-			emit_raw(&a->out->e, (const uint8_t *)(s + 1), (size_t)(len - 2));
-			return 0;
+			const char *s = toks[1];
+			int len = (int)strlen(s);
+			if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+			{
+				emit_raw(&a->out->e, (const uint8_t *)(s + 1), (size_t)(len - 2));
+				return 0;
+			}
+			fprintf(stderr, "asm: .ascii attend une chaine entre guillemets\n");
+			return -1;
+		}
+		if (n == 3)
+		{
+			const char *arg = toks[1];
+			if (!isdigit(arg[0]))
+			{
+				fprintf(stderr, "asm: .ascii xor attend une valeur décimale positive\n");
+				return -1;
+			}
+			long xor_key = strtol(arg, NULL, 0);
+			if (xor_key < 0 || xor_key > 255)
+			{
+				fprintf(stderr, "asm: .ascii xor valeur décimale hors plage 0-255: %s\n", arg);
+				return -1;
+			}
+			const char *s = toks[2];
+			int len = (int)strlen(s);
+			if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+			{
+				for (int i = 0; i < len - 2; i++)
+				{
+					uint8_t c = (const uint8_t *)(s + 1 + i) ^ (char)xor_key;
+					emit_raw(&a->out->e, &c, 1);
+				}
+				return 0;
+			}
+			fprintf(stderr, "asm: .ascii attend une chaine entre guillemets\n");
+			return -1;
 		}
 		fprintf(stderr, "asm: .ascii attend une chaine entre guillemets\n");
 		return -1;
 	}
-	if (!strcmp(toks[0], ".string") && n == 2)
+	if (!strcmp(toks[0], ".string") && (n == 2 || n == 3))
 	{
-		const char *s = toks[1];
-		int len = (int)strlen(s);
-		if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+		if (n == 2)
 		{
-			emit_raw(&a->out->e, (const uint8_t *)(s + 1), (size_t)(len - 2));
-			uint8_t zero = 0;
-			emit_raw(&a->out->e, &zero, 1);   /* .string ajoute un octet nul final, contrairement a .ascii */
-			return 0;
+			const char *s = toks[1];
+			int len = (int)strlen(s);
+			if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+			{
+				emit_raw(&a->out->e, (const uint8_t *)(s + 1), (size_t)(len - 2));
+				uint8_t zero = 0;
+				emit_raw(&a->out->e, &zero, 1);   /* .string ajoute un octet nul final, contrairement a .ascii */
+				return 0;
+			}
+			fprintf(stderr, "asm: .string attend une chaine entre guillemets\n");
+			return -1;
+		}
+		if (n == 3)
+		{
+			const char *arg = toks[1];
+			if (!isdigit(arg[0]))
+			{
+				fprintf(stderr, "asm: .string xor attend une valeur décimale positive\n");
+				return -1;
+			}
+			long xor_key = strtol(arg, NULL, 0);
+			if (xor_key < 0 || xor_key > 255)
+			{
+				fprintf(stderr, "asm: .string xor valeur décimale hors plage 0-255: %s\n", arg);
+				return -1;
+			}
+			const char *s = toks[2];
+			int len = (int)strlen(s);
+			if (len >= 2 && s[0] == '"' && s[len - 1] == '"')
+			{
+				for (int i = 0; i < len - 2; i++)
+				{
+					uint8_t c = (const uint8_t *)(s + 1 + i) ^ (char)xor_key;
+					emit_raw(&a->out->e, &c, 1);
+				}
+				uint8_t zero = 0 ^ (char)xor_key;
+				emit_raw(&a->out->e, &zero, 1);   /* .string ajoute un octet nul final, contrairement a .ascii */
+				return 0;
+			}
+			fprintf(stderr, "asm: .string attend une chaine entre guillemets\n");
+			return -1;
 		}
 		fprintf(stderr, "asm: .string attend une chaine entre guillemets\n");
 		return -1;
+	}
+	if (!strcmp(toks[0], ".resb") && n == 2)
+	{
+		const char *arg = toks[1];
+		if (!isdigit(arg[0]) && !(arg[0] == '-' && isdigit(arg[1])))
+		{
+			fprintf(stderr, "asm: .resb attend une valeur décimale\n");
+			return -1;
+		}
+		long val = strtol(arg, NULL, 0);
+		for (long i = 0; i < val; i++)
+		{
+			uint8_t byte = (uint8_t)0;
+			emit_raw(&a->out->e, &byte, 1);
+		}
+		return 0;
+	}
+	if (!strcmp(toks[0], ".db") && n >= 2)
+	{
+		for (int i = 1; i < n; i++)
+		{
+			const char *arg = toks[i];
+
+			// Cas 1: Chaîne entre guillemets (ex: db "Hello")
+			if (arg[0] == '"' && arg[strlen(arg)-1] == '"')
+			{
+				size_t len = strlen(arg) - 2;
+				emit_raw(&a->out->e, (const uint8_t *)(arg + 1), len);
+			}
+			// Cas 2: Valeur hexadécimale (ex: db 0x41)
+			else if (arg[0] == '0' && arg[1] == 'x')
+			{
+				unsigned int val;
+				if (sscanf(arg, "0x%x", &val) == 1)
+				{
+					uint8_t byte = (uint8_t)val;
+					emit_raw(&a->out->e, &byte, 1);
+				}
+				else
+				{
+					fprintf(stderr, "asm: db valeur hexadécimale invalide: %s\n", arg);
+					return -1;
+				}
+			}
+			// Cas 3: Valeur décimale (ex: db 65)
+			else if (isdigit(arg[0]) || (arg[0] == '-' && isdigit(arg[1])))
+			{
+				long val = strtol(arg, NULL, 0);
+				if (val >= 0 && val <= 255)
+				{
+					uint8_t byte = (uint8_t)val;
+					emit_raw(&a->out->e, &byte, 1);
+				}
+				else
+				{
+					fprintf(stderr, "asm: db valeur décimale hors plage 0-255: %s\n", arg);
+					return -1;
+				}
+			}
+			// Cas 4: Symbole (ex: db SYMBOL)
+			else
+			{
+				int64_t val = sym(a, arg);
+				if (val >= 0 && val <= 255)
+				{
+					uint8_t byte = (uint8_t)val;
+					emit_raw(&a->out->e, &byte, 1);
+				}
+				else
+				{
+					fprintf(stderr, "asm: db symbole invalide ou hors plage: %s\n", arg);
+					return -1;
+				}
+			}
+		}
+		return 0;
 	}
 
 	/* macrodefinitions obfuscation polymorphe */
@@ -866,9 +1070,42 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "_set") && n == 3)
 	{
-		if (!preg(toks[1], &r1, &s1)) return -1;
-
 		size_t off_before = a->out->e.len;
+		if (toks[1][0] == '[')
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			if (!preg(toks[2], &r2, &s2) || s2 != 8)
+			{
+				fprintf(stderr, "asm: _SET [mem],reg attend un registre 8 bits\n");
+				return -1;
+			}
+			if (mt == 3)   /* [base] seul */
+			{
+				if (lsb_value)
+					emit_mov_mem_sib_r8(&a->out->e, base, 4, r2);            /* bit=1 : mod=00, SIB, idx=4 */
+				else
+					emit_mov_mem_sib_disp8_r8(&a->out->e, base, 4, 0, r2);   /* bit=0 : mod=01, SIB, idx=4, disp8=0 */
+			}
+			else if (mt == 1)   /* [base+idx] */
+			{
+				if (lsb_value)
+					emit_mov_mem_sib_r8(&a->out->e, base, idx, r2);
+				else
+					emit_mov_mem_sib_disp8_r8(&a->out->e, base, idx, 0, r2);
+			}
+			else if (mt == 4)   /* [base+disp8], PAS SIB par nature */
+			{
+				fprintf(stderr, "asm: _SET [base+disp8],reg — forme non-SIB non supportee "
+						"par ce LDE (utilise mt==3 ou mt==1)\n");
+				return -1;
+			}
+			snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET [mem],%s", toks[2]);
+			g_bit_log_off[g_bit_log_len] = off_before;
+			g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
+			a->key_index++;
+			return 0;
+		}
+		if (!preg(toks[1], &r1, &s1)) return -1;
 		if (toks[2][0] == '[')                       /* source mémoire */
 		{
 			mt = pmem(toks[2], &base, &idx, lbl, &d8);

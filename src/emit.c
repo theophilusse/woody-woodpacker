@@ -1197,3 +1197,123 @@ int emit_neg_r64(t_emitter *e, t_reg reg)
     b[2] = MODRM11(3, reg);
     return emit_raw(e, b, 3);
 }
+
+/////////////// Batman
+// A tester vvvv
+
+// Émet un CALL direct (relatif 32 bits)
+int emit_call_direct(t_emitter *e, int32_t offset) {
+    uint8_t b[5];
+    int n = 0;
+
+    // Opcode CALL rel32
+    b[n++] = 0xE8;
+
+    // Écriture de l'offset (little-endian)
+    for (int i = 0; i < 4; i++) {
+        b[n++] = (offset >> (i * 8)) & 0xFF;
+    }
+
+    return emit_raw(e, b, n);
+}
+
+// Émet un CALL indirect via registre (CALL r/m64)
+int emit_call_indirect_reg(t_emitter *e, t_reg reg) {
+    uint8_t b[3];
+    int n = 0;
+    uint8_t r = mk_rex(1, 0, reg);  // w=1 (64 bits), reg=0 (non utilisé ici), rm=reg
+
+    // Ajout du REX si nécessaire
+    if (r != 0x40 || reg >= 8) b[n++] = r;
+
+    // Opcode CALL r/m64
+    b[n++] = 0xFF;
+
+    // ModR/M: mod=11 (registre direct), reg=002 (opcode extension pour CALL), rm=reg
+    b[n++] = 0xC0 | (2 << 3) | (reg & 0x07);
+
+    return emit_raw(e, b, n);
+}
+
+// Émet un CALL indirect via mémoire (CALL [rip + disp32])
+int emit_call_indirect_mem(t_emitter *e, int32_t disp) {
+    uint8_t b[7];
+    int n = 0;
+    uint8_t r = mk_rex(1, 0, 0x05);  // w=1, reg=0, rm=0x05 (disp32)
+
+    // Ajout du REX si nécessaire
+    if (r != 0x40) b[n++] = r;
+
+    // Opcode CALL r/m64
+    b[n++] = 0xFF;
+
+    // ModR/M: mod=00 (disp32), reg=002 (opcode extension), rm=101 (disp32)
+    b[n++] = 0x15;  // mod=00, reg=010 (CALL), rm=101
+
+    // Écriture du displacement (little-endian)
+    for (int i = 0; i < 4; i++) {
+        b[n++] = (disp >> (i * 8)) & 0xFF;
+    }
+
+    return emit_raw(e, b, n);
+}
+
+// Émet un CALL indirect via SIB (CALL [base + idx*scale + disp])
+int emit_call_indirect_sib(t_emitter *e, t_reg base, t_reg idx, int scale, int32_t disp) {
+    uint8_t b[8];
+    int n = 0;
+    uint8_t r = mk_rex(1, 0, 0x04);  // w=1, reg=0, rm=0x04 (SIB)
+
+    // Ajout du REX si nécessaire
+    if (r != 0x40 || base >= 8 || idx >= 8) b[n++] = r;
+
+    // Opcode CALL r/m64
+    b[n++] = 0xFF;
+
+    // ModR/M: mod=00 (disp32), reg=002 (opcode extension), rm=100 (SIB)
+    b[n++] = 0x00 | (2 << 3) | 0x04;
+
+    // SIB byte
+    uint8_t sib = ((scale & 0x03) << 6) | ((idx & 0x07) << 3) | (base & 0x07);
+    b[n++] = sib;
+
+    // Écriture du displacement (si nécessaire)
+    if ((base & 0x07) == 5 || disp != 0) {
+        // mod=00 avec base=RBP/R13 ou disp != 0 → mod=01 (disp8) ou mod=10 (disp32)
+        if ((base & 0x07) == 5) {
+            b[n-3] = 0x40 | (2 << 3) | 0x04;  // mod=01, reg=010, rm=100
+            b[n++] = disp & 0xFF;  // disp8
+        } else {
+            b[n-3] = 0x80 | (2 << 3) | 0x04;  // mod=10, reg=010, rm=100
+            // Écriture du displacement (little-endian)
+            for (int i = 0; i < 4; i++) {
+                b[n++] = (disp >> (i * 8)) & 0xFF;
+            }
+        }
+    }
+
+    return emit_raw(e, b, n);
+}
+
+/* MOVZX r32, [base] (word, 16 bits) : 0F B7 /r mod=00 */
+int emit_movzx_r32_mem16(t_emitter *e, t_reg dst, t_reg base)
+{
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(0, dst, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x0F; b[n++] = 0xB7; b[n++] = MODRM00(dst, base);
+    return emit_raw(e, b, n);
+}
+
+/* MOV [base+idx+disp8], r8 : 88 /r SIB mod=01 (variante "longue" pour bit=0) */
+int emit_mov_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, int8_t disp, t_reg src)
+{
+    uint8_t b[5]; int n = 0;
+    uint8_t r = mk_rex_sib(0, src, idx, base);
+    if (r != 0x40 || src >= 4 || base >= 8) b[n++] = r;
+    b[n++] = 0x88;
+    b[n++] = 0x40 | ((src & 0x07) << 3) | 0x04;   /* mod=01 */
+    b[n++] = ((idx & 0x07) << 3) | (base & 0x07);
+    b[n++] = (uint8_t)disp;
+    return emit_raw(e, b, n);
+}

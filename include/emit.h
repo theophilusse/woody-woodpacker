@@ -168,6 +168,12 @@ int emit_add_r64_imm32(t_emitter *e, t_reg reg, int32_t imm);
 int emit_neg_r8(t_emitter *e, t_reg reg);
 int emit_neg_r32(t_emitter *e, t_reg reg);
 int emit_neg_r64(t_emitter *e, t_reg reg);
+int emit_call_direct(t_emitter *e, int32_t offset);
+int emit_call_indirect_reg(t_emitter *e, t_reg reg);
+int emit_call_indirect_mem(t_emitter *e, int32_t disp);
+int emit_call_indirect_sib(t_emitter *e, t_reg base, t_reg idx, int scale, int32_t disp);
+int emit_movzx_r32_mem16(t_emitter *e, t_reg dst, t_reg base);
+int emit_mov_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, int8_t disp, t_reg src);
 
 /* opcodes jcc utiles */
 # define JL   0x7C

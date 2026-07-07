@@ -100,7 +100,28 @@ static const char STUB_RUN_LDE_ACTIVE[] =
 "@o_3c:\n"
 "cmp al, 0x3c\n" "jne @o_3c_break\n"
 "add rsi, 2\n" "jmp @lde_loop\n"
-"@o_3c_break:\n";
+"@o_3c_break:\n"
+
+"@o_88:\n"
+"cmp al, 0x88\n" "jne @o_88_break\n"
+"_SET eax, [rsi+1]\n"
+"_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
+"cmp edx, 0x0\n" "je @o88_m00\n"
+"cmp edx, 0x40\n" "je @o88_m01\n"
+"jmp @lde_fallback\n"
+
+"@o88_m00:\n"                          /* mod=00, TOUJOURS SIB (bit=1) */
+"cmp al, 4\n" "jne @lde_fallback\n"    /* rm doit valoir 4, sinon pattern inattendu */
+"cmp ecx, 128\n" "jge @adv_8800\n"
+"_INC ecx\n"
+"@adv_8800:\n" "add rsi, 3\n" "jmp @lde_loop\n"   /* opcode+modrm+SIB = 3 octets */
+
+"@o88_m01:\n"                          /* mod=01, TOUJOURS SIB (bit=0) */
+"cmp al, 4\n" "jne @lde_fallback\n"
+"cmp ecx, 128\n" "jge @adv_8801\n"
+"_INC ecx\n"
+"@adv_8801:\n" "add rsi, 4\n" "jmp @lde_loop\n"   /* opcode+modrm+SIB+disp8 = 4 octets */
+"@o_88_break\n";
 
 static const char STUB_LDE_INT3_TRAP[] =
 	"@o_cc:\n"

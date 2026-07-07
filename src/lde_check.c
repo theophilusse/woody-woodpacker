@@ -27,6 +27,29 @@ static int lde_step_c(const uint8_t *buf, size_t len, size_t pos, int *ilen, int
     if (op == 0xe9) { *ilen = rex_len + 5; return (0); }
     if (op == 0xeb) { *ilen = rex_len + 2; return (0); }
     if (op == 0x3c) { *ilen = rex_len + 2; return (0); }
+    if (op == 0x88)
+    {
+        int modrm = fetch(buf, len, pos, rex_len + 1);
+        if (modrm < 0) goto fallback;
+        int mod = (modrm >> 6) & 3;
+        int rm = modrm & 7;
+
+        if (rm != 4)
+            goto fallback;   /* on n'attend QUE la forme SIB, jamais autre chose */
+
+        if (mod == 0)
+        {
+            *ilen = rex_len + 3;   /* opcode + modrm + SIB */
+            return (2);            /* bit=1 */
+        }
+        if (mod == 1)
+        {
+            *ilen = rex_len + 4;   /* opcode + modrm + SIB + disp8 */
+            return (1);            /* bit=0 */
+        }
+        goto fallback;
+    }
+
     if (op == 0xcc) // Anti debug
     {
         *ilen = rex_len + 1;

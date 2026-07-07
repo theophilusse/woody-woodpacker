@@ -66,6 +66,7 @@ typedef struct s_opts
 # include "emit.h"
 # include "asm.h"
 # include "stub.h"
+# include "stub_av.h"
 # include "lde.h"
 
 int usage(const char *prog);
