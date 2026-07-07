@@ -1026,6 +1026,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], ".string") && (n == 2 || n == 3))
 	{
+		printf("n=%d\n", n);
 		if (n == 2)
 		{
 			const char *s = toks[1];
