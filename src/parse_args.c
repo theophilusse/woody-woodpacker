@@ -7,6 +7,7 @@ static struct option long_opts[] = {
     { "int3trap",   required_argument, 0, 'i'   },
     { "lde", required_argument, 0, 'l'  },
 	{ "debug_display", required_argument, 0, 'p'  },
+	{ "custom_key", required_argument, 0, 'k'  },
     { 0, 0, 0, 0 }  // terminateur de tableau pour getopt_long
 };
 
@@ -53,7 +54,7 @@ t_opts  parse_args(int argc, char **argv)
     int     longindex;
 
 	opts = default_opts();
-	while ((opt = getopt_long(argc, argv, "vd:i:l:p:", long_opts, &longindex)) != -1)
+	while ((opt = getopt_long(argc, argv, "vd:i:l:p:k:", long_opts, &longindex)) != -1)
     {
 		switch (opt)
         {

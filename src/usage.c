@@ -7,5 +7,6 @@ int usage(const char *prog)
 	printf(" -d        use antidebugger\n");
     printf(" -i        use int3 trap\n");
     printf(" -l        use LDE\n");
+    printf(" -k        custom key\n");
 	return (1);
 }
