@@ -9,7 +9,7 @@ char *build_stub_source(const t_opts *opts)
     int         i;
 
     n = 0;
-    blocks[n++] = STUB_ANTI_AV;
+    blocks[n++] = STUB_AV_DETECT;
     if (0)
     {
         blocks[n++] = STUB_HEADER;
