@@ -35,7 +35,7 @@ static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto, t_opts *opts)
 
 	if (opts->use_custom_key)
 	{
-		memcpy(crypto->key, opts->custom_key, KEY_LEN);
+		memcpy(crypto->key, opts->custom_key, KEY_LEN + 1);
 		crypto->key_len = KEY_LEN;
 	}
 	else
