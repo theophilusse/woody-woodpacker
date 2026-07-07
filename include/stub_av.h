@@ -4,7 +4,8 @@
 static const char STUB_AV_DETECT[] =
 //"section .text\n"
 //    "global _start\n"
-
+"scan_start:\n"//remove
+"scan_end:\n"//remove
 "_start:\n"
     //; Ouvrir le répertoire /proc
     "mov rax, 2\n"          //; sys_open
