@@ -1421,3 +1421,16 @@ int emit_ret(t_emitter *e)
 	uint8_t b = 0xC3;
 	return emit_raw(e, &b, 1);
 }
+
+/* CMP [base+idx], imm8 : 80 /7 ib SIB mod=00 */
+int emit_cmp_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm)
+{
+    uint8_t b[6]; int n = 0;
+    uint8_t r = mk_rex_sib(0, 0, idx, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x80;
+    b[n++] = MODRM00(7, 4);
+    b[n++] = SIB(0, idx, base);
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}

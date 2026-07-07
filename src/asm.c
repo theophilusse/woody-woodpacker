@@ -834,14 +834,19 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		mt = pmem(toks[1], &base, &idx, lbl, &d8);
 		val = sym(a, toks[2]);
 		if (val < 0) val = strtoll(toks[2], NULL, 0);
-		if (mt == 3)   /* [base] seul, disp implicite = 0 */
+		if (mt == 3)
 		{
 			emit_cmp_mem_disp8_imm8(&a->out->e, base, 0, (uint8_t)val);
 			return 0;
 		}
-		if (mt == 4)   /* [base+disp8], disp reel (positif ou negatif via pmem) */
+		if (mt == 4)
 		{
 			emit_cmp_mem_disp8_imm8(&a->out->e, base, d8, (uint8_t)val);
+			return 0;
+		}
+		if (mt == 1)   /* [base+idx], SIB */
+		{
+			emit_cmp_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)val);
 			return 0;
 		}
 		fprintf(stderr, "asm: cmp [mem],imm (mt=%d) non gere\n", mt);
