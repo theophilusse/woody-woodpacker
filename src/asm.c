@@ -870,13 +870,13 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		char sub_toks[3][64];
 
-		strcpy(sub_toks[0], "_SET");
+		strcpy(sub_toks[0], "_set");
 		strcpy(sub_toks[1], "al");
 		strcpy(sub_toks[2], "[rsi]");
 		if (ainstr(a, sub_toks, 3) != 0)
 			return -1;
 
-		strcpy(sub_toks[0], "_INC");
+		strcpy(sub_toks[0], "_inc");
 		strcpy(sub_toks[1], "rsi");
 		if (ainstr(a, sub_toks, 2) != 0)
 			return -1;
@@ -887,13 +887,13 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		char sub_toks[3][64];
 
-		strcpy(sub_toks[0], "_SET");
+		strcpy(sub_toks[0], "_set");
 		strcpy(sub_toks[1], "[rdi]");
 		strcpy(sub_toks[2], "al");
 		if (ainstr(a, sub_toks, 3) != 0)
 			return -1;
 
-		strcpy(sub_toks[0], "_INC");
+		strcpy(sub_toks[0], "_inc");
 		strcpy(sub_toks[1], "rdi");
 		if (ainstr(a, sub_toks, 2) != 0)
 			return -1;
