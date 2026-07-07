@@ -1415,3 +1415,9 @@ int emit_xor_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
     memcpy(b + 3, &imm, 4);
     return emit_raw(e, b, 7);
 }
+
+int emit_ret(t_emitter *e)
+{
+	uint8_t b = 0xC3;
+	emit_raw(&a->out->e, &b, 1);
+}

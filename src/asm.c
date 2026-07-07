@@ -258,6 +258,11 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		return 0;
 	}
+	if (!strcmp(toks[0], "ret") && n == 1)
+	{
+		emit_ret(&a->out->e);
+		return 0;
+	}
 	if (!strcmp(toks[0], "call") && n == 2) // Batman a tester
 	{
 		// Cas 1: CALL indirect via registre (ex: call rax)
