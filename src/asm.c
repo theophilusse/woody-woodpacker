@@ -466,11 +466,33 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 	}
 	if (!strcmp(toks[0], "shl") && n == 3
-		&& preg(toks[1], &r1, &s1) && s1 == 8
-		&& !strcmp(toks[2], "cl"))
+        && preg(toks[1], &r1, &s1) && s1 == 8
+        && !strcmp(toks[2], "cl"))
 	{
 		emit_shl_r8_cl(&a->out->e, r1);
 		return 0;
+	}
+	if (!strcmp(toks[0], "shl") && n == 3 && preg(toks[1], &r1, &s1))
+	{
+		val = sym(a, toks[2]);
+		if (val < 0) val = strtoll(toks[2], NULL, 0);
+		if (s1 == 32)
+		{
+			emit_shl_r32_imm8(&a->out->e, r1, (uint8_t)val);
+			return 0;
+		}
+		if (s1 == 64)
+		{
+			emit_shl_r64_imm8(&a->out->e, r1, (uint8_t)val);
+			return 0;
+		}
+		if (s1 == 8)
+		{
+			emit_shl_r8_imm8(&a->out->e, r1, (uint8_t)val);
+			return 0;
+		}
+		fprintf(stderr, "asm: shl %s,%s non gere\n", toks[1], toks[2]);
+		return -1;
 	}
 	if (!strcmp(toks[0], "shr") && n == 3 && preg(toks[1], &r1, &s1))
 	{

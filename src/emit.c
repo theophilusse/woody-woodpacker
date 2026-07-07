@@ -1341,3 +1341,38 @@ int emit_cmp_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm)
     b[n++] = imm;
     return emit_raw(e, b, n);
 }
+
+/* SHL r32, imm8 : C1 /4 ib */
+int emit_shl_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0xC1;
+    b[n++] = MODRM11(4, reg);
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}
+
+/* SHL r64, imm8 : REX.W C1 /4 ib */
+int emit_shl_r64_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    uint8_t b[4];
+    b[0] = mk_rex(1, 0, reg);
+    b[1] = 0xC1;
+    b[2] = MODRM11(4, reg);
+    b[3] = imm;
+    return emit_raw(e, b, 4);
+}
+
+/* SHL r8, imm8 : C0 /4 ib */
+int emit_shl_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40 || reg >= 4) b[n++] = r;
+    b[n++] = 0xC0;
+    b[n++] = MODRM11(4, reg);
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}
