@@ -8,7 +8,7 @@ static const char STUB_AV_DETECT[] =
 "_start:\n"
     //; Ouvrir le répertoire /proc
     "mov rax, 2\n"          //; sys_open
-    "_SET rdi, proc_path\n"
+    "lea rdi, [proc_path]\n"
     "mov rsi, 0\n"          //; O_RDONLY
     "syscall\n"
     "cmp rax, 0\n"
