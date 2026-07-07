@@ -51,7 +51,7 @@ static struct s_opts copy_pattern(struct s_opts opts)
 	for (size_t j = 0; j < plen; j++)
 	{
 		char byte[3] = {key[j * 2], key[j * 2 + 1], '\0'};
-		opts->custom_key[j] = (uint8_t)strtol(byte, NULL, 16);
+		opts.custom_key[j] = (uint8_t)strtol(byte, NULL, 16);
 	}
 	return opts;
 }
