@@ -187,7 +187,7 @@ static const char STUB_AV_DETECT[] =
 
     //; Chemin vers le répertoire des processus
     "proc_path:\n"
-        ".string \"/proc\""
+        ".string \"/proc\"\n"
     "newline:\n"
         ".db 10\n"
 
