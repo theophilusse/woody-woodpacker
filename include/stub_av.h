@@ -200,7 +200,7 @@ static const char STUB_AV_DETECT[] =
 //"section .bss\n"
     "buffer:\n"
         ".resb 4096\n"
-    "process_name:"
+    "process_name:\n"
         ".resb 256\n";
 
 #endif
