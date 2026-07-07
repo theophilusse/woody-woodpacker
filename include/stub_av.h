@@ -28,6 +28,16 @@ static const char STUB_AV_DETECT[] =
 "process_entry_loop:\n"
 "cmp r14, r13\n"
 "jge scan_loop\n"
+
+
+    /* ── DEBUG ULTRA MINIMAL : un point à chaque entrée traitée ── */
+"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
+"mov rax, 1\n" "mov rdi, 1\n"
+"lea rsi, [debug_dot]\n" "mov rdx, 1\n"
+"syscall\n"
+"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
+    /* ── FIN DEBUG ── */
+
     //; Vérifier si c'est un répertoire numérique (PID)
 "_ZERO eax\n"
 "_SET al, [r14+18]\n"
@@ -236,6 +246,10 @@ static const char STUB_AV_DETECT[] =
 "ret";
 
 static const char STUB_AV_DATA[] =
+"debug_dot:\n"
+".db 46\n"    //; caractère '.'
+
+
 "msg_clear:\n"
     ".string \"Clear\"\n"
     ".db 10\n"
