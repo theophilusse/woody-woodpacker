@@ -33,11 +33,19 @@ static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto, t_opts *opts)
 {
     Elf64_Phdr *p;
 
-    if (crypto_generate_key(crypto) != 0)
-    {
-        fprintf(stderr, "error: key generation failed\n");
-        return (-1);
-    }
+	if (opts->use_custom_key)
+	{
+		memcpy(crypto->key, opts->custom_key, KEY_LEN);
+		crypto->key_len = KEY_LEN;
+	}
+	else
+	{
+		if (crypto_generate_key(crypto) != 0)
+		{
+			fprintf(stderr, "error: key generation failed\n");
+			return (-1);
+		}
+	}
     p = &ctx->phdrs[ctx->target_phdr_idx];
     crypto->text_vaddr = p->p_vaddr;
     crypto->text_len   = p->p_filesz;       /* p_filesz ORIGINAL, avant injection */

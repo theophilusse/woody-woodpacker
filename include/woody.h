@@ -58,6 +58,8 @@ typedef struct s_opts
     int     use_lde;
     char    *file;
 	int		debug_display;
+	int		use_custom_key;
+	uint8_t	custom_key[KEY_LEN];
 }   t_opts;
 
 # include "opts.h"

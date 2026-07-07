@@ -1,72 +1,33 @@
-0x401e58:	""
-0x401e59:	"H\215<%\001"
-0x401e5f:	""
-0x401e60:	""
-0x401e61:	"L\211\316H\215\024% "
-0x401e6a:	""
-0x401e6b:	""
-0x401e6c:	"\017\005\261\nA\210I H\215\004%\001"
-0x401e7a:	""
-0x401e7b:	""
-0x401e7c:	"H\277\001"
-0x401e80:	""
-0x401e81:	""
-0x401e82:	""
-0x401e83:	""
-0x401e84:	""
-0x401e85:	""
-0x401e86:	"L\211\316H\203\306 H\215\024%\001"
-0x401e93:	""
-0x401e94:	""
-   0x401e58:	add    BYTE PTR [rax-0x73],cl
-   0x401e5b:	cmp    al,0x25
-   0x401e5d:	add    DWORD PTR [rax],eax
-   0x401e5f:	add    BYTE PTR [rax],al
-   0x401e61:	mov    rsi,r9
-   0x401e64:	lea    rdx,ds:0x20
-=> 0x401e6c:	syscall 
-   0x401e6e:	mov    cl,0xa
-   0x401e70:	mov    BYTE PTR [r9+0x20],cl
-   0x401e74:	lea    rax,ds:0x1
-   0x401e7c:	movabs rdi,0x1
-   0x401e86:	mov    rsi,r9
-   0x401e89:	add    rsi,0x20
-   0x401e8d:	lea    rdx,ds:0x1
-   0x401e95:	syscall 
-   0x401e97:	add    rsp,0x28
-   0x401e9e:	lea    rax,[rip+0xfffffffffffffff9]        # 0x401e9e
-   0x401ea5:	mov    rdx,0xd3d
-   0x401eac:	sub    rax,rdx
-   0x401eaf:	sub    rax,0x401161
-rax            0x1                 1
-rbx            0x9d                157
-rcx            0x44                68
-rdx            0x20                32
-rsi            0x7fffffffe408      140737488348168
-rdi            0x1                 1
-rbp            0x7fffffffe430      0x7fffffffe430
-rsp            0x7fffffffe408      0x7fffffffe408
-r8             0x7fffffffe430      140737488348208
-r9             0x7fffffffe408      140737488348168
-r10            0x10                16
-r11            0x20                32
-r12            0x401161            4198753
-r13            0x7fffffffe450      140737488348240
-r14            0x0                 0
-r15            0x0                 0
-rip            0x401e6c            0x401e6c
-eflags         0x246               [ PF ZF IF ]
-cs             0x33                51
-ss             0x2b                43
-ds             0x0                 0
-es             0x0                 0
-fs             0x0                 0
-gs             0x0                 0
-Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
-Use 'set logging enabled off'.
-
-0x7fffffffe430:	0x38	0xa2	0x74	0x56	0xb2	0xd5	0xc1	0xdb
-0x7fffffffe438:	0x7b	0x09	0x4d	0x85	0x16	0x28	0x8b	0x9d
-Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
-Use 'set logging enabled off'.
-
+=> 0x401ea6:	mov    %r9,%rsi
+   0x401ea9:	add    $0x20,%rsi
+   0x401ead:	movabs $0x1,%rdx
+   0x401eb7:	syscall 
+   0x401eb9:	add    $0x28,%rsp
+   0x401ec0:	lea    -0x7(%rip),%rax        # 0x401ec0
+   0x401ec7:	mov    $0xd5f,%rdx
+   0x401ece:	sub    %rdx,%rax
+   0x401ed1:	sub    $0x401161,%rax
+   0x401ed8:	lea    0x0(%rax),%r15
+   0x401edc:	mov    %rax,%rdi
+   0x401edf:	add    $0x401000,%rdi
+   0x401ee6:	mov    $0x1000,%esi
+   0x401eec:	lea    0x7,%rdx
+   0x401ef4:	lea    0xa,%rax
+   0x401efc:	syscall 
+   0x401efe:	cmp    $0x0,%rax
+   0x401f05:	jl     0x401f0c
+   0x401f07:	jmp    0x401f24
+   0x401f0c:	mov    %rax,%rdi
+rsi            0x7fffffffe428      140737488348200
+r9             0x7fffffffe428      140737488348200
+0x0000000000401ea9 in ?? ()
+rsi            0x7fffffffe428      140737488348200
+r9             0x7fffffffe428      140737488348200
+0x0000000000401ead in ?? ()
+0x0000000000401eb7 in ?? ()
+0x0000000000401eb9 in ?? ()
+0x0000000000401ec0 in ?? ()
+0x7fffffffe428:	0x68	0x95	0xfc	0xf7	0xff	0x7f	0x00	0x00
+0x7fffffffe430:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x7fffffffe438:	0x00	0x00	0x32	0x00	0x00	0x00	0x00	0x37
+0x7fffffffe440:	0x73	0x00	0x00	0x00	0x00	0x00	0x00	0x00

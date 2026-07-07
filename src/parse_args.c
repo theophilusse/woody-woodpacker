@@ -24,6 +24,28 @@ struct s_opts default_opts(void)
 	return opts;
 }
 
+static struct s_opts copy_pattern(struct s_opts opts)
+{
+	if (strlen(optarg) > 16 || strlen(optarg) % 2 != 0) // verify length hex
+	{
+		fprintf(stderr, "ft_ping: invalid custom_key: '%s'\n", optarg);
+		exit(1);
+	}
+	for (int i = 0; optarg[i]; i++) // verify hex symbols
+	{
+		if (!((optarg[i] >= '0' && optarg[i] <= '9') ||
+			(optarg[i] >= 'a' && optarg[i] <= 'f') ||
+			(optarg[i] >= 'A' && optarg[i] <= 'F')))
+		{
+			fprintf(stderr, "ft_ping: invalid custom_key: '%s'\n", optarg);
+			exit(1);
+		}
+	}
+	strncpy(opts.custom_key, optarg, sizeof(opts.custom_key) - 1);
+	opts.custom_key[sizeof(opts.custom_key) - 1] = '\0';
+	return opts;
+}
+
 t_opts  parse_args(int argc, char **argv)
 {
     t_opts  opts;
@@ -69,6 +91,10 @@ t_opts  parse_args(int argc, char **argv)
 					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
 					exit(1);
 				}
+				break;
+			case 'k':
+				opts = copy_pattern(opts);
+				opts.use_custom_key = 1;
 				break;
 			case '?':
 				usage(argv[0]);
