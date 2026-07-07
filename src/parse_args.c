@@ -58,7 +58,7 @@ static struct s_opts copy_pattern(struct s_opts opts)
 	}
 	if (strlen(optarg) == KEY_LEN)
 	{
-		strncpy(opts.custom_key, optarg, KEY_LEN / 2);
+		strncpy(opts.custom_key, optarg, KEY_LEN);
 	}
 	return opts;
 }
