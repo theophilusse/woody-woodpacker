@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 	}
 	opts = parse_args(argc, argv);
 	for (size_t i = 0; i < KEY_LEN; i++)
-        printf("%02X", opts->custom_key[i]);
+        printf("%02X", opts.custom_key[i]);
     printf("\n");
 	return 0;
 
