@@ -132,7 +132,7 @@ static const char STUB_AV_DETECT[] =
 	"_SET eax, 1\n"
 	"_SET edi, 1\n"
 	"lea rsi, [msg_clear]\n"
-	"_SET edx, 6\n"
+	"_SET edx, 7\n"
 	"syscall\n"
 
     //; Quitter normalement
