@@ -35,7 +35,7 @@ static const char STUB_AV_DETECT[] =
     "jge scan_loop\n"       //; Passer à l'entrée suivante
 
     //; Vérifier si c'est un répertoire numérique (PID)
-    "mov rdi, [r14 + 16]\n" //; d_type (16 octets après le début de l'entrée)
+    "_SET rdi, [r14 + 16]\n" //; d_type (16 octets après le début de l'entrée)
     "cmp rdi, 2\n"          //; DT_DIR
     "jne next_entry\n"
 
