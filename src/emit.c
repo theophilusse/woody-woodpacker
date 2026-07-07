@@ -1419,5 +1419,5 @@ int emit_xor_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
 int emit_ret(t_emitter *e)
 {
 	uint8_t b = 0xC3;
-	emit_raw(&a->out->e, &b, 1);
+	emit_raw(e, &b, 1);
 }
