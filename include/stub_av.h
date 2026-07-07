@@ -87,9 +87,9 @@ static const char STUB_AV_DETECT[] =
     //; Passer à l'entrée suivante
     //"movzx rax, word [r14]\n"
     "_ZERO eax\n"
-    "_SET al, [r14+1]\n"
+    "_SET al, [r14+17]\n"
     "shl eax, 8\n"
-    "_SET al, [r14]\n"
+    "_SET al, [r14+16]\n"
     "add r14, rax\n"
     "jmp process_entry_loop\n"
 
