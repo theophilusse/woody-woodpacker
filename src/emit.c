@@ -1376,3 +1376,42 @@ int emit_shl_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
     b[n++] = imm;
     return emit_raw(e, b, n);
 }
+
+/* XOR r8, imm8 : 80 /6 ib (ou 34 ib pour AL specifiquement) */
+int emit_xor_r8_imm8(t_emitter *e, t_reg reg, uint8_t imm)
+{
+    if (reg == REG_RAX) {
+        uint8_t b[2] = {0x34, imm};
+        return emit_raw(e, b, 2);
+    }
+    uint8_t b[4]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40 || reg >= 4) b[n++] = r;
+    b[n++] = 0x80;
+    b[n++] = MODRM11(6, reg);
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}
+
+/* XOR r32, imm32 : 81 /6 id */
+int emit_xor_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm)
+{
+    uint8_t b[7]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x81;
+    b[n++] = MODRM11(6, reg);
+    memcpy(b + n, &imm, 4); n += 4;
+    return emit_raw(e, b, n);
+}
+
+/* XOR r64, imm32 (sign-extended) : REX.W 81 /6 id */
+int emit_xor_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
+{
+    uint8_t b[7];
+    b[0] = mk_rex(1, 0, reg);
+    b[1] = 0x81;
+    b[2] = MODRM11(6, reg);
+    memcpy(b + 3, &imm, 4);
+    return emit_raw(e, b, 7);
+}

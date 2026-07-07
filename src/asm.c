@@ -442,6 +442,28 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			mt = pmem(toks[2], &base, &idx, lbl, &d8);
 			if (mt == 1) { emit_xor_r8_mem_sib(&a->out->e, r1, base, idx); return 0; }
 		}
+
+		/* Cas 5: xor reg, imm */
+		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1))
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (s1 == 8)
+			{
+				emit_xor_r8_imm8(&a->out->e, r1, (uint8_t)val);
+				return 0;
+			}
+			if (s1 == 32)
+			{
+				emit_xor_r32_imm32(&a->out->e, r1, (uint32_t)val);
+				return 0;
+			}
+			if (s1 == 64)
+			{
+				emit_xor_r64_imm32(&a->out->e, r1, (int32_t)val);
+				return 0;
+			}
+		}
 	}
 
 	if (!strcmp(toks[0], "or") && n == 3)
