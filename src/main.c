@@ -46,6 +46,10 @@ static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto, t_opts *opts)
 			return (-1);
 		}
 	}
+	for (size_t i = 0; i < crypto->key_len; i++)
+        printf("%02X", crypto->key[i]);
+    printf("\n");
+	exit(0);
     p = &ctx->phdrs[ctx->target_phdr_idx];
     crypto->text_vaddr = p->p_vaddr;
     crypto->text_len   = p->p_filesz;       /* p_filesz ORIGINAL, avant injection */
