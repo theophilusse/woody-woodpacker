@@ -193,7 +193,7 @@ static const char STUB_AV_DETECT[] =
 
     //; Messages
     "found_msg:\n"
-        ".string \"Processus interdit détecté: \""
+        ".string \"Processus interdit détecté: \"\n"
     "len_found_msg:\n"
         ".db 28\n"
 
