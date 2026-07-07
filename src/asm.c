@@ -301,8 +301,7 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		else // Cas 1: CALL direct (rel32)
 		{
-			// Adresse symbolique (ex: $label)
-			int64_t lval = sym(a, toks[1]);  // +1 pour sauter le '$'
+			int64_t lval = sym(a, toks[1]);
 			if (lval >= 0)
 			{
 				int64_t disp = lval - (int64_t)(a->out->e.len + 5);
@@ -310,12 +309,11 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 			}
 			else
 			{
-				// Forward reference: utiliser un trampoline
-				uint8_t bytes[2] = {0xEB, 0};  // JMP rel8 (placeholder)
+				uint8_t bytes[2] = {0xEB, 0};
 				emit_raw(&a->out->e, bytes, 2);
 				size_t dummy;
-				emit_jmp_rel32(&a->out->e, &dummy);  // JMP rel32 (pour le trampoline)
-				addfixup(a, toks[1] + 1, dummy, dummy + 4, 0);  // is_rel8 = 0
+				emit_jmp_rel32(&a->out->e, &dummy);
+				addfixup(a, toks[1], dummy, dummy + 4, 0);   /* RETIRE le +1 */
 			}
 			return 0;
 		}
@@ -1026,7 +1024,6 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], ".string") && (n == 2 || n == 3))
 	{
-		printf("n=%d\n", n);
 		if (n == 2)
 		{
 			const char *s = toks[1];
