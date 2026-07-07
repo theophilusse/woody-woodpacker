@@ -1352,7 +1352,14 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
             if (ainstr(&a, toks + 1, n - 1) < 0) return -1;
             continue;
         }
-        if (ainstr(&a, toks, n) < 0) return -1;
+        if (ainstr(&a, toks, n) < 0)
+		{
+			fprintf(stderr, "asm: ");
+			for (int i = 0; i < n; i++)
+				fprintf(stderr, "%s ", toks[i]);
+			fprintf(stderr, "\n");
+			return -1;
+		}
     }
     /* resolution des fixups */
     for (int i = 0; i < a.nfixups; i++) {
