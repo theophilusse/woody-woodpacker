@@ -117,10 +117,6 @@ int main(int argc, char **argv)
         return (usage(argv[0]));
 	}
 	opts = parse_args(argc, argv);
-	for (size_t i = 0; i < KEY_LEN; i++)
-        printf("%02X", opts.custom_key[i]);
-    printf("\n");
-	return 0;
 
     ctx = load_and_validate(opts.file);
     if (!ctx)
