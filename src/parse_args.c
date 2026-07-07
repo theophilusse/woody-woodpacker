@@ -27,31 +27,38 @@ struct s_opts default_opts(void)
 
 static struct s_opts copy_pattern(struct s_opts opts)
 {
-	char key[32];
+	char key[KEY_LEN * 2];
 
-	if (strlen(optarg) != 32 || strlen(optarg) % 2 != 0) // verify length hex
+	if ((strlen(optarg) != KEY_LEN * 2 && strlen(optarg) != KEY_LEN / 2) || strlen(optarg) % 2 != 0) // verify length hex
 	{
-		fprintf(stderr, "error: invalid custom_key: '%s'\n", optarg);
+		fprintf(stderr, "error: invalid custom_key (need 128bits): '%s'\n", optarg);
 		exit(1);
 	}
-	for (int i = 0; optarg[i]; i++) // verify hex symbols
+	if (strlen(optarg) == KEY_LEN * 2)
 	{
-		if (!((optarg[i] >= '0' && optarg[i] <= '9') ||
-			(optarg[i] >= 'a' && optarg[i] <= 'f') ||
-			(optarg[i] >= 'A' && optarg[i] <= 'F')))
+		for (int i = 0; optarg[i]; i++) // verify hex symbols
 		{
-			fprintf(stderr, "error: invalid custom_key: '%s'\n", optarg);
-			exit(1);
+			if (!((optarg[i] >= '0' && optarg[i] <= '9') ||
+				(optarg[i] >= 'a' && optarg[i] <= 'f') ||
+				(optarg[i] >= 'A' && optarg[i] <= 'F')))
+			{
+				fprintf(stderr, "error: invalid custom_key: '%s'\n", optarg);
+				exit(1);
+			}
+		}
+		strncpy(key, optarg, sizeof(key) - 1);
+		key[sizeof(key) - 1] = '\0';
+		
+		size_t plen = strlen(key) / 2;
+		for (size_t j = 0; j < plen; j++)
+		{
+			char byte[3] = {key[j * 2], key[j * 2 + 1], '\0'};
+			opts.custom_key[j] = (uint8_t)strtol(byte, NULL, 16);
 		}
 	}
-	strncpy(key, optarg, sizeof(key) - 1);
-	key[sizeof(key) - 1] = '\0';
-	
-	size_t plen = strlen(key) / 2;
-	for (size_t j = 0; j < plen; j++)
+	if (strlen(optarg) == KEY_LEN / 2)
 	{
-		char byte[3] = {key[j * 2], key[j * 2 + 1], '\0'};
-		opts.custom_key[j] = (uint8_t)strtol(byte, NULL, 16);
+		strncpy(opts.custom_key, optarg, KEY_LEN / 2);
 	}
 	return opts;
 }
