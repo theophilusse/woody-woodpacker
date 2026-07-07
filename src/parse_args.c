@@ -49,7 +49,7 @@ static struct s_opts copy_pattern(struct s_opts opts)
 		strncpy(key, optarg, sizeof(key) - 1);
 		key[sizeof(key) - 1] = '\0';
 		
-		size_t plen = strlen(key) / 2;
+		size_t plen = KEY_LEN;
 		for (size_t j = 0; j < plen; j++)
 		{
 			char byte[3] = {key[j * 2], key[j * 2 + 1], '\0'};
