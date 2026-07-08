@@ -1,7 +1,7 @@
 /* polyblock.c */
 #include "polyblock.h"
 
-static t_polyblock *find_block(t_polyctx *ctx, const char *name)
+t_polyblock *find_block(t_polyctx *ctx, const char *name)
 {
     int i;
 
