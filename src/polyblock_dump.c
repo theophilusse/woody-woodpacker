@@ -1,3 +1,5 @@
+#include "polyblock.h"
+
 static const char *method_name(t_decrypt_method m)
 {
     switch (m)
