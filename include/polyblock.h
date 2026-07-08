@@ -100,5 +100,6 @@ typedef struct s_polyctx
 
 int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order);
 t_polyctx *polyblock_parse_all(const char *source);
+void polyblock_dump(t_polyctx *ctx);
 
 #endif
