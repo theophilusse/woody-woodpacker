@@ -170,6 +170,64 @@ void test_polyblock_cycle_detection(void)
         fprintf(stderr, "ECHEC: cycle NON detecte (bug!)\n");
 }
 
+void test_polyblock_resolve_sizes(void)
+{
+    const char *source =
+"%POLYBLOCK_START anti_debug\n"
+"%CIPHERTEXT SYNC\n"
+"    _SET eax, 1\n"
+"    _SET edi, 2\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO eax\n"
+"    _INC eax\n"
+"    _INC eax\n"
+"%POLYBLOCK_END\n";
+
+    t_polyctx *ctx = polyblock_parse_all(source);
+    if (!ctx)
+    {
+        fprintf(stderr, "ECHEC parsing\n");
+        return;
+    }
+
+    t_asm a;
+    t_asm_result out;
+    t_crypto_ctx crypto;
+
+    memset(&a, 0, sizeof(a));
+    memset(&out, 0, sizeof(out));
+    memset(&crypto, 0, sizeof(crypto));
+    a.out = &out;
+    a.crypto = &crypto;
+    a.key_sync_enabled = 1;
+    a.label_base_offset = 0;
+
+    if (polyblock_resolve_sizes(&a, ctx) < 0)
+    {
+        fprintf(stderr, "ECHEC resolve_sizes\n");
+        return;
+    }
+
+    int i;
+    for (i = 0; i < ctx->n_blocks; i++)
+    {
+        t_polyblock *blk = &ctx->blocks[i];
+        fprintf(stderr, "=== BLOCK '%s' ===\n", blk->identifier);
+        fprintf(stderr, "  final_offset=%zu final_size=%zu\n",
+                blk->final_offset, blk->final_size);
+        fprintf(stderr, "  ciphertext: len=%zu bytes=",
+                blk->ciphertext.bytecode_len);
+        for (size_t k = 0; k < blk->ciphertext.bytecode_len; k++)
+            fprintf(stderr, "%02x ", blk->ciphertext.bytecode[k]);
+        fprintf(stderr, "\n");
+        fprintf(stderr, "  plaintext:  len=%zu bytes=",
+                blk->plaintext.bytecode_len);
+        for (size_t k = 0; k < blk->plaintext.bytecode_len; k++)
+            fprintf(stderr, "%02x ", blk->plaintext.bytecode[k]);
+        fprintf(stderr, "\n");
+    }
+}
+
 int main(int argc, char **argv)
 {
     t_elf_ctx       *ctx;
@@ -177,7 +235,8 @@ int main(int argc, char **argv)
 	struct s_opts	opts;
 
 	//test_polyblock_parsing();
-	test_polyblock_cycle_detection();
+	//test_polyblock_cycle_detection();
+	test_polyblock_resolve_sizes();
 	return 0;
     if (argc < 2)
 	{

@@ -63,6 +63,8 @@ static int	tokenize(const char *line, char toks[][64], int max)
 	return n;
 }
 
+
+
 static int preg(const char *s, t_reg *r, int *sz)
 {
     int i;
@@ -219,6 +221,37 @@ static void apply_offset_shift(t_asm *a, t_block_variant *variant, size_t final_
         a->fixups[i].off += final_offset;
         a->fixups[i].end += final_offset;
     }
+}
+
+int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
+{
+    t_polyblock *order[MAX_POLYBLOCKS];
+    int         n_order;
+    size_t      position = 0;
+    int         i;
+
+    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
+        return (-1);
+
+    for (i = 0; i < n_order; i++)
+    {
+        t_polyblock *blk = order[i];
+
+        if (resolve_variant(a, ctx, &blk->ciphertext, 1) < 0)
+            return (-1);
+        if (resolve_variant(a, ctx, &blk->plaintext, 0) < 0)
+            return (-1);
+
+        if (equalize_sizes(a, ctx, blk) < 0)
+            return (-1);
+
+        apply_offset_shift(a, &blk->ciphertext, position);
+        apply_offset_shift(a, &blk->plaintext, position);
+
+        blk->final_offset = position;
+        position += blk->final_size;
+    }
+    return (0);
 }
 
 static void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)

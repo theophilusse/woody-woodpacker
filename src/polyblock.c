@@ -44,63 +44,64 @@ static void split_directive(const char *line, char *keyword, char *rest)
 }
 */
 
-static int equalize_sizes(t_polyblock *blk)
+static int equalize_sizes(t_asm *a, t_polyctx *ctx, t_polyblock *blk)
 {
-    size_t max_len = blk->ciphertext.bytecode_len > blk->plaintext.bytecode_len
-                    ? blk->ciphertext.bytecode_len : blk->plaintext.bytecode_len;
-    t_block_variant *shorter = blk->ciphertext.bytecode_len < max_len
-                              ? &blk->ciphertext : &blk->plaintext;
+    size_t max_len;
+    t_block_variant *shorter;
+    int is_cipher_shorter;
+    char junk_directive[64];
+    char *new_src;
+    size_t pad;
 
     if (blk->ciphertext.bytecode_len == blk->plaintext.bytecode_len)
     {
-        blk->final_size = max_len;
+        blk->final_size = blk->ciphertext.bytecode_len;
         return (0);
     }
 
-    size_t pad = max_len - shorter->bytecode_len;
-    uint8_t *padded = realloc(shorter->bytecode, max_len);
-    if (!padded)
+    if (blk->ciphertext.bytecode_len < blk->plaintext.bytecode_len)
+    {
+        shorter = &blk->ciphertext;
+        is_cipher_shorter = 1;
+        max_len = blk->plaintext.bytecode_len;
+    }
+    else
+    {
+        shorter = &blk->plaintext;
+        is_cipher_shorter = 0;
+        max_len = blk->ciphertext.bytecode_len;
+    }
+    pad = max_len - shorter->bytecode_len;
+
+    /* Reconstruit le texte source du variant le plus court avec _JUNK ajoute a la fin */
+    snprintf(junk_directive, sizeof(junk_directive), "_junk %zu\n", pad);
+    new_src = malloc(strlen(shorter->src) + strlen(junk_directive) + 1);
+    if (!new_src)
         return (-1);
-    memset(padded + shorter->bytecode_len, 0x90, pad);   /* NOP filler */
-    shorter->bytecode = padded;
-    shorter->bytecode_len = max_len;
+    strcpy(new_src, shorter->src);
+    strcat(new_src, junk_directive);
+    free(shorter->src);
+    shorter->src = new_src;
+
+    /* Re-assemble ce variant avec le _JUNK inclus.
+    ** Attention : il faut d'abord "annuler" les labels/fixups de l'ancien
+    ** assemblage (puisqu'on va tout refaire), en les retirant du pool global. */
+    a->nlabels = shorter->label_range_start;
+    a->nfixups = shorter->fixup_range_start;
+    free(shorter->bytecode);
+    shorter->bytecode = NULL;
+
+    if (resolve_variant(a, ctx, shorter, is_cipher_shorter) < 0)
+        return (-1);
+
+    if (shorter->bytecode_len != max_len)
+    {
+        fprintf(stderr, "polyblock: _JUNK n'a pas produit la taille exacte attendue "
+                "(%zu vs %zu) pour '%s'\n", shorter->bytecode_len, max_len, blk->identifier);
+        return (-1);
+    }
+
     blk->final_size = max_len;
-    return (0);
-}
-
-/* DFS avec marquage 3 couleurs (blanc/gris/noir) pour detecter les cycles */
-static int visit_block(t_polyctx *ctx, t_polyblock *b, t_polyblock **order, int *n_order)
-{
-    int i;
-    t_polyblock *dep;
-
-    if (b->resolved)
-        return (0);
-    if (b->visiting)
-    {
-        fprintf(stderr, "polyblock: dependance cyclique detectee sur '%s'\n", b->identifier);
-        return (-1);
-    }
-    b->visiting = 1;
-    for (i = 0; i < b->n_depends; i++)
-    {
-        dep = find_block(ctx, b->depends_on[i]);
-        if (!dep)
-        {
-            fprintf(stderr, "polyblock: '%s' depend de '%s', introuvable\n",
-                    b->identifier, b->depends_on[i]);
-            b->visiting = 0;
-            return (-1);
-        }
-        if (visit_block(ctx, dep, order, n_order) < 0)
-        {
-            b->visiting = 0;
-            return (-1);
-        }
-    }
-    b->visiting = 0;
-    b->resolved = 1;
-    order[(*n_order)++] = b;
     return (0);
 }
 
