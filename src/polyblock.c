@@ -72,7 +72,7 @@ int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order)
     return (0);
 }
 
-static int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result *diff)
+int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result *diff)
 {
     size_t i;
 
@@ -107,7 +107,7 @@ static int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_
     return (0);
 }
 
-static char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
+char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
         t_decrypt_method method, const char *target_label)
 {
     char    *out_src;

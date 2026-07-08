@@ -127,5 +127,6 @@ t_polyctx *polyblock_parse_all(const char *source);
 void polyblock_dump(t_polyctx *ctx);
 int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
 int polyblock_generate_decrypts(t_asm *a, t_polyctx *ctx);
-
+int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result *diff);
+char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff, t_decrypt_method method, const char *target_label);
 #endif
