@@ -332,7 +332,7 @@ static void log_bit(t_asm *a, const char *name, size_t off, int bit)
 }
 
 /* ── assemblage d une instruction ──────────────────────────────── */
-static int	ainstr(t_asm *a, char toks[][64], int n)
+int	ainstr(t_asm *a, char toks[][64], int n)
 {
 	unsigned int		lsb_value;
 	t_reg	r1, r2, base, idx;

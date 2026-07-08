@@ -45,5 +45,6 @@ typedef struct
 }	t_asm;
 
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts);
+int	ainstr(t_asm *a, char toks[][64], int n);
 
 #endif
