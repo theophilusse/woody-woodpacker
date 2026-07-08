@@ -146,7 +146,7 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
             case METHOD_XOR:
             {
                 uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
-                snprintf(line, sizeof(line), "xor byte [rdi], %u\n", k);
+                snprintf(line, sizeof(line), "xor [rdi], %u\n", k);
                 break;
             }
             case METHOD_ADD:
@@ -154,10 +154,10 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
                 if (diff->entries[i].delta == 1)
                 {
                     uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
-                    snprintf(line, sizeof(line), "xor byte [rdi], %u\n", k);
+                    snprintf(line, sizeof(line), "xor [rdi], %u\n", k);
                 }
                 else
-                    snprintf(line, sizeof(line), "add byte [rdi], %u\n", diff->entries[i].delta);
+                    snprintf(line, sizeof(line), "add [rdi], %u\n", diff->entries[i].delta);
                 break;
             }
             case METHOD_SUB:
@@ -166,15 +166,15 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
                 if (neg == 1)
                 {
                     uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
-                    snprintf(line, sizeof(line), "xor byte [rdi], %u\n", k);
+                    snprintf(line, sizeof(line), "xor [rdi], %u\n", k);
                 }
                 else
-                    snprintf(line, sizeof(line), "sub byte [rdi], %u\n", neg);
+                    snprintf(line, sizeof(line), "sub [rdi], %u\n", neg);
                 break;
             }
             case METHOD_MOV:
             {
-                snprintf(line, sizeof(line), "mov byte [rdi], %u\n", diff->entries[i].plain_byte);
+                snprintf(line, sizeof(line), "mov [rdi], %u\n", diff->entries[i].plain_byte);
                 break;
             }
             default:
