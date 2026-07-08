@@ -1,6 +1,7 @@
 #ifndef POLYBLOCK_H
 # define POLYBLOCK_H
 
+# include "woody.h"
 # define MAX_POLYBLOCK_NAME 64
 # define MAX_DECRYPT_METHODS 8
 # define MAX_BREAKPOINTS 16

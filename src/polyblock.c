@@ -8,6 +8,16 @@ static int is_directive(const char *line)
     return (*line == '%');
 }
 
+static t_polyblock *find_block(t_polyctx *ctx, const char *name)
+{
+    int i;
+
+    for (i = 0; i < ctx->n_blocks; i++)
+        if (!strcmp(ctx->blocks[i].identifier, name))
+            return (&ctx->blocks[i]);
+    return (NULL);
+}
+
 /* Extrait le mot-cle de directive (POLYBLOCK_START, CIPHERTEXT, etc.)
 ** et le reste de la ligne dans `rest`. Retourne le mot-cle. */
 static void split_directive(const char *line, char *keyword, char *rest)
@@ -64,16 +74,6 @@ static int visit_block(t_polyctx *ctx, t_polyblock *b, t_polyblock **order, int 
     b->resolved = 1;
     order[(*n_order)++] = b;
     return (0);
-}
-
-static t_polyblock *find_block(t_polyctx *ctx, const char *name)
-{
-    int i;
-
-    for (i = 0; i < ctx->n_blocks; i++)
-        if (!strcmp(ctx->blocks[i].identifier, name))
-            return (&ctx->blocks[i]);
-    return (NULL);
 }
 
 /* Retourne un ordre topologique (dependances d'abord), ou -1 si cycle */
