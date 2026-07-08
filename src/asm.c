@@ -108,7 +108,7 @@ static int64_t	sym(t_asm *a, const char *n)
 /* base_offset : ajoute a a->out->e.len pour obtenir l'offset final du label.
 ** Vaut 0 pour un assemblage normal (stub principal), et final_offset du bloc
 ** pour un assemblage de variant polyblock effectue dans un buffer temporaire. */
-static void deflabel(t_asm *a, const char *name)
+void deflabel(t_asm *a, const char *name)
 {
     if (a->nlabels >= MAX_LABELS)
     {
