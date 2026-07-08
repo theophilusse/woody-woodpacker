@@ -32,7 +32,7 @@ typedef struct s_asm_result
 	size_t		patch_jmp_oep;
 }	t_asm_result;
 
-typedef struct
+typedef struct s_asm
 {
 	t_asm_result    *out;
 	t_crypto_ctx    *crypto;

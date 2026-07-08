@@ -1,14 +1,22 @@
-In file included from include/polyblock.h:4,
-                 from src/polyblock.c:2:
-include/asm.h:43:9: error: unknown type name ‘t_polyctx’
-   43 |         t_polyctx       *polyctx;          /* contexte polyblock global, NULL si stub principal */
-      |         ^~~~~~~~~
-include/asm.h:50:39: error: unknown type name ‘t_polyctx’
-   50 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
-      |                                       ^~~~~~~~~
-src/polyblock.c: In function ‘polyblock_topo_sort’:
-src/polyblock.c:59:17: error: implicit declaration of function ‘visit_block’ [-Werror=implicit-function-declaration]
-   59 |             if (visit_block(ctx, &ctx->blocks[i], order, n_order) < 0)
-      |                 ^~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [Makefile:30: obj/polyblock.o] Error 1
+In file included from src/asm.c:1:
+include/asm.h:48:9: error: conflicting types for ‘t_asm’; have ‘struct <anonymous>’
+   48 | }       t_asm;
+      |         ^~~~~
+In file included from include/woody.h:71,
+                 from include/opts.h:4,
+                 from include/asm.h:6,
+                 from src/asm.c:1:
+include/polyblock.h:13:22: note: previous declaration of ‘t_asm’ with type ‘t_asm’
+   13 | typedef struct t_asm t_asm;
+      |                      ^~~~~
+src/asm.c:287:5: error: conflicting types for ‘polyblock_resolve_sizes’; have ‘int(t_asm *, t_polyctx *)’ {aka ‘int(t_asm *, struct s_polyctx *)’}
+  287 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/woody.h:71,
+                 from include/opts.h:4,
+                 from include/asm.h:6,
+                 from src/asm.c:1:
+include/polyblock.h:113:5: note: previous declaration of ‘polyblock_resolve_sizes’ with type ‘int(t_asm *, t_polyctx *)’ {aka ‘int(t_asm *, struct s_polyctx *)’}
+  113 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+make: *** [Makefile:30: obj/asm.o] Error 1
