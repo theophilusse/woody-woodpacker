@@ -108,6 +108,5 @@ t_polyblock *find_block(t_polyctx *ctx, const char *name);
 int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order);
 t_polyctx *polyblock_parse_all(const char *source);
 void polyblock_dump(t_polyctx *ctx);
-int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
 
 #endif
