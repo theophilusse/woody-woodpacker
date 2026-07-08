@@ -230,6 +230,86 @@ void test_polyblock_resolve_sizes(void)
     }
 }
 
+const char *source_ref =
+"%POLYBLOCK_START secret_cipher\n"
+"%CIPHERTEXT NOSYNC\n"
+"    _SET eax, 99\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO eax\n"
+"%POLYBLOCK_END\n"
+"%POLYBLOCK_START anti_debug\n"
+"%CIPHERTEXT SYNC\n"
+"    _SET edi, 1\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO edi\n"
+"%POLYBLOCK_END\n";
+
+const char *source_nested =
+"%POLYBLOCK_START outer\n"
+"%CIPHERTEXT SYNC\n"
+"%POLYBLOCK_START inner\n"
+"%CIPHERTEXT NOSYNC\n"
+"    _SET eax, 5\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO eax\n"
+"%POLYBLOCK_END\n"
+"    _SET edi, 1\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO edi\n"
+"%POLYBLOCK_END\n";
+
+static void run_polyblock_test(const char *source, const char *label)
+{
+    fprintf(stderr, "\n########## TEST: %s ##########\n", label);
+
+    t_polyctx *ctx = polyblock_parse_all(source);
+    if (!ctx)
+    {
+        fprintf(stderr, "ECHEC parsing\n");
+        return;
+    }
+
+    t_asm a;
+    t_asm_result out;
+    t_crypto_ctx crypto;
+
+    memset(&a, 0, sizeof(a));
+    memset(&out, 0, sizeof(out));
+    memset(&crypto, 0, sizeof(crypto));
+    crypto.key_len = 16;
+    a.out = &out;
+    a.crypto = &crypto;
+    a.key_sync_enabled = 1;
+    a.label_base_offset = 0;
+
+    if (polyblock_resolve_sizes(&a, ctx) < 0)
+    {
+        fprintf(stderr, "ECHEC resolve_sizes\n");
+        return;
+    }
+
+    for (int i = 0; i < ctx->n_blocks; i++)
+    {
+        t_polyblock *blk = &ctx->blocks[i];
+        fprintf(stderr, "=== BLOCK '%s' ===\n", blk->identifier);
+        fprintf(stderr, "  final_offset=%zu final_size=%zu\n",
+                blk->final_offset, blk->final_size);
+        fprintf(stderr, "  ciphertext len=%zu: ", blk->ciphertext.bytecode_len);
+        for (size_t k = 0; k < blk->ciphertext.bytecode_len; k++)
+            fprintf(stderr, "%02x ", blk->ciphertext.bytecode[k]);
+        fprintf(stderr, "\n  plaintext  len=%zu: ", blk->plaintext.bytecode_len);
+        for (size_t k = 0; k < blk->plaintext.bytecode_len; k++)
+            fprintf(stderr, "%02x ", blk->plaintext.bytecode[k]);
+        fprintf(stderr, "\n");
+    }
+}
+
+void test_polyblock_final(void)
+{
+    run_polyblock_test(source_ref, "REFERENCE SIMPLE");
+    run_polyblock_test(source_nested, "IMBRICATION SYNTAXIQUE");
+}
+
 int main(int argc, char **argv)
 {
     t_elf_ctx       *ctx;
@@ -238,7 +318,8 @@ int main(int argc, char **argv)
 
 	//test_polyblock_parsing();
 	//test_polyblock_cycle_detection();
-	test_polyblock_resolve_sizes();
+	//test_polyblock_resolve_sizes();
+	test_polyblock_final();
 	return 0;
     if (argc < 2)
 	{
