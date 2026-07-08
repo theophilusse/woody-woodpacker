@@ -1,23 +1,15 @@
-src/asm.c: In function ‘polyblock_link’:
-src/asm.c:255:9: error: implicit declaration of function ‘addfixup’ [-Werror=implicit-function-declaration]
-  255 |         addfixup(a, entry_block, dummy, dummy + 4, 0);
-      |         ^~~~~~~~
-src/asm.c:260:9: error: too many arguments to function ‘polyblock_resolve_sizes’
-  260 |     if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
-      |         ^~~~~~~~~~~~~~~~~~~~~~~
 In file included from include/woody.h:71,
                  from include/opts.h:4,
                  from include/asm.h:6,
                  from src/asm.c:1:
-include/polyblock.h:128:5: note: declared here
+include/polyblock.h:134:5: error: conflicting types for ‘polyblock_resolve_sizes’; have ‘int(t_asm *, t_polyctx *, size_t)’ {aka ‘int(struct s_asm *, struct s_polyctx *, long unsigned int)’}
+  134 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+include/polyblock.h:128:5: note: previous declaration of ‘polyblock_resolve_sizes’ with type ‘int(t_asm *, t_polyctx *)’ {aka ‘int(struct s_asm *, struct s_polyctx *)’}
   128 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
       |     ^~~~~~~~~~~~~~~~~~~~~~~
-src/asm.c:247:17: error: variable ‘jmp_fixup_off’ set but not used [-Werror=unused-but-set-variable]
-  247 |     size_t      jmp_fixup_off;
-      |                 ^~~~~~~~~~~~~
-src/asm.c: At top level:
-src/asm.c:294:5: error: conflicting types for ‘polyblock_resolve_sizes’; have ‘int(t_asm *, t_polyctx *, size_t)’ {aka ‘int(struct s_asm *, struct s_polyctx *, long unsigned int)’}
-  294 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position)
+src/asm.c:303:5: error: conflicting types for ‘polyblock_resolve_sizes’; have ‘int(t_asm *, t_polyctx *, size_t)’ {aka ‘int(struct s_asm *, struct s_polyctx *, long unsigned int)’}
+  303 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position)
       |     ^~~~~~~~~~~~~~~~~~~~~~~
 In file included from include/woody.h:71,
                  from include/opts.h:4,
@@ -26,12 +18,4 @@ In file included from include/woody.h:71,
 include/polyblock.h:128:5: note: previous declaration of ‘polyblock_resolve_sizes’ with type ‘int(t_asm *, t_polyctx *)’ {aka ‘int(struct s_asm *, struct s_polyctx *)’}
   128 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
       |     ^~~~~~~~~~~~~~~~~~~~~~~
-src/asm.c:331:13: error: conflicting types for ‘addfixup’; have ‘void(t_asm *, const char *, size_t,  size_t,  int)’ {aka ‘void(struct s_asm *, const char *, long unsigned int,  long unsigned int,  int)’} [-Werror]
-  331 | static void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
-      |             ^~~~~~~~
-src/asm.c:331:13: error: static declaration of ‘addfixup’ follows non-static declaration
-src/asm.c:255:9: note: previous implicit declaration of ‘addfixup’ with type ‘void(t_asm *, const char *, size_t,  size_t,  int)’ {aka ‘void(struct s_asm *, const char *, long unsigned int,  long unsigned int,  int)’}
-  255 |         addfixup(a, entry_block, dummy, dummy + 4, 0);
-      |         ^~~~~~~~
-cc1: all warnings being treated as errors
 make: *** [Makefile:30: obj/asm.o] Error 1
