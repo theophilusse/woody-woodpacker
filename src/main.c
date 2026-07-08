@@ -325,53 +325,6 @@ const char *source_decrypt =
 "    _ZERO edi\n"
 "%POLYBLOCK_END\n";
 
-static void run_polyblock_test_full(const char *source, const char *label)
-{
-    fprintf(stderr, "\n########## TEST: %s ##########\n", label);
-
-    t_polyctx *ctx = polyblock_parse_all(source);
-    if (!ctx) { fprintf(stderr, "ECHEC parsing\n"); return; }
-
-    t_asm a;
-    t_asm_result out;
-    t_crypto_ctx crypto;
-
-    memset(&a, 0, sizeof(a));
-    memset(&out, 0, sizeof(out));
-    memset(&crypto, 0, sizeof(crypto));
-    crypto.key_len = 16;
-    a.out = &out;
-    a.crypto = &crypto;
-    a.key_sync_enabled = 1;
-
-    if (polyblock_resolve_sizes(&a, ctx, 0) < 0)
-    {
-        fprintf(stderr, "ECHEC resolve_sizes\n");
-        return;
-    }
-
-	if (polyblock_resolve_sizes(&a, ctx, 0) < 0)
-	{
-		fprintf(stderr, "ECHEC resolve_sizes\n");
-		return;
-	}
-	fprintf(stderr, "OK: resolve_sizes termine (DECRYPT injecte en interne)\n");
-
-	for (int i = 0; i < ctx->n_blocks; i++)
-	{
-		t_polyblock *blk = &ctx->blocks[i];
-		fprintf(stderr, "=== BLOCK '%s' ===\n", blk->identifier);
-		fprintf(stderr, "  final_offset=%zu final_size=%zu\n", blk->final_offset, blk->final_size);
-		fprintf(stderr, "  ciphertext len=%zu: ", blk->ciphertext.bytecode_len);
-		for (size_t k = 0; k < blk->ciphertext.bytecode_len; k++)
-			fprintf(stderr, "%02x ", blk->ciphertext.bytecode[k]);
-		fprintf(stderr, "\n  plaintext  len=%zu: ", blk->plaintext.bytecode_len);
-		for (size_t k = 0; k < blk->plaintext.bytecode_len; k++)
-			fprintf(stderr, "%02x ", blk->plaintext.bytecode[k]);
-		fprintf(stderr, "\n");
-	}
-}
-
 int main(int argc, char **argv)
 {
     t_elf_ctx       *ctx;
