@@ -121,6 +121,21 @@ void deflabel(t_asm *a, const char *name)
     a->nlabels++;
 }
 
+static void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
+{
+    if (a->nfixups >= MAX_FIXUPS)
+    {
+        fprintf(stderr, "asm: ERREUR MAX_FIXUPS (%d) depasse pour '%s'\n",
+                MAX_FIXUPS, name);
+        exit(1);
+    }
+    a->fixups[a->nfixups].off = off + a->label_base_offset;
+    a->fixups[a->nfixups].end = end + a->label_base_offset;
+    a->fixups[a->nfixups].is_rel8 = is_rel8;
+    strncpy(a->fixups[a->nfixups].name, name, 63);
+    a->nfixups++;
+}
+
 int assemble_source(t_asm *a, const char *src)
 {
     char    toks[8][64];
@@ -244,24 +259,19 @@ t_asm_result *polyblock_link(t_asm *a, t_polyctx *ctx, const char *entry_block,
     t_polyblock *order[MAX_POLYBLOCKS];
     int         n_order;
     int         i;
-    size_t      jmp_fixup_off;
 
-    /* 1. Emet le jmp <entry_block> initial, AVANT toute resolution de taille,
-    ** pour que position parte deja decalee du bon montant (5 octets ici). */
+    /* 1. Emet le jmp <entry_block> initial */
     {
         size_t dummy;
         emit_jmp_rel32(&a->out->e, &dummy);
-        jmp_fixup_off = dummy;
         addfixup(a, entry_block, dummy, dummy + 4, 0);
     }
 
-    /* 2. Resout tailles/offsets de tous les blocs, en partant de la position
-    ** REELLE actuelle (apres le jmp initial). */
+    /* 2. Resout tailles/offsets de tous les blocs */
     if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
         return (NULL);
 
-    /* 3. Copie chaque bloc (etat CIPHERTEXT, celui present sur disque) dans
-    ** le buffer final, a son final_offset (deja correctement calcule). */
+    /* 3. Copie chaque bloc dans le buffer final */
     if (polyblock_topo_sort(ctx, order, &n_order) < 0)
         return (NULL);
     for (i = 0; i < n_order; i++)
@@ -270,12 +280,11 @@ t_asm_result *polyblock_link(t_asm *a, t_polyctx *ctx, const char *entry_block,
         emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
     }
 
-    /* 4. Assemble les donnees hors-bloc (.string, labels globaux type
-    ** greeting_msg/farewell_msg), a la suite. */
+    /* 4. Assemble les donnees hors-bloc */
     if (data_src && assemble_source(a, data_src) < 0)
         return (NULL);
 
-    /* 5. Resolution finale de tous les fixups accumules */
+    /* 5. Resolution finale des fixups */
     for (i = 0; i < a->nfixups; i++)
     {
         int64_t target = sym(a, a->fixups[i].name);
@@ -326,21 +335,6 @@ int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position)
         position += blk->final_size;
     }
     return (0);
-}
-
-static void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
-{
-    if (a->nfixups >= MAX_FIXUPS)
-    {
-        fprintf(stderr, "asm: ERREUR MAX_FIXUPS (%d) depasse pour '%s'\n",
-                MAX_FIXUPS, name);
-        exit(1);
-    }
-    a->fixups[a->nfixups].off = off + a->label_base_offset;
-    a->fixups[a->nfixups].end = end + a->label_base_offset;
-    a->fixups[a->nfixups].is_rel8 = is_rel8;
-    strncpy(a->fixups[a->nfixups].name, name, 63);
-    a->nfixups++;
 }
 
 /* ── parse memoire [base+idx] ou [label] ──────────────────────── */

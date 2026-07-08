@@ -131,5 +131,6 @@ int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result 
 char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff, t_decrypt_method method, const char *target_label);
 int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant);
 int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk, t_block_variant *variant, int is_cipher);
+int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position);
 
 #endif
