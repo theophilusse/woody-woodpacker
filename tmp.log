@@ -1,6 +1,14 @@
-[DEBUG] parse_polyblock('a')
-[DEBUG] parse_decrypt_directive line='    %DECRYPT b XOR'
-[DEBUG] parse_polyblock('b')
-[DEBUG] parse_decrypt_directive line='    %DECRYPT a XOR'
-polyblock: dependance cyclique detectee sur 'a'
-OK: cycle correctement detecte
+In file included from include/polyblock.h:4,
+                 from src/polyblock.c:2:
+include/asm.h:43:9: error: unknown type name ‘t_polyctx’
+   43 |         t_polyctx       *polyctx;          /* contexte polyblock global, NULL si stub principal */
+      |         ^~~~~~~~~
+include/asm.h:50:39: error: unknown type name ‘t_polyctx’
+   50 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
+      |                                       ^~~~~~~~~
+src/polyblock.c: In function ‘polyblock_topo_sort’:
+src/polyblock.c:59:17: error: implicit declaration of function ‘visit_block’ [-Werror=implicit-function-declaration]
+   59 |             if (visit_block(ctx, &ctx->blocks[i], order, n_order) < 0)
+      |                 ^~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [Makefile:30: obj/polyblock.o] Error 1

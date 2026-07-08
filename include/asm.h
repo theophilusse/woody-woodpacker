@@ -10,6 +10,8 @@
 #define MAX_LABELS 512
 #define MAX_FIXUPS 512
 
+typedef struct s_polyctx t_polyctx;
+
 typedef struct
 {
 	char name[64];
@@ -47,6 +49,5 @@ typedef struct
 
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts);
 int	ainstr(t_asm *a, char toks[][64], int n);
-int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx);
 
 #endif
