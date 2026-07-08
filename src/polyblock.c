@@ -1,12 +1,14 @@
 /* polyblock.c */
 #include "polyblock.h"
 
+/*
 static int is_directive(const char *line)
 {
     while (*line == ' ' || *line == '\t')
         line++;
     return (*line == '%');
 }
+*/
 
 static t_polyblock *find_block(t_polyctx *ctx, const char *name)
 {
@@ -20,6 +22,7 @@ static t_polyblock *find_block(t_polyctx *ctx, const char *name)
 
 /* Extrait le mot-cle de directive (POLYBLOCK_START, CIPHERTEXT, etc.)
 ** et le reste de la ligne dans `rest`. Retourne le mot-cle. */
+/*
 static void split_directive(const char *line, char *keyword, char *rest)
 {
     const char *p = line;
@@ -27,7 +30,7 @@ static void split_directive(const char *line, char *keyword, char *rest)
 
     while (*p == ' ' || *p == '\t')
         p++;
-    p++; /* saute le '%' */
+    p++; // saute le '%'
     i = 0;
     while (*p && *p != ' ' && *p != '\t' && *p != '\n' && i < 63)
         keyword[i++] = *p++;
@@ -39,6 +42,7 @@ static void split_directive(const char *line, char *keyword, char *rest)
         rest[i++] = *p++;
     rest[i] = '\0';
 }
+*/
 
 /* DFS avec marquage 3 couleurs (blanc/gris/noir) pour detecter les cycles */
 static int visit_block(t_polyctx *ctx, t_polyblock *b, t_polyblock **order, int *n_order)
