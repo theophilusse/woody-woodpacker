@@ -68,6 +68,7 @@ typedef struct s_opts
 # include "stub.h"
 # include "stub_av.h"
 # include "lde.h"
+# include "polyblock.h"
 
 int usage(const char *prog);
 

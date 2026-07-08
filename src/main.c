@@ -106,12 +106,78 @@ static void print_key(t_crypto_ctx *crypto)
     printf("\n");
 }
 
+/* test_polyblock.c, ou directement dans main.c en mode debug */
+void test_polyblock_parsing(void)
+{
+    const char *source =
+"%POLYBLOCK_START anti_debug\n"
+"%CIPHERTEXT SYNC\n"
+"    %DECRYPT secret_cipher SUB, ADD\n"
+"    jmp secret_cipher\n"
+"%PLAINTEXT SYNC\n"
+"    ; anti debug code\n"
+"    %DECRYPT anti_debug XOR\n"
+"%POLYBLOCK_END\n"
+"%POLYBLOCK_START secret_cipher\n"
+"%CIPHERTEXT NOSYNC\n"
+"    ; contenu chiffre place ici a la generation\n"
+"%PLAINTEXT SYNC\n"
+"    write(\"fuck you\")\n"
+"    exit(0)\n"
+"%POLYBLOCK_END\n";
+
+    t_polyctx *ctx = polyblock_parse_all(source);
+    if (!ctx)
+    {
+        fprintf(stderr, "ECHEC du parsing\n");
+        return;
+    }
+    polyblock_dump(ctx);
+
+    t_polyblock *order[MAX_POLYBLOCKS];
+    int n_order = 0;
+    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
+    {
+        fprintf(stderr, "ECHEC: cycle detecte\n");
+        return;
+    }
+    fprintf(stderr, "=== ORDRE TOPOLOGIQUE ===\n");
+    for (int i = 0; i < n_order; i++)
+        fprintf(stderr, "%d: %s\n", i, order[i]->identifier);
+}
+
+void test_polyblock_cycle_detection(void)
+{
+    const char *source =
+"%POLYBLOCK_START a\n"
+"%CIPHERTEXT\n"
+"    %DECRYPT b XOR\n"
+"%PLAINTEXT\n"
+"%POLYBLOCK_END\n"
+"%POLYBLOCK_START b\n"
+"%CIPHERTEXT\n"
+"    %DECRYPT a XOR\n"
+"%PLAINTEXT\n"
+"%POLYBLOCK_END\n";
+
+    t_polyctx *ctx = polyblock_parse_all(source);
+    t_polyblock *order[MAX_POLYBLOCKS];
+    int n_order = 0;
+
+    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
+        fprintf(stderr, "OK: cycle correctement detecte\n");
+    else
+        fprintf(stderr, "ECHEC: cycle NON detecte (bug!)\n");
+}
+
 int main(int argc, char **argv)
 {
     t_elf_ctx       *ctx;
     t_crypto_ctx    crypto;
 	struct s_opts	opts;
 
+	test_polyblock_parsing();
+	return 0;
     if (argc < 2)
 	{
         return (usage(argv[0]));
