@@ -162,7 +162,8 @@ static int assemble_source(t_asm *a, const char *src)
     return (0);
 }
 
-static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, int is_cipher)
+static int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
+        t_block_variant *variant, int is_cipher)
 {
     t_emitter   local_e;
     t_emitter   saved_e;
@@ -172,7 +173,7 @@ static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, i
     int         saved_is_cipher;
     int         saved_sync;
 
-    variant->key_index_before = a->key_index;   /* NOUVEAU : memorise le point de depart */
+    variant->key_index_before = a->key_index;
 
     memset(&local_e, 0, sizeof(local_e));
     saved_e = a->out->e;
@@ -187,6 +188,9 @@ static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, i
 
     label_start = a->nlabels;
     fixup_start = a->nfixups;
+
+    if (is_cipher)
+        deflabel(a, blk->identifier);
 
     if (assemble_source(a, variant->src) < 0)
     {
@@ -254,13 +258,13 @@ static int equalize_sizes(t_asm *a, t_polyctx *ctx, t_polyblock *blk)
     ** Attention : il faut d'abord "annuler" les labels/fixups de l'ancien
     ** assemblage (puisqu'on va tout refaire), en les retirant du pool global. */
     a->nlabels = shorter->label_range_start;
-    a->nfixups = shorter->fixup_range_start;
+	a->nfixups = shorter->fixup_range_start;
 	a->key_index = shorter->key_index_before;
-    free(shorter->bytecode);
-    shorter->bytecode = NULL;
+	free(shorter->bytecode);
+	shorter->bytecode = NULL;
 
-    if (resolve_variant(a, ctx, shorter, is_cipher_shorter) < 0)
-        return (-1);
+	if (resolve_variant(a, ctx, blk, shorter, is_cipher_shorter) < 0)
+		return (-1);
 
     if (shorter->bytecode_len != max_len)
     {
@@ -287,6 +291,78 @@ static void apply_offset_shift(t_asm *a, t_block_variant *variant, size_t final_
     }
 }
 
+static char *replace_placeholder(const char *src, const char *placeholder, const char *replacement)
+{
+    char    *result;
+    char    *pos;
+    size_t  before_len;
+    size_t  after_len;
+    size_t  new_len;
+
+    pos = strstr(src, placeholder);
+    if (!pos)
+        return (strdup(src));   /* rien a remplacer */
+
+    before_len = (size_t)(pos - src);
+    after_len = strlen(pos + strlen(placeholder));
+    new_len = before_len + strlen(replacement) + after_len + 1;
+
+    result = malloc(new_len);
+    if (!result)
+        return (NULL);
+    memcpy(result, src, before_len);
+    strcpy(result + before_len, replacement);
+    strcat(result, pos + strlen(placeholder));
+    return (result);
+}
+
+static int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
+{
+    int     i;
+    char    *new_src;
+
+    for (i = 0; i < variant->n_decrypts; i++)
+    {
+        t_decrypt_spec  *spec = &variant->decrypts[i];
+        t_polyblock     *target;
+        t_diff_result   diff;
+        t_decrypt_method chosen;
+        char            *stub_src;
+        char            placeholder[64];
+
+        target = find_block(ctx, spec->target_identifier);
+        if (!target)
+        {
+            fprintf(stderr, "polyblock: DECRYPT cible '%s' introuvable\n",
+                    spec->target_identifier);
+            return (-1);
+        }
+        if (!target->ciphertext.bytecode || !target->plaintext.bytecode)
+        {
+            fprintf(stderr, "polyblock: DECRYPT cible '%s' pas encore resolue "
+                    "(ordre topologique incorrect)\n", spec->target_identifier);
+            return (-1);
+        }
+        if (compute_diff(&target->ciphertext, &target->plaintext, &diff) < 0)
+            return (-1);
+
+        chosen = spec->methods[rand() % spec->n_methods];
+        spec->chosen_method = chosen;
+        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
+        if (!stub_src)
+            return (-1);
+
+        snprintf(placeholder, sizeof(placeholder), "%%decrypt_slot %d", i);
+        new_src = replace_placeholder(variant->src, placeholder, stub_src);
+        free(stub_src);
+        if (!new_src)
+            return (-1);
+        free(variant->src);
+        variant->src = new_src;
+    }
+    return (0);
+}
+
 int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
 {
     t_polyblock *order[MAX_POLYBLOCKS];
@@ -301,10 +377,15 @@ int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
     {
         t_polyblock *blk = order[i];
 
-        if (resolve_variant(a, ctx, &blk->ciphertext, 1) < 0)
+        if (substitute_decrypt_slots(ctx, &blk->ciphertext) < 0)
             return (-1);
-        if (resolve_variant(a, ctx, &blk->plaintext, 0) < 0)
+        if (substitute_decrypt_slots(ctx, &blk->plaintext) < 0)
             return (-1);
+
+        if (resolve_variant(a, ctx, blk, &blk->ciphertext, 1) < 0)
+			return (-1);
+		if (resolve_variant(a, ctx, blk, &blk->plaintext, 0) < 0)
+			return (-1);
 
         if (equalize_sizes(a, ctx, blk) < 0)
             return (-1);
@@ -1706,6 +1787,15 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		emit_raw(&a->out->e, child_variant->bytecode, child_variant->bytecode_len);
 		return (0);
+	}
+	if (!strcmp(toks[0], "%decrypt_slot") && n == 2)
+	{
+		int idx = atoi(toks[1]);
+		t_block_variant *variant = a->current_variant_is_cipher ? NULL : NULL;
+		/* TODO: recuperer le variant courant pour acceder a decrypts[idx].generated_bytecode */
+
+		fprintf(stderr, "asm: %%decrypt_slot %d rencontre mais pas encore resolu\n", idx);
+		return (-1);   /* provisoire, a completer avec l'injection reelle */
 	}
 	fprintf(stderr, "asm: inconnu: '%s' (%d tokens)\n", toks[0], n);
 	for (int i = 0; i < n; i++)

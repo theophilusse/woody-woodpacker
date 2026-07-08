@@ -265,11 +265,18 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
         }
         if (line_is_directive(line, "DECRYPT"))
         {
+            int decrypt_index;
+
             if (parse_decrypt_directive(ctx, blk, line,
                     in_ciphertext ? &blk->ciphertext : &blk->plaintext) < 0)
                 return (NULL);
+            decrypt_index = (in_ciphertext ? blk->ciphertext.n_decrypts : blk->plaintext.n_decrypts) - 1;
             if (current_accum)
-                accum_line(current_accum, line);
+            {
+                char ref[64];
+                snprintf(ref, sizeof(ref), "%%decrypt_slot %d", decrypt_index);
+                accum_line(current_accum, ref);
+            }
             continue;
         }
         /* ligne normale (instruction _SET/_ZERO/etc ou label) */
