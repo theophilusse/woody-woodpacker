@@ -98,7 +98,7 @@ typedef struct s_polyctx
     char            block_names[MAX_POLYBLOCKS][MAX_POLYBLOCK_NAME];
 }   t_polyctx;
 
-int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order)
+int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order);
 t_polyctx *polyblock_parse_all(const char *source);
 
 #endif
