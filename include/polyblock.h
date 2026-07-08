@@ -107,6 +107,20 @@ typedef struct s_polyctx
     char            block_names[MAX_POLYBLOCKS][MAX_POLYBLOCK_NAME];
 }   t_polyctx;
 
+typedef struct s_diff_entry
+{
+    size_t  offset;         /* position dans le bloc (0-indexed) */
+    uint8_t cipher_byte;
+    uint8_t plain_byte;
+    uint8_t delta;          /* plain_byte - cipher_byte, modulo 256 */
+}   t_diff_entry;
+
+typedef struct s_diff_result
+{
+    t_diff_entry    entries[8192];   /* borne large, ajustable */
+    size_t          n_entries;
+}   t_diff_result;
+
 t_polyblock *find_block(t_polyctx *ctx, const char *name);
 int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order);
 t_polyctx *polyblock_parse_all(const char *source);

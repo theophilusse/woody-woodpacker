@@ -1440,3 +1440,42 @@ int emit_nop(t_emitter *e)
     uint8_t b = 0x90;
     return emit_raw(e, &b, 1);
 }
+
+/* ADD [base+disp8], imm8 : 80 /0 ib */
+int emit_add_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm)
+{
+    uint8_t b[5]; int n = 0;
+    uint8_t r = mk_rex(0, 0, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x80;
+    b[n++] = MODRM01(0, base);
+    b[n++] = (uint8_t)disp;
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}
+
+/* SUB [base+disp8], imm8 : 80 /5 ib */
+int emit_sub_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm)
+{
+    uint8_t b[5]; int n = 0;
+    uint8_t r = mk_rex(0, 0, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x80;
+    b[n++] = MODRM01(5, base);
+    b[n++] = (uint8_t)disp;
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}
+
+/* MOV [base+disp8], imm8 : C6 /0 ib */
+int emit_mov_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm)
+{
+    uint8_t b[5]; int n = 0;
+    uint8_t r = mk_rex(0, 0, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0xC6;
+    b[n++] = MODRM01(0, base);
+    b[n++] = (uint8_t)disp;
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}

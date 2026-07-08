@@ -71,3 +71,150 @@ int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order)
     }
     return (0);
 }
+
+static int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result *diff)
+{
+    size_t i;
+
+    if (cipher->bytecode_len != plain->bytecode_len)
+    {
+        fprintf(stderr, "polyblock: diff impossible, tailles differentes (%zu vs %zu)\n",
+                cipher->bytecode_len, plain->bytecode_len);
+        return (-1);
+    }
+    if (cipher->bytecode_len > 8192)
+    {
+        fprintf(stderr, "polyblock: bloc trop grand pour le diff (%zu > 8192)\n",
+                cipher->bytecode_len);
+        return (-1);
+    }
+
+    diff->n_entries = 0;
+    for (i = 0; i < cipher->bytecode_len; i++)
+    {
+        uint8_t c = cipher->bytecode[i];
+        uint8_t p = plain->bytecode[i];
+
+        if (c == p)
+            continue;   /* octet deja identique, aucune transformation necessaire */
+
+        diff->entries[diff->n_entries].offset = i;
+        diff->entries[diff->n_entries].cipher_byte = c;
+        diff->entries[diff->n_entries].plain_byte = p;
+        diff->entries[diff->n_entries].delta = (uint8_t)(p - c);   /* wraparound naturel sur uint8_t */
+        diff->n_entries++;
+    }
+    return (0);
+}
+
+static char *emit_decrypt_xor_loop(t_polyblock *target_blk, t_diff_result *diff, char *out_src)
+{
+    size_t i;
+    char line[128];
+
+    /* Charge le pointeur de base vers le bloc cible (RIP-relative) */
+    strcat(out_src, "lea rdi, [target_block_start]\n");   /* label a definir dynamiquement */
+
+    for (i = 0; i < diff->n_entries; i++)
+    {
+        uint8_t xor_key = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
+
+        if (diff->entries[i].offset == (i > 0 ? diff->entries[i-1].offset + 1 : 0))
+        {
+            /* offset consecutif : xor [rdi], key puis inc rdi -- compact */
+            snprintf(line, sizeof(line), "xor byte [rdi], %u\n", xor_key);
+            strcat(out_src, line);
+            strcat(out_src, "_INC rdi\n");
+        }
+        else
+        {
+            /* saut non consecutif : recalcule le pointeur */
+            snprintf(line, sizeof(line), "lea rdi, [target_block_start+%zu]\n",
+                    diff->entries[i].offset);
+            strcat(out_src, line);
+            snprintf(line, sizeof(line), "xor byte [rdi], %u\n", xor_key);
+            strcat(out_src, line);
+        }
+    }
+    return (out_src);
+}
+
+static char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
+        t_decrypt_method method, const char *target_label)
+{
+    char    *out_src;
+    char    line[128];
+    size_t  cap = 8192;
+    size_t  i;
+
+    out_src = malloc(cap);
+    if (!out_src)
+        return (NULL);
+    out_src[0] = '\0';
+
+    if (diff->n_entries == 0)
+        return (out_src);   /* rien a patcher, bloc deja identique */
+
+    snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
+    strcat(out_src, line);
+
+    for (i = 0; i < diff->n_entries; i++)
+    {
+        size_t off = diff->entries[i].offset;
+        size_t prev_off = (i > 0) ? diff->entries[i - 1].offset : (size_t)-1;
+
+        if (off != prev_off + 1)
+        {
+            if (off == 0)
+                snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
+            else
+                snprintf(line, sizeof(line), "lea rdi, [%s+%zu]\n", target_label, off);
+            strcat(out_src, line);
+        }
+
+        switch (method)
+        {
+            case METHOD_XOR:
+            {
+                uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
+                snprintf(line, sizeof(line), "xor byte [rdi], %u\n", k);
+                break;
+            }
+            case METHOD_ADD:
+            {
+                if (diff->entries[i].delta == 1)
+                {
+                    uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
+                    snprintf(line, sizeof(line), "xor byte [rdi], %u\n", k);
+                }
+                else
+                    snprintf(line, sizeof(line), "add byte [rdi], %u\n", diff->entries[i].delta);
+                break;
+            }
+            case METHOD_SUB:
+            {
+                uint8_t neg = (uint8_t)(-(int)diff->entries[i].delta);
+                if (neg == 1)
+                {
+                    uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
+                    snprintf(line, sizeof(line), "xor byte [rdi], %u\n", k);
+                }
+                else
+                    snprintf(line, sizeof(line), "sub byte [rdi], %u\n", neg);
+                break;
+            }
+            case METHOD_MOV:
+            {
+                snprintf(line, sizeof(line), "mov byte [rdi], %u\n", diff->entries[i].plain_byte);
+                break;
+            }
+            default:
+                fprintf(stderr, "polyblock: methode %d non geree pour patch octet-a-octet\n", method);
+                free(out_src);
+                return (NULL);
+        }
+        strcat(out_src, line);
+        strcat(out_src, "_INC rdi\n");
+    }
+    return (out_src);
+}
