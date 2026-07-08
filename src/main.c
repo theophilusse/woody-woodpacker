@@ -197,6 +197,8 @@ void test_polyblock_resolve_sizes(void)
     memset(&a, 0, sizeof(a));
     memset(&out, 0, sizeof(out));
     memset(&crypto, 0, sizeof(crypto));
+	crypto.key_len = 16;
+	memset(crypto.key, 0x55, 16);
     a.out = &out;
     a.crypto = &crypto;
     a.key_sync_enabled = 1;
