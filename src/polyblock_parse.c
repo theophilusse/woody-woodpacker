@@ -206,7 +206,8 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
 
         if (line_is_directive(line, "CIPHERTEXT"))
         {
-            in_ciphertext = 1; in_plaintext = 0;
+            in_ciphertext = 1;
+            //in_plaintext = 0;
             cipher_sync = parse_sync_flag(line);   /* AFFECTE, pas redeclare */
             current_accum = &cipher_acc;
             continue;
