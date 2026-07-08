@@ -350,13 +350,26 @@ static void run_polyblock_test_full(const char *source, const char *label)
         return;
     }
 
-    if (polyblock_generate_decrypts(&a, ctx) < 0)
-    {
-        fprintf(stderr, "ECHEC generate_decrypts\n");
-        return;
-    }
+	if (polyblock_resolve_sizes(&a, ctx) < 0)
+	{
+		fprintf(stderr, "ECHEC resolve_sizes\n");
+		return;
+	}
+	fprintf(stderr, "OK: resolve_sizes termine (DECRYPT injecte en interne)\n");
 
-    fprintf(stderr, "OK: generate_decrypts termine sans erreur\n");
+	for (int i = 0; i < ctx->n_blocks; i++)
+	{
+		t_polyblock *blk = &ctx->blocks[i];
+		fprintf(stderr, "=== BLOCK '%s' ===\n", blk->identifier);
+		fprintf(stderr, "  final_offset=%zu final_size=%zu\n", blk->final_offset, blk->final_size);
+		fprintf(stderr, "  ciphertext len=%zu: ", blk->ciphertext.bytecode_len);
+		for (size_t k = 0; k < blk->ciphertext.bytecode_len; k++)
+			fprintf(stderr, "%02x ", blk->ciphertext.bytecode[k]);
+		fprintf(stderr, "\n  plaintext  len=%zu: ", blk->plaintext.bytecode_len);
+		for (size_t k = 0; k < blk->plaintext.bytecode_len; k++)
+			fprintf(stderr, "%02x ", blk->plaintext.bytecode[k]);
+		fprintf(stderr, "\n");
+	}
 }
 
 int main(int argc, char **argv)

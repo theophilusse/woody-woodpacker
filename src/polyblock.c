@@ -188,53 +188,62 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
     return (out_src);
 }
 
-int polyblock_generate_decrypts(t_asm *a, t_polyctx *ctx)
+static char *replace_placeholder(const char *src, const char *placeholder, const char *replacement)
+{
+    char    *result;
+    char    *pos;
+    size_t  before_len;
+    size_t  new_len;
+
+    pos = strstr(src, placeholder);
+    if (!pos)
+        return (strdup(src));
+
+    before_len = (size_t)(pos - src);
+    new_len = before_len + strlen(replacement) + strlen(pos + strlen(placeholder)) + 1;
+
+    result = malloc(new_len);
+    if (!result)
+        return (NULL);
+    memcpy(result, src, before_len);
+    result[before_len] = '\0';
+    strcat(result, replacement);
+    strcat(result, pos + strlen(placeholder));
+    return (result);
+}
+
+int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
 {
     t_polyblock *order[MAX_POLYBLOCKS];
     int         n_order;
-    int         i, j;
+    size_t      position = 0;
+    int         i;
 
-    (void)a;
     if (polyblock_topo_sort(ctx, order, &n_order) < 0)
         return (-1);
 
     for (i = 0; i < n_order; i++)
     {
         t_polyblock *blk = order[i];
-        t_block_variant *variants[2] = { &blk->ciphertext, &blk->plaintext };
 
-        for (int v = 0; v < 2; v++)
-        {
-            t_block_variant *variant = variants[v];
+        if (substitute_decrypt_slots(ctx, &blk->ciphertext) < 0)
+            return (-1);
+        if (substitute_decrypt_slots(ctx, &blk->plaintext) < 0)
+            return (-1);
 
-            for (j = 0; j < variant->n_decrypts; j++)
-            {
-                t_decrypt_spec *spec = &variant->decrypts[j];
-                t_polyblock *target = find_block(ctx, spec->target_identifier);
-                t_diff_result diff;
-                t_decrypt_method chosen;
-                char *stub_src;
+        if (resolve_variant(a, ctx, blk, &blk->ciphertext, 1) < 0)
+            return (-1);
+        if (resolve_variant(a, ctx, blk, &blk->plaintext, 0) < 0)
+            return (-1);
 
-                if (!target)
-                {
-                    fprintf(stderr, "polyblock: DECRYPT cible '%s' introuvable\n",
-                            spec->target_identifier);
-                    return (-1);
-                }
-                if (compute_diff(&target->ciphertext, &target->plaintext, &diff) < 0)
-                    return (-1);
+        if (equalize_sizes(a, ctx, blk) < 0)
+            return (-1);
 
-                chosen = spec->methods[rand() % spec->n_methods];
-                stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
-                if (!stub_src)
-                    return (-1);
+        apply_offset_shift(a, &blk->ciphertext, position);
+        apply_offset_shift(a, &blk->plaintext, position);
 
-                spec->chosen_method = chosen;
-                /* TODO: injecter stub_src dans le bytecode final a la position
-                ** du %DECRYPT (necessite de re-assembler ou d'injecter apres coup) */
-                free(stub_src);
-            }
-        }
+        blk->final_offset = position;
+        position += blk->final_size;
     }
     return (0);
 }

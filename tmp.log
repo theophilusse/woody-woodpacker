@@ -1,24 +1,6 @@
 
-########## TEST: REFERENCE SIMPLE ##########
+########## TEST: DECRYPT XOR ##########
 [DEBUG] parse_polyblock('secret_cipher')
 [DEBUG] parse_polyblock('anti_debug')
-=== BLOCK 'secret_cipher' ===
-  final_offset=0 final_size=8
-  ciphertext len=8: 48 8d 04 25 63 00 00 00 
-  plaintext  len=8: 31 c0 41 83 ef 01 90 90 
-=== BLOCK 'anti_debug' ===
-  final_offset=8 final_size=8
-  ciphertext len=8: 48 8d 3c 25 01 00 00 00 
-  plaintext  len=8: 31 ff 41 83 ef 01 90 90 
-
-########## TEST: IMBRICATION SYNTAXIQUE ##########
-[DEBUG] parse_polyblock('outer')
-[DEBUG] parse_polyblock('inner')
-=== BLOCK 'outer' ===
-  final_offset=8 final_size=16
-  ciphertext len=16: 48 8d 04 25 05 00 00 00 48 8d 3c 25 01 00 00 00 
-  plaintext  len=16: 31 ff 41 81 c6 01 00 00 00 41 83 ef 01 90 90 90 
-=== BLOCK 'inner' ===
-  final_offset=0 final_size=8
-  ciphertext len=8: 48 8d 04 25 05 00 00 00 
-  plaintext  len=8: 31 c0 41 83 ef 01 90 90 
+[DEBUG] parse_decrypt_directive line='    %DECRYPT secret_cipher XOR'
+OK: generate_decrypts termine sans erreur

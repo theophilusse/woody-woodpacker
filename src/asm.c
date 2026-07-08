@@ -383,9 +383,9 @@ int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
             return (-1);
 
         if (resolve_variant(a, ctx, blk, &blk->ciphertext, 1) < 0)
-			return (-1);
-		if (resolve_variant(a, ctx, blk, &blk->plaintext, 0) < 0)
-			return (-1);
+            return (-1);
+        if (resolve_variant(a, ctx, blk, &blk->plaintext, 0) < 0)
+            return (-1);
 
         if (equalize_sizes(a, ctx, blk) < 0)
             return (-1);
