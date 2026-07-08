@@ -382,8 +382,8 @@ int main(int argc, char **argv)
 	//test_polyblock_cycle_detection();
 	//test_polyblock_resolve_sizes();
 	//test_polyblock_final();
-	run_polyblock_test_full(source_decrypt, "DECRYPT XOR");
-	return 0;
+	//run_polyblock_test_full(source_decrypt, "DECRYPT XOR");
+	//return 0;
     if (argc < 2)
 	{
         return (usage(argv[0]));

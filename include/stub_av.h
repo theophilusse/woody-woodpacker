@@ -1,6 +1,56 @@
 #ifndef STUB_AV_H
 # define STUB_AV_H
 
+static const char STUB_POLY_DEMO_BLOCKS[] =
+"%POLYBLOCK_START greeting\n"
+"%CIPHERTEXT NOSYNC\n"
+"    _SET eax, 111\n"
+"    _SET edi, 111\n"
+"    _SET esi, 111\n"
+"%PLAINTEXT SYNC\n"
+"    _SET eax, 1\n"
+"    _SET edi, 1\n"
+"    lea rsi, [greeting_msg]\n"
+"    _SET edx, 13\n"
+"    syscall\n"
+"    jmp back_from_greeting\n"
+"%POLYBLOCK_END\n"
+
+"%POLYBLOCK_START farewell\n"
+"%CIPHERTEXT NOSYNC\n"
+"    _SET eax, 222\n"
+"    _SET edi, 222\n"
+"%PLAINTEXT SYNC\n"
+"    _SET eax, 1\n"
+"    _SET edi, 1\n"
+"    lea rsi, [farewell_msg]\n"
+"    _SET edx, 9\n"
+"    syscall\n"
+"    jmp back_from_farewell\n"
+"%POLYBLOCK_END\n"
+
+"%POLYBLOCK_START main_flow\n"
+"%CIPHERTEXT SYNC\n"
+"    %DECRYPT greeting XOR\n"
+"    jmp greeting\n"
+"back_from_greeting:\n"
+"    %DECRYPT farewell ADD, SUB\n"
+"    jmp farewell\n"
+"back_from_farewell:\n"
+"    _SET eax, 60\n"
+"    _ZERO edi\n"
+"    syscall\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO eax\n"
+"    _ZERO edi\n"
+"%POLYBLOCK_END\n";
+
+static const char STUB_POLY_DEMO_DATA[] =
+"greeting_msg:\n"
+".string \"Hello World!\\n\"\n"
+"farewell_msg:\n"
+".string \"Goodbye!\\n\"\n";
+
 static const char STUB_AV_DETECT[] =
 "scan_start:\n"//remove
 "_start:\n"
