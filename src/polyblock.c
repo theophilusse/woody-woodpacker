@@ -194,6 +194,7 @@ int polyblock_generate_decrypts(t_asm *a, t_polyctx *ctx)
     int         n_order;
     int         i, j;
 
+    (void)a;
     if (polyblock_topo_sort(ctx, order, &n_order) < 0)
         return (-1);
 
