@@ -263,53 +263,6 @@ static char *replace_placeholder(const char *src, const char *placeholder, const
     return (result);
 }
 
-static int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
-{
-    int     i;
-    char    *new_src;
-
-    for (i = 0; i < variant->n_decrypts; i++)
-    {
-        t_decrypt_spec  *spec = &variant->decrypts[i];
-        t_polyblock     *target;
-        t_diff_result   diff;
-        t_decrypt_method chosen;
-        char            *stub_src;
-        char            placeholder[64];
-
-        target = find_block(ctx, spec->target_identifier);
-        if (!target)
-        {
-            fprintf(stderr, "polyblock: DECRYPT cible '%s' introuvable\n",
-                    spec->target_identifier);
-            return (-1);
-        }
-        if (!target->ciphertext.bytecode || !target->plaintext.bytecode)
-        {
-            fprintf(stderr, "polyblock: DECRYPT cible '%s' pas encore resolue "
-                    "(ordre topologique incorrect)\n", spec->target_identifier);
-            return (-1);
-        }
-        if (compute_diff(&target->ciphertext, &target->plaintext, &diff) < 0)
-            return (-1);
-
-        chosen = spec->methods[rand() % spec->n_methods];
-        spec->chosen_method = chosen;
-        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
-        if (!stub_src)
-            return (-1);
-
-        snprintf(placeholder, sizeof(placeholder), "%%decrypt_slot %d", i);
-        new_src = replace_placeholder(variant->src, placeholder, stub_src);
-        free(stub_src);
-        if (!new_src)
-            return (-1);
-        free(variant->src);
-        variant->src = new_src;
-    }
-    return (0);
-}
-
 int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
 {
     t_polyblock *order[MAX_POLYBLOCKS];
