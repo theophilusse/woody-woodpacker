@@ -170,9 +170,9 @@ static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, i
     int         fixup_start;
     t_polyctx   *saved_polyctx;
     int         saved_is_cipher;
-	int saved_sync = a->key_sync_enabled;
+    int         saved_sync;
 
-    a->key_sync_enabled = (variant->sync == SYNC_ON);
+    variant->key_index_before = a->key_index;   /* NOUVEAU : memorise le point de depart */
 
     memset(&local_e, 0, sizeof(local_e));
     saved_e = a->out->e;
@@ -180,8 +180,10 @@ static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, i
 
     saved_polyctx = a->polyctx;
     saved_is_cipher = a->current_variant_is_cipher;
+    saved_sync = a->key_sync_enabled;
     a->polyctx = ctx;
     a->current_variant_is_cipher = is_cipher;
+    a->key_sync_enabled = (variant->sync == SYNC_ON);
 
     label_start = a->nlabels;
     fixup_start = a->nfixups;
@@ -191,7 +193,7 @@ static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, i
         a->out->e = saved_e;
         a->polyctx = saved_polyctx;
         a->current_variant_is_cipher = saved_is_cipher;
-		a->key_sync_enabled = saved_sync;
+        a->key_sync_enabled = saved_sync;
         return (-1);
     }
 
@@ -205,7 +207,7 @@ static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, i
     a->out->e = saved_e;
     a->polyctx = saved_polyctx;
     a->current_variant_is_cipher = saved_is_cipher;
-	a->key_sync_enabled = saved_sync;
+    a->key_sync_enabled = saved_sync;
     return (0);
 }
 
@@ -253,6 +255,7 @@ static int equalize_sizes(t_asm *a, t_polyctx *ctx, t_polyblock *blk)
     ** assemblage (puisqu'on va tout refaire), en les retirant du pool global. */
     a->nlabels = shorter->label_range_start;
     a->nfixups = shorter->fixup_range_start;
+	a->key_index = shorter->key_index_before;
     free(shorter->bytecode);
     shorter->bytecode = NULL;
 
