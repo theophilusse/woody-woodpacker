@@ -44,7 +44,7 @@ static void split_directive(const char *line, char *keyword, char *rest)
 }
 */
 
-static int equalize_sizes(t_asm *a, t_polyctx *ctx, t_polyblock *blk)
+int equalize_sizes(t_asm *a, t_polyctx *ctx, t_polyblock *blk)
 {
     size_t max_len;
     t_block_variant *shorter;
