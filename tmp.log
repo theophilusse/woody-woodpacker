@@ -14,8 +14,6 @@
 ########## TEST: IMBRICATION SYNTAXIQUE ##########
 [DEBUG] parse_polyblock('outer')
 [DEBUG] parse_polyblock('inner')
-asm: inconnu: '%polyblock_ref' (2 tokens)
-  tok[0] = '%polyblock_ref'
-  tok[1] = 'inner'
+asm: %POLYBLOCK_REF 'inner' pas encore resolu (ordre topologique incorrect ?)
 asm: %polyblock_ref inner 
 ECHEC resolve_sizes

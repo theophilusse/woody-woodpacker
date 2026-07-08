@@ -40,6 +40,14 @@ static int visit_block(t_polyctx *ctx, t_polyblock *b, t_polyblock **order, int 
             return (-1);
         }
     }
+    for (i = 0; i < b->n_children; i++)
+    {
+        if (visit_block(ctx, b->children[i], order, n_order) < 0)
+        {
+            b->visiting = 0;
+            return (-1);
+        }
+    }
     b->visiting = 0;
     b->resolved = 1;
     order[(*n_order)++] = b;
@@ -55,7 +63,7 @@ int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order)
         ctx->blocks[i].resolved = 0;
     for (i = 0; i < ctx->n_blocks; i++)
     {
-        if (!ctx->blocks[i].resolved)
+        if (!ctx->blocks[i].parent && !ctx->blocks[i].resolved)
         {
             if (visit_block(ctx, &ctx->blocks[i], order, n_order) < 0)
                 return (-1);
