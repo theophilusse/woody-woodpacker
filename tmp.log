@@ -3,4 +3,12 @@
 [DEBUG] parse_polyblock('secret_cipher')
 [DEBUG] parse_polyblock('anti_debug')
 [DEBUG] parse_decrypt_directive line='    %DECRYPT secret_cipher XOR'
-OK: generate_decrypts termine sans erreur
+OK: resolve_sizes termine (DECRYPT injecte en interne)
+=== BLOCK 'secret_cipher' ===
+  final_offset=0 final_size=8
+  ciphertext len=8: 48 8d 04 25 63 00 00 00 
+  plaintext  len=8: 31 c0 45 31 ff 90 90 90 
+=== BLOCK 'anti_debug' ===
+  final_offset=8 final_size=95
+  ciphertext len=95: 48 8d 3d f9 ff ff ff 80 77 00 79 81 c7 01 00 00 00 80 77 00 4d 81 c7 01 00 00 00 80 77 00 45 81 c7 01 00 00 00 80 77 00 a6 81 c7 01 00 00 00 80 77 00 8c 81 c7 01 00 00 00 80 77 00 01 81 c7 01 00 00 00 80 77 00 90 81 c7 01 00 00 00 80 77 00 90 81 c7 01 00 00 00 48 8d 3c 25 01 00 00 00 
+  plaintext  len=95: 31 ff 41 81 c7 01 00 00 00 41 83 ef 01 45 31 ff 41 81 c6 01 00 00 00 45 31 f6 41 83 ee 01 41 81 c7 01 00 00 00 41 81 c6 01 00 00 00 45 31 f6 41 81 c6 01 00 00 00 45 31 ff 41 81 c6 01 00 00 00 41 81 c6 01 00 00 00 41 81 c6 01 00 00 00 45 31 f6 45 31 ff 41 81 c7 01 00 00 00 90 90 90 90 
