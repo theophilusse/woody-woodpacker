@@ -54,12 +54,12 @@ typedef struct s_decrypt_spec
 ** alternatives d'un meme espace memoire polymorphe */
 typedef struct s_block_variant
 {
-    char        *src;              /* texte source de ce variant (avant expansion macro) */
+    char        *src;
     size_t      src_len;
-    uint8_t     *bytecode;         /* bytecode assemble (rempli en phase de resolution) */
+    uint8_t     *bytecode;
     size_t      bytecode_len;
     t_sync_mode sync;
-    t_decrypt_spec *decrypts;      /* %DECRYPT trouves DANS ce variant */
+    t_decrypt_spec decrypts[MAX_DECRYPT_SPECS];   /* tableau, pas pointeur */
     int         n_decrypts;
 }   t_block_variant;
 

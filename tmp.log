@@ -1,0 +1,2 @@
+[DEBUG] parse_polyblock('anti_debug')
+[DEBUG] parse_decrypt_directive line='    %DECRYPT secret_cipher SUB, ADD'
