@@ -188,7 +188,6 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
     return (out_src);
 }
 
-/*
 static char *replace_placeholder(const char *src, const char *placeholder, const char *replacement)
 {
     char    *result;
@@ -212,7 +211,6 @@ static char *replace_placeholder(const char *src, const char *placeholder, const
     strcat(result, pos + strlen(placeholder));
     return (result);
 }
-*/
 
 int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
 {

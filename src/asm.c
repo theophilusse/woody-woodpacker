@@ -238,31 +238,6 @@ static void apply_offset_shift(t_asm *a, t_block_variant *variant, size_t final_
     }
 }
 
-static char *replace_placeholder(const char *src, const char *placeholder, const char *replacement)
-{
-    char    *result;
-    char    *pos;
-    size_t  before_len;
-    size_t  after_len;
-    size_t  new_len;
-
-    pos = strstr(src, placeholder);
-    if (!pos)
-        return (strdup(src));   /* rien a remplacer */
-
-    before_len = (size_t)(pos - src);
-    after_len = strlen(pos + strlen(placeholder));
-    new_len = before_len + strlen(replacement) + after_len + 1;
-
-    result = malloc(new_len);
-    if (!result)
-        return (NULL);
-    memcpy(result, src, before_len);
-    strcpy(result + before_len, replacement);
-    strcat(result, pos + strlen(placeholder));
-    return (result);
-}
-
 int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
 {
     t_polyblock *order[MAX_POLYBLOCKS];
