@@ -258,7 +258,7 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
             if (current_accum)
             {
                 char ref[128];
-                snprintf(ref, sizeof(ref), "%%POLYBLOCK_REF %s", child_id);
+                snprintf(ref, sizeof(ref), "%%polyblock_ref %s", child_id);   /* minuscules, fix precedent */
                 accum_line(current_accum, ref);
             }
             continue;
@@ -272,12 +272,9 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
                 accum_line(current_accum, line);
             continue;
         }
+        /* ligne normale (instruction _SET/_ZERO/etc ou label) */
         if (current_accum)
-        {
-            char ref[128];
-            snprintf(ref, sizeof(ref), "%%polyblock_ref %s", child_id);
-            accum_line(current_accum, ref);
-        }
+            accum_line(current_accum, line);
     }
 
     /* Fige les textes source ET les flags sync, UNE SEULE FOIS, apres la boucle */
