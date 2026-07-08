@@ -204,7 +204,7 @@ void test_polyblock_resolve_sizes(void)
     a.key_sync_enabled = 1;
     a.label_base_offset = 0;
 
-    if (polyblock_resolve_sizes(&a, ctx) < 0)
+    if (polyblock_resolve_sizes(&a, ctx, 0) < 0)
     {
         fprintf(stderr, "ECHEC resolve_sizes\n");
         return;
@@ -282,7 +282,7 @@ static void run_polyblock_test(const char *source, const char *label)
     a.key_sync_enabled = 1;
     a.label_base_offset = 0;
 
-    if (polyblock_resolve_sizes(&a, ctx) < 0)
+    if (polyblock_resolve_sizes(&a, ctx, 0) < 0)
     {
         fprintf(stderr, "ECHEC resolve_sizes\n");
         return;
@@ -344,13 +344,13 @@ static void run_polyblock_test_full(const char *source, const char *label)
     a.crypto = &crypto;
     a.key_sync_enabled = 1;
 
-    if (polyblock_resolve_sizes(&a, ctx) < 0)
+    if (polyblock_resolve_sizes(&a, ctx, 0) < 0)
     {
         fprintf(stderr, "ECHEC resolve_sizes\n");
         return;
     }
 
-	if (polyblock_resolve_sizes(&a, ctx) < 0)
+	if (polyblock_resolve_sizes(&a, ctx, 0) < 0)
 	{
 		fprintf(stderr, "ECHEC resolve_sizes\n");
 		return;
