@@ -260,18 +260,17 @@ t_asm_result *polyblock_link(t_asm *a, t_polyctx *ctx, const char *entry_block,
     int         n_order;
     int         i;
 
-    /* 1. Emet le jmp <entry_block> initial */
+    deflabel(a, "scan_start");   /* AJOUT : englobe tout depuis le tout debut */
+
     {
         size_t dummy;
         emit_jmp_rel32(&a->out->e, &dummy);
         addfixup(a, entry_block, dummy, dummy + 4, 0);
     }
 
-    /* 2. Resout tailles/offsets de tous les blocs */
     if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
         return (NULL);
 
-    /* 3. Copie chaque bloc dans le buffer final */
     if (polyblock_topo_sort(ctx, order, &n_order) < 0)
         return (NULL);
     for (i = 0; i < n_order; i++)
@@ -280,11 +279,11 @@ t_asm_result *polyblock_link(t_asm *a, t_polyctx *ctx, const char *entry_block,
         emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
     }
 
-    /* 4. Assemble les donnees hors-bloc */
+    deflabel(a, "scan_end");     /* AJOUT : juste avant les donnees */
+
     if (data_src && assemble_source(a, data_src) < 0)
         return (NULL);
 
-    /* 5. Resolution finale des fixups */
     for (i = 0; i < a->nfixups; i++)
     {
         int64_t target = sym(a, a->fixups[i].name);

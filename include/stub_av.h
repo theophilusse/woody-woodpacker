@@ -2,7 +2,7 @@
 # define STUB_AV_H
 
 static const char STUB_POLY_DEMO_BLOCKS[] =
-"scan_start:\n"
+//"scan_start:\n"
 "%POLYBLOCK_START greeting\n"
 "%CIPHERTEXT NOSYNC\n"
 "    _SET eax, 111\n"
@@ -44,8 +44,8 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 "%PLAINTEXT SYNC\n"
 "    _ZERO eax\n"
 "    _ZERO edi\n"
-"%POLYBLOCK_END\n"
-"scan_end:\n";
+"%POLYBLOCK_END\n";
+//"scan_end:\n";
 
 static const char STUB_POLY_DEMO_DATA[] =
 "greeting_msg:\n"

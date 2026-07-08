@@ -9,9 +9,14 @@ char *build_stub_source(const t_opts *opts)
     int         i;
 
     n = 0;
-    blocks[n++] = STUB_AV_DETECT;
-    blocks[n++] = STUB_FOOTER;
-    blocks[n++] = STUB_AV_DATA;
+    blocks[n++] = STUB_POLY_DEMO_BLOCKS;
+    blocks[n++] = STUB_POLY_DEMO_DATA;
+    if (0)
+    {
+        blocks[n++] = STUB_AV_DETECT;
+        blocks[n++] = STUB_FOOTER;
+        blocks[n++] = STUB_AV_DATA;
+    }
     if (0)
     {
         blocks[n++] = STUB_HEADER;
