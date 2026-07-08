@@ -10,7 +10,7 @@ static int is_directive(const char *line)
 }
 */
 
-static t_polyblock *find_block(t_polyctx *ctx, const char *name)
+t_polyblock *find_block(t_polyctx *ctx, const char *name)
 {
     int i;
 
@@ -43,6 +43,30 @@ static void split_directive(const char *line, char *keyword, char *rest)
     rest[i] = '\0';
 }
 */
+
+static int equalize_sizes(t_polyblock *blk)
+{
+    size_t max_len = blk->ciphertext.bytecode_len > blk->plaintext.bytecode_len
+                    ? blk->ciphertext.bytecode_len : blk->plaintext.bytecode_len;
+    t_block_variant *shorter = blk->ciphertext.bytecode_len < max_len
+                              ? &blk->ciphertext : &blk->plaintext;
+
+    if (blk->ciphertext.bytecode_len == blk->plaintext.bytecode_len)
+    {
+        blk->final_size = max_len;
+        return (0);
+    }
+
+    size_t pad = max_len - shorter->bytecode_len;
+    uint8_t *padded = realloc(shorter->bytecode, max_len);
+    if (!padded)
+        return (-1);
+    memset(padded + shorter->bytecode_len, 0x90, pad);   /* NOP filler */
+    shorter->bytecode = padded;
+    shorter->bytecode_len = max_len;
+    blk->final_size = max_len;
+    return (0);
+}
 
 /* DFS avec marquage 3 couleurs (blanc/gris/noir) pour detecter les cycles */
 static int visit_block(t_polyctx *ctx, t_polyblock *b, t_polyblock **order, int *n_order)

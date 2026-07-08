@@ -26,6 +26,13 @@ static int preg(const char *s, t_reg *r, int *sz)
     return 0;
 }
 
+static const char *reg_name(t_reg r, int size)
+{
+    if (size == 32) return (R32[r]);
+    if (size == 64) return (R64[r]);
+    return ("?");
+}
+
 /* ── symboles ───────────────────────────────────────────────────── */
 static int64_t	sym(t_asm *a, const char *n)
 {
@@ -45,32 +52,137 @@ static int64_t	sym(t_asm *a, const char *n)
 	return -1;
 }
 
-static void	deflabel(t_asm *a, const char *name)
+/* base_offset : ajoute a a->out->e.len pour obtenir l'offset final du label.
+** Vaut 0 pour un assemblage normal (stub principal), et final_offset du bloc
+** pour un assemblage de variant polyblock effectue dans un buffer temporaire. */
+static void deflabel(t_asm *a, const char *name)
 {
-	if (a->nlabels >= MAX_LABELS)
-	{
-		fprintf(stderr, "asm: ERREUR MAX_LABELS (%d) depasse a la definition de '%s'\n",
-			MAX_LABELS, name);
-		exit(1);
-	}
-	strncpy(a->labels[a->nlabels].name, name, 63);
-	a->labels[a->nlabels].off = a->out->e.len;
-	a->nlabels++;
+    if (a->nlabels >= MAX_LABELS)
+    {
+        fprintf(stderr, "asm: ERREUR MAX_LABELS (%d) depasse a la definition de '%s'\n",
+                MAX_LABELS, name);
+        exit(1);
+    }
+    strncpy(a->labels[a->nlabels].name, name, 63);
+    a->labels[a->nlabels].off = a->out->e.len + a->label_base_offset;
+    a->nlabels++;
 }
 
-static void	addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
+static int assemble_source(t_asm *a, const char *src)
 {
-	if (a->nfixups >= MAX_FIXUPS)
-	{
-		fprintf(stderr, "asm: ERREUR MAX_FIXUPS (%d) depasse pour '%s'\n",
-			MAX_FIXUPS, name);
-		exit(1);
-	}
-	a->fixups[a->nfixups].off = off;
-	a->fixups[a->nfixups].end = end;
-	a->fixups[a->nfixups].is_rel8 = is_rel8;
-	strncpy(a->fixups[a->nfixups].name, name, 63);
-	a->nfixups++;
+    char    toks[8][64];
+    char    line[256];
+    int     n, llen, tok0len;
+    const char *p;
+
+    p = src;
+    while (*p)
+    {
+        const char *start = p;
+        while (*p && *p != '\n') p++;
+        llen = (int)(p - start);
+        if (*p == '\n') p++;
+        if (llen <= 0 || llen > 255) continue;
+        strncpy(line, start, (size_t)llen);
+        line[llen] = '\0';
+        memset(toks, 0, sizeof(toks));
+        n = tokenize(line, toks, 8);
+        if (n == 0) continue;
+        tok0len = (int)strlen(toks[0]);
+        if (tok0len > 1 && toks[0][tok0len - 1] == ':')
+        {
+            toks[0][tok0len - 1] = '\0';
+            deflabel(a, toks[0]);
+            if (ainstr(a, toks + 1, n - 1) < 0)
+                return (-1);
+            continue;
+        }
+        if (ainstr(a, toks, n) < 0)
+        {
+            fprintf(stderr, "asm: ");
+            for (int i = 0; i < n; i++)
+                fprintf(stderr, "%s ", toks[i]);
+            fprintf(stderr, "\n");
+            return (-1);
+        }
+    }
+    return (0);
+}
+
+static int resolve_variant(t_asm *a, t_polyctx *ctx, t_block_variant *variant, int is_cipher)
+{
+    t_emitter   local_e;
+    t_emitter   saved_e;
+    int         label_start;
+    int         fixup_start;
+    t_polyctx   *saved_polyctx;
+    int         saved_is_cipher;
+	int saved_sync = a->key_sync_enabled;
+
+    a->key_sync_enabled = (variant->sync == SYNC_ON);
+
+    memset(&local_e, 0, sizeof(local_e));
+    saved_e = a->out->e;
+    a->out->e = local_e;
+
+    saved_polyctx = a->polyctx;
+    saved_is_cipher = a->current_variant_is_cipher;
+    a->polyctx = ctx;
+    a->current_variant_is_cipher = is_cipher;
+
+    label_start = a->nlabels;
+    fixup_start = a->nfixups;
+
+    if (assemble_source(a, variant->src) < 0)
+    {
+        a->out->e = saved_e;
+        a->polyctx = saved_polyctx;
+        a->current_variant_is_cipher = saved_is_cipher;
+		a->key_sync_enabled = saved_sync;
+        return (-1);
+    }
+
+    variant->bytecode = a->out->e.buf;
+    variant->bytecode_len = a->out->e.len;
+    variant->label_range_start = label_start;
+    variant->label_range_end = a->nlabels;
+    variant->fixup_range_start = fixup_start;
+    variant->fixup_range_end = a->nfixups;
+
+    a->out->e = saved_e;
+    a->polyctx = saved_polyctx;
+    a->current_variant_is_cipher = saved_is_cipher;
+	a->key_sync_enabled = saved_sync;
+    return (0);
+}
+
+/* A appeler une fois final_offset du bloc connu (apres egalisation) */
+static void apply_offset_shift(t_asm *a, t_block_variant *variant, size_t final_offset)
+{
+    int i;
+
+    for (i = variant->label_range_start; i < variant->label_range_end; i++)
+        a->labels[i].off += final_offset;
+    for (i = variant->fixup_range_start; i < variant->fixup_range_end; i++)
+    {
+        a->fixups[i].off += final_offset;
+        a->fixups[i].end += final_offset;
+    }
+}
+
+static void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
+{
+    if (a->nfixups >= MAX_FIXUPS)
+    {
+        fprintf(stderr, "asm: ERREUR MAX_FIXUPS (%d) depasse pour '%s'\n",
+                MAX_FIXUPS, name);
+        exit(1);
+    }
+    a->fixups[a->nfixups].off = off + a->label_base_offset;
+    a->fixups[a->nfixups].end = end + a->label_base_offset;
+    a->fixups[a->nfixups].is_rel8 = is_rel8;
+    strncpy(a->fixups[a->nfixups].name, name, 63);
+    a->nfixups++;
 }
 
 /* ── tokeniseur ─────────────────────────────────────────────────── */
@@ -207,6 +319,16 @@ static uint8_t jcc_opcode(const char *m)
     if (!strcmp(m,"jbe")||!strcmp(m,"jna")) return 0x76;
 	if (!strcmp(m,"jb") ||!strcmp(m,"jnae")||!strcmp(m,"jc")) return 0x72;
     return 0;
+}
+
+static void log_bit(t_asm *a, const char *name, size_t off, int bit)
+{
+    if (!a->key_sync_enabled)
+        return;
+    snprintf(g_bit_log_name[g_bit_log_len], 32, "%s", name);
+    g_bit_log_off[g_bit_log_len] = off;
+    g_bit_log[g_bit_log_len++] = bit;
+    a->key_index++;
 }
 
 /* ── assemblage d une instruction ──────────────────────────────── */
@@ -1152,33 +1274,29 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 	if (!strcmp(toks[0], "_zero") && n == 2)
 	{
 		if (!preg(toks[1], &r1, &s1)) return -1;
-
 		size_t off_before = a->out->e.len;
 		if (s1 == 8) {
-			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);   /* 0x24/0x80 ✓ */
-			else           emit_xor_r32_r32(&a->out->e, r1, r1);   /* 0x31 ✓ LDE reconnaît */
+			if (lsb_value) emit_and_r8_imm8(&a->out->e, r1, 0);
+			else           emit_xor_r32_r32(&a->out->e, r1, r1);
 		}
 		else if (s1 == 32) {
-			if (lsb_value)
-				emit_and_r32_imm8(&a->out->e, r1, 0);
-			else
-				emit_xor_r32_r32(&a->out->e, r1, r1);  // XOR r32, r32
+			if (lsb_value) emit_and_r32_imm8(&a->out->e, r1, 0);
+			else           emit_xor_r32_r32(&a->out->e, r1, r1);
 		}
 		else if (s1 == 64) {
-			if (lsb_value)
-				emit_and_r64_imm8(&a->out->e, r1, 0);  // AND r64, 0
-			else
-				emit_xor_r64_r64(&a->out->e, r1, r1);  // XOR r64, r64
+			if (lsb_value) emit_and_r64_imm8(&a->out->e, r1, 0);
+			else           emit_xor_r64_r64(&a->out->e, r1, r1);
 		}
-	    snprintf(g_bit_log_name[g_bit_log_len], 32, "_ZERO %s", toks[1]);
-		g_bit_log_off[g_bit_log_len] = off_before;
-		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-		a->key_index++;
+		char logname[32];
+		snprintf(logname, 32, "_ZERO %s", toks[1]);
+		log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 		return 0;
 	}
 	if (!strcmp(toks[0], "_set") && n == 3)
 	{
 		size_t off_before = a->out->e.len;
+		char logname[32];
+
 		if (toks[1][0] == '[')
 		{
 			mt = pmem(toks[1], &base, &idx, lbl, &d8);
@@ -1187,58 +1305,51 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				fprintf(stderr, "asm: _SET [mem],reg attend un registre 8 bits\n");
 				return -1;
 			}
-			if (mt == 3)   /* [base] seul */
+			if (mt == 3)
 			{
 				if (lsb_value)
-					emit_mov_mem_sib_r8(&a->out->e, base, 4, r2);            /* bit=1 : mod=00, SIB, idx=4 */
+					emit_mov_mem_sib_r8(&a->out->e, base, 4, r2);
 				else
-					emit_mov_mem_sib_disp8_r8(&a->out->e, base, 4, 0, r2);   /* bit=0 : mod=01, SIB, idx=4, disp8=0 */
+					emit_mov_mem_sib_disp8_r8(&a->out->e, base, 4, 0, r2);
 			}
-			else if (mt == 1)   /* [base+idx] */
+			else if (mt == 1)
 			{
 				if (lsb_value)
 					emit_mov_mem_sib_r8(&a->out->e, base, idx, r2);
 				else
 					emit_mov_mem_sib_disp8_r8(&a->out->e, base, idx, 0, r2);
 			}
-			else if (mt == 4)   /* [base+disp8], PAS SIB par nature */
+			else
 			{
-				fprintf(stderr, "asm: _SET [base+disp8],reg — forme non-SIB non supportee "
-						"par ce LDE (utilise mt==3 ou mt==1)\n");
+				fprintf(stderr, "asm: _SET [mem],reg (mt=%d) non gere\n", mt);
 				return -1;
 			}
-			snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET [mem],%s", toks[2]);
-			g_bit_log_off[g_bit_log_len] = off_before;
-			g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-			a->key_index++;
+			snprintf(logname, 32, "_SET [mem],%s", toks[2]);
+			log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 			return 0;
 		}
+
 		if (!preg(toks[1], &r1, &s1)) return -1;
-		if (toks[2][0] == '[')                       /* source mémoire */
+
+		if (toks[2][0] == '[')
 		{
 			mt = pmem(toks[2], &base, &idx, lbl, &d8);
-
 			if (s1 == 8)
 			{
 				if (lsb_value) {
-					/* bit=1 : MOV r8, r/m8 (0x8A) — nouveau pattern LDE */
 					if (mt == 3) emit_mov_r8_mem_reg(&a->out->e, r1, base);
 					if (mt == 4) emit_mov_r8_mem_disp8(&a->out->e, r1, base, d8);
 					if (mt == 1) emit_mov_r8_mem_sib_disp(&a->out->e, r1, base, idx, 0);
 					emit_and_r32_imm32(&a->out->e, r1, 0xff);
 				} else {
-					/* bit=0 : MOVZX r32(alias), r/m8 — deja reconnu par le LDE */
 					if (mt == 3) emit_movzx_r32_mem_reg(&a->out->e, r1, base);
 					if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
 					if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 				}
-				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				g_bit_log_off[g_bit_log_len] = off_before;
-				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-				a->key_index++;
+				snprintf(logname, 32, "_SET %s", toks[1]);
+				log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 				return 0;
 			}
-
 			if (lsb_value) {
 				if (mt == 3) emit_mov_r32_mem_reg(&a->out->e, r1, base);
 				if (mt == 4) emit_mov_r32_mem_disp8(&a->out->e, r1, base, d8);
@@ -1248,80 +1359,55 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				if (mt == 4) emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8);
 				if (mt == 1) emit_movzx_r32_mem_sib8(&a->out->e, r1, base, idx);
 			}
-			snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-			g_bit_log_off[g_bit_log_len] = off_before;
-			g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-			a->key_index++;
+			snprintf(logname, 32, "_SET %s", toks[1]);
+			log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 			return 0;
 		}
-		else if (preg(toks[2], &r2, &s2))            /* source registre */
+		else if (preg(toks[2], &r2, &s2))
 		{
-			/* r64 → r64 */
 			if (s1 == 64 && s2 == 64)
 			{
-				if (lsb_value)
-					emit_mov_r64_r64(&a->out->e, r1, r2);       /* 48 89 /r */
-				else
-					emit_lea_r64_reg0(&a->out->e, r1, r2);       /* 48 8D mod=01 disp8=0 */
-				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				g_bit_log_off[g_bit_log_len] = off_before;
-				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-				a->key_index++;
+				if (lsb_value) emit_mov_r64_r64(&a->out->e, r1, r2);
+				else           emit_lea_r64_reg0(&a->out->e, r1, r2);
+				snprintf(logname, 32, "_SET %s", toks[1]);
+				log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 				return 0;
 			}
-
-			/* r32 → r32 */
 			if (s1 == 32 && s2 == 32)
 			{
-				if (lsb_value)
-					emit_mov_r32_r32(&a->out->e, r1, r2);       /* 89 /r, déjà géré par @check_89 */
-				else
-					emit_lea_r32_reg0(&a->out->e, r1, r2);      /* 8D mod=01 disp8=0, nouvelle fonction */
-				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				g_bit_log_off[g_bit_log_len] = off_before;
-				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-				a->key_index++;
+				if (lsb_value) emit_mov_r32_r32(&a->out->e, r1, r2);
+				else           emit_lea_r32_reg0(&a->out->e, r1, r2);
+				snprintf(logname, 32, "_SET %s", toks[1]);
+				log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 				return 0;
 			}
-
 			if (s1 == 32 && s2 == 8)
 			{
-				if (lsb_value)
-					emit_movzx_r32_r8(&a->out->e, r1, r2);
-				else
-					emit_and_r32_imm32(&a->out->e, r1, 0xff);
-				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				g_bit_log_off[g_bit_log_len] = off_before;
-				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-				a->key_index++;
+				if (lsb_value) emit_movzx_r32_r8(&a->out->e, r1, r2);
+				else           emit_and_r32_imm32(&a->out->e, r1, 0xff);
+				snprintf(logname, 32, "_SET %s", toks[1]);
+				log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 				return 0;
 			}
-
-			/* r8 imm */
 			if (s1 == 8)
 			{
-				if (lsb_value)
-					emit_mov_r8_imm8(&a->out->e, r1, (uint8_t)val);   /* B0+r ib */
-				else
-					emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val); /* B8+r id, zero-extend */
-				snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-				g_bit_log_off[g_bit_log_len] = off_before;
-				g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-				a->key_index++;
+				if (lsb_value) emit_mov_r8_imm8(&a->out->e, r1, (uint8_t)val);
+				else           emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
+				snprintf(logname, 32, "_SET %s", toks[1]);
+				log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 				return 0;
 			}
 			fprintf(stderr, "asm: _SET %s,%s (s1=%d,s2=%d) non gere\n", toks[1], toks[2], s1, s2);
-    		return -1;
+			return -1;
 		}
-		else                                          /* source immédiate */
+		else
 		{
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
-			//size_t off_before = a->out->e.len; // debug
 			if (s1 == 64)
 			{
 				if (lsb_value) emit_mov_r64_imm64(&a->out->e, r1, (uint64_t)val);
-				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);  /* déjà 64 bits par construction */
+				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
 			}
 			else
 			{
@@ -1329,56 +1415,150 @@ static int	ainstr(t_asm *a, char toks[][64], int n)
 				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
 			}
 		}
-		snprintf(g_bit_log_name[g_bit_log_len], 32, "_SET %s", toks[1]);
-		g_bit_log_off[g_bit_log_len] = off_before;
-		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-		a->key_index++;
+		snprintf(logname, 32, "_SET %s", toks[1]);
+		log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 		return 0;
 	}
 	if (!strcmp(toks[0], "_inc") && n == 2)
 	{
-		if (!preg(toks[1], &r1, &s1))
-			return (-1);
+		if (!preg(toks[1], &r1, &s1)) return (-1);
 		size_t off_before = a->out->e.len;
-		if (lsb_value)           // variante 0 : INC
-		{
+		if (lsb_value) {
 			if (s1 == 8)       emit_inc_r8(&a->out->e, r1);
 			else if (s1 == 32) emit_inc_r32(&a->out->e, r1);
 			else               emit_inc_r64(&a->out->e, r1);
-		}
-		else {  /* lsb=0 */
+		} else {
 			if (s1 == 8)
-				emit_add_r8_imm8(&a->out->e, r1, 1);   /* 80 /0 01 ← LDE reconnaît */
+				emit_add_r8_imm8(&a->out->e, r1, 1);
 			else if (s1 == 32 || s1 == 64)
 				emit_add_r32_imm32_long(&a->out->e, r1, 1);
 		}
-		snprintf(g_bit_log_name[g_bit_log_len], 32, "_INC %s", toks[1]);
-		g_bit_log_off[g_bit_log_len] = off_before;
-		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-		a->key_index++;
+		char logname[32];
+		snprintf(logname, 32, "_INC %s", toks[1]);
+		log_bit(a, logname, off_before, lsb_value ? 1 : 0);
 		return (0);
 	}
 	if (!strcmp(toks[0], "_dec") && n == 2)
 	{
-		if (!preg(toks[1], &r1, &s1))
-			return (-1);
+		if (!preg(toks[1], &r1, &s1)) return (-1);
 		size_t off_before = a->out->e.len;
-		if (lsb_value)           // variante 0 : DEC
-		{
+		if (lsb_value) {
 			if (s1 == 8)       emit_dec_r8(&a->out->e, r1);
 			else if (s1 == 32) emit_dec_r32(&a->out->e, r1);
 			else               emit_dec_r64(&a->out->e, r1);
-		}
-		else                               // variante 1 : SUB reg, 1
-		{
+		} else {
 			if (s1 == 8)       emit_sub_r8_imm8(&a->out->e, r1, 1);
 			else if (s1 == 32) emit_sub_r32_imm8(&a->out->e, r1, 1);
 			else               emit_sub_r64_imm8(&a->out->e, r1, 1);
 		}
-		snprintf(g_bit_log_name[g_bit_log_len], 32, "_DEC %s", toks[1]);
-		g_bit_log_off[g_bit_log_len] = off_before;
-		g_bit_log[g_bit_log_len++] = lsb_value ? 1 : 0;
-		a->key_index++;
+		char logname[32];
+		snprintf(logname, 32, "_DEC %s", toks[1]);
+		log_bit(a, logname, off_before, lsb_value ? 1 : 0);
+		return (0);
+	}
+	if (!strcmp(toks[0], "_junk") && n == 2)
+	{
+		long        target_bytes;
+		size_t      start_len;
+		size_t      remaining;
+		t_reg       scratch_regs[2];
+		int         guard;
+
+		target_bytes = strtol(toks[1], NULL, 0);
+		if (target_bytes < 0)
+		{
+			fprintf(stderr, "asm: _JUNK attend une taille positive\n");
+			return (-1);
+		}
+		scratch_regs[0] = REG_R14;
+		scratch_regs[1] = REG_R15;
+		start_len = a->out->e.len;
+		guard = 0;
+
+		while ((long)(a->out->e.len - start_len) < target_bytes)
+		{
+			remaining = (size_t)target_bytes - (a->out->e.len - start_len);
+			if (guard++ > (target_bytes * 4 + 64))
+			{
+				fprintf(stderr, "asm: _JUNK n'a pas pu converger vers %ld octets\n", target_bytes);
+				return (-1);
+			}
+
+			/* ── Complement fin : remplissage NOP octet par octet, TOUJOURS exact ── */
+			if (remaining <= 3)
+			{
+				while (remaining-- > 0)
+					emit_nop(&a->out->e);
+				break;
+			}
+
+			/* ── Sinon, tente une macro polymorphe SEULEMENT si sa PLUS GRANDE
+			** variante possible tient dans remaining, sinon fallback NOP ── */
+			{
+				t_reg reg = scratch_regs[rand() % 2];
+				int choice = rand() % 3;   /* _INC, _DEC, _ZERO : tailles connues et bornees */
+				char sub_toks[3][64];
+				size_t before = a->out->e.len;
+
+				if (choice == 0 && remaining >= 3)      /* _INC r32 : 2 ou 3 octets max */
+				{
+					snprintf(sub_toks[0], 64, "_inc");
+					snprintf(sub_toks[1], 64, "%s", reg_name(reg, 32));
+					ainstr(a, sub_toks, 2);
+				}
+				else if (choice == 1 && remaining >= 3) /* _DEC r32 : 2 ou 3 octets max */
+				{
+					snprintf(sub_toks[0], 64, "_dec");
+					snprintf(sub_toks[1], 64, "%s", reg_name(reg, 32));
+					ainstr(a, sub_toks, 2);
+				}
+				else if (choice == 2 && remaining >= 6) /* _ZERO r32 : 2 a 6 octets max (REX+AND long) */
+				{
+					snprintf(sub_toks[0], 64, "_zero");
+					snprintf(sub_toks[1], 64, "%s", reg_name(reg, 32));
+					ainstr(a, sub_toks, 2);
+				}
+				else
+				{
+					emit_nop(&a->out->e);   /* fallback si aucune macro ne tient dans remaining */
+					continue;
+				}
+
+				/* Verifie qu'on n'a PAS depasse remaining malgre le garde ci-dessus */
+				if (a->out->e.len - before > remaining)
+				{
+					fprintf(stderr, "asm: _JUNK depassement interne detecte, "
+							"reduction du buffer non supportee — ajuste les seuils\n");
+					return (-1);
+				}
+			}
+		}
+		return (0);
+	}
+	if (!strcmp(toks[0], "%POLYBLOCK_REF") && n == 2)
+	{
+		t_polyblock *child;
+		t_block_variant *child_variant;
+
+		if (!a->polyctx)
+		{
+			fprintf(stderr, "asm: %%POLYBLOCK_REF hors contexte polyblock\n");
+			return (-1);
+		}
+		child = find_block(a->polyctx, toks[1]);
+		if (!child)
+		{
+			fprintf(stderr, "asm: %%POLYBLOCK_REF '%s' introuvable\n", toks[1]);
+			return (-1);
+		}
+		child_variant = a->current_variant_is_cipher ? &child->ciphertext : &child->plaintext;
+		if (!child_variant->bytecode)
+		{
+			fprintf(stderr, "asm: %%POLYBLOCK_REF '%s' pas encore resolu "
+					"(ordre topologique incorrect ?)\n", toks[1]);
+			return (-1);
+		}
+		emit_raw(&a->out->e, child_variant->bytecode, child_variant->bytecode_len);
 		return (0);
 	}
 	fprintf(stderr, "asm: inconnu: '%s' (%d tokens)\n", toks[0], n);
@@ -1428,47 +1608,20 @@ void dump_all_blocks(t_asm *a)
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts)
 {
     t_asm   a;
-    char    toks[8][64];
-    char    line[256];
-    int     n, llen, tok0len;
     int     lde_bit_log[512];
     int     lde_bit_log_len;
     int     bits;
 
-    g_bit_log_len = 0;          /* reset du log cote asm.c pour cette generation */
+	a.key_sync_enabled = 1;
+    g_bit_log_len = 0;
     lde_bit_log_len = 0;
-
     memset(&a, 0, sizeof(a));
     a.out    = out;
     a.crypto = crypto;
-    const char *p = src;
-    while (*p) {
-        const char *start = p;
-        while (*p && *p != '\n') p++;
-        llen = (int)(p - start);
-        if (*p == '\n') p++;
-        if (llen <= 0 || llen > 255) continue;
-        strncpy(line, start, (size_t)llen);
-        line[llen] = '\0';
-        memset(toks, 0, sizeof(toks));
-        n = tokenize(line, toks, 8);
-        if (n == 0) continue;
-        tok0len = (int)strlen(toks[0]);
-        if (tok0len > 1 && toks[0][tok0len - 1] == ':') {
-            toks[0][tok0len - 1] = '\0';
-            deflabel(&a, toks[0]);
-            if (ainstr(&a, toks + 1, n - 1) < 0) return -1;
-            continue;
-        }
-        if (ainstr(&a, toks, n) < 0)
-		{
-			fprintf(stderr, "asm: ");
-			for (int i = 0; i < n; i++)
-				fprintf(stderr, "%s ", toks[i]);
-			fprintf(stderr, "\n");
-			return -1;
-		}
-    }
+    a.label_base_offset = 0;   /* stub principal : jamais decale */
+
+    if (assemble_source(&a, src) < 0)
+        return (-1);
     /* resolution des fixups */
     for (int i = 0; i < a.nfixups; i++) {
         int64_t target = sym(&a, a.fixups[i].name);

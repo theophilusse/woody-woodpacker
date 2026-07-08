@@ -61,6 +61,10 @@ typedef struct s_block_variant
     t_sync_mode sync;
     t_decrypt_spec decrypts[MAX_DECRYPT_SPECS];   /* tableau, pas pointeur */
     int         n_decrypts;
+    int         label_range_start;
+    int         label_range_end;
+    int         fixup_range_start;
+    int         fixup_range_end;
 }   t_block_variant;
 
 /* Un bloc polymorphe complet : le noeud de l'arbre/DAG */
@@ -99,6 +103,7 @@ typedef struct s_polyctx
     char            block_names[MAX_POLYBLOCKS][MAX_POLYBLOCK_NAME];
 }   t_polyctx;
 
+t_polyblock *find_block(t_polyctx *ctx, const char *name);
 int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order);
 t_polyctx *polyblock_parse_all(const char *source);
 void polyblock_dump(t_polyctx *ctx);

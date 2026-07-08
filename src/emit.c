@@ -1434,3 +1434,9 @@ int emit_cmp_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm)
     b[n++] = imm;
     return emit_raw(e, b, n);
 }
+
+int emit_nop(t_emitter *e)
+{
+    uint8_t b = 0x90;
+    return emit_raw(e, &b, 1);
+}

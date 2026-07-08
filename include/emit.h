@@ -184,6 +184,7 @@ int emit_xor_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm);
 int emit_xor_r64_imm32(t_emitter *e, t_reg reg, int32_t imm);
 int emit_ret(t_emitter *e);
 int emit_cmp_mem_sib_imm8(t_emitter *e, t_reg base, t_reg idx, uint8_t imm);
+int emit_nop(t_emitter *e);
 
 /* opcodes jcc utiles */
 # define JL   0x7C
