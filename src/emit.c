@@ -1479,3 +1479,16 @@ int emit_mov_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm)
     b[n++] = imm;
     return emit_raw(e, b, n);
 }
+
+/* XOR [base+disp8], imm8 : 80 /6 ib */
+int emit_xor_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm)
+{
+    uint8_t b[5]; int n = 0;
+    uint8_t r = mk_rex(0, 0, base);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x80;
+    b[n++] = MODRM01(6, base);
+    b[n++] = (uint8_t)disp;
+    b[n++] = imm;
+    return emit_raw(e, b, n);
+}

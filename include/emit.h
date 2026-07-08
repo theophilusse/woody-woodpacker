@@ -189,6 +189,7 @@ int emit_nop(t_emitter *e);
 int emit_add_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 int emit_sub_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 int emit_mov_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
+int emit_xor_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 
 /* opcodes jcc utiles */
 # define JL   0x7C
