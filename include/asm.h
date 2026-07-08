@@ -30,6 +30,21 @@ typedef struct s_asm_result
 	size_t		patch_jmp_oep;
 }	t_asm_result;
 
+typedef struct
+{
+	t_asm_result    *out;
+	t_crypto_ctx    *crypto;
+	t_lbl           labels[MAX_LABELS];
+	int             nlabels;
+	t_fix           fixups[MAX_FIXUPS];
+	int             nfixups;
+	size_t			key_index;
+	size_t          label_base_offset;
+	t_polyctx       *polyctx;          /* contexte polyblock global, NULL si stub principal */
+    int             current_variant_is_cipher;
+	int				key_sync_enabled;
+}	t_asm;
+
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts);
 int	ainstr(t_asm *a, char toks[][64], int n);
 
