@@ -62,6 +62,21 @@ typedef struct s_opts
 	char	custom_key[KEY_LEN];
 }   t_opts;
 
+typedef struct
+{
+	t_asm_result    *out;
+	t_crypto_ctx    *crypto;
+	t_lbl           labels[MAX_LABELS];
+	int             nlabels;
+	t_fix           fixups[MAX_FIXUPS];
+	int             nfixups;
+	size_t			key_index;
+	size_t          label_base_offset;
+	t_polyctx       *polyctx;          /* contexte polyblock global, NULL si stub principal */
+    int             current_variant_is_cipher;
+	int				key_sync_enabled;
+}	t_asm;
+
 # include "opts.h"
 # include "emit.h"
 # include "asm.h"
