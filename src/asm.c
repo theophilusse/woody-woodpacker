@@ -12,6 +12,57 @@ static const char *R32[] = {"eax","ecx","edx","ebx","esp","ebp","esi","edi",
 static const char *R8L[] = {"al","cl","dl","bl"};                                   /* index 0-3 */
 static const char *R8H[] = {"r8b","r9b","r10b","r11b","r12b","r13b","r14b","r15b"}; /* index 8-15 */
 
+/* ── tokeniseur ─────────────────────────────────────────────────── */
+/* retourne nb tokens, tokenise une ligne.
+ * crochets [base+idx] = un seul token.
+ * pas de lowercase dans les identifiants commencant par @. */
+static int	tokenize(const char *line, char toks[][64], int max)
+{
+	const char	*p = line;
+	int			n = 0;
+	int			i;
+
+	while (*p && *p != ';' && *p != '\n')
+	{
+		while (*p == ' ' || *p == '\t') p++;
+		if (!*p || *p == ';' || *p == '\n') break;
+		if (*p == ',') { p++; continue; }
+		if (*p == '"')
+		{
+			char tmp[64]; i = 0; tmp[i++] = '"'; p++;
+			while (*p && *p != '"' && i < 62) tmp[i++] = *p++;
+			if (*p == '"') { tmp[i++] = '"'; p++; }
+			tmp[i] = '\0';
+			if (n < max) { strncpy(toks[n++], tmp, 63); }
+			continue;
+		}
+		if (*p == '[')
+		{
+			char tmp[64]; i = 0; tmp[i++] = '['; p++;
+			while (*p && *p != ']') tmp[i++] = tolower((unsigned char)*p++);
+			if (*p == ']') { tmp[i++] = ']'; p++; }
+			tmp[i] = '\0';
+			if (n < max) { strncpy(toks[n++], tmp, 63); }
+			continue;
+		}
+		if (*p)
+		{
+			char tmp[64]; i = 0;
+			while (*p && *p != ' ' && *p != '\t' && *p != ',' && *p != '[' && *p != ']' && *p != ';' && *p != '\n')
+				tmp[i++] = *p++;
+			tmp[i] = '\0';
+			if (i > 0 && n < max)
+			{
+				int j = 0;
+				while (tmp[j]) { toks[n][j] = tolower((unsigned char)tmp[j]); j++; }
+				toks[n][j] = '\0';
+				n++;
+			}
+		}
+	}
+	return n;
+}
+
 static int preg(const char *s, t_reg *r, int *sz)
 {
     int i;
@@ -183,57 +234,6 @@ static void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_
     a->fixups[a->nfixups].is_rel8 = is_rel8;
     strncpy(a->fixups[a->nfixups].name, name, 63);
     a->nfixups++;
-}
-
-/* ── tokeniseur ─────────────────────────────────────────────────── */
-/* retourne nb tokens, tokenise une ligne.
- * crochets [base+idx] = un seul token.
- * pas de lowercase dans les identifiants commencant par @. */
-static int	tokenize(const char *line, char toks[][64], int max)
-{
-	const char	*p = line;
-	int			n = 0;
-	int			i;
-
-	while (*p && *p != ';' && *p != '\n')
-	{
-		while (*p == ' ' || *p == '\t') p++;
-		if (!*p || *p == ';' || *p == '\n') break;
-		if (*p == ',') { p++; continue; }
-		if (*p == '"')
-		{
-			char tmp[64]; i = 0; tmp[i++] = '"'; p++;
-			while (*p && *p != '"' && i < 62) tmp[i++] = *p++;
-			if (*p == '"') { tmp[i++] = '"'; p++; }
-			tmp[i] = '\0';
-			if (n < max) { strncpy(toks[n++], tmp, 63); }
-			continue;
-		}
-		if (*p == '[')
-		{
-			char tmp[64]; i = 0; tmp[i++] = '['; p++;
-			while (*p && *p != ']') tmp[i++] = tolower((unsigned char)*p++);
-			if (*p == ']') { tmp[i++] = ']'; p++; }
-			tmp[i] = '\0';
-			if (n < max) { strncpy(toks[n++], tmp, 63); }
-			continue;
-		}
-		if (*p)
-		{
-			char tmp[64]; i = 0;
-			while (*p && *p != ' ' && *p != '\t' && *p != ',' && *p != '[' && *p != ']' && *p != ';' && *p != '\n')
-				tmp[i++] = *p++;
-			tmp[i] = '\0';
-			if (i > 0 && n < max)
-			{
-				int j = 0;
-				while (tmp[j]) { toks[n][j] = tolower((unsigned char)tmp[j]); j++; }
-				toks[n][j] = '\0';
-				n++;
-			}
-		}
-	}
-	return n;
 }
 
 /* ── parse memoire [base+idx] ou [label] ──────────────────────── */
