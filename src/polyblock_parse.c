@@ -74,101 +74,6 @@ static void accum_line(t_accum *acc, const char *line)
     acc->buf[acc->len] = '\0';
 }
 
-/* Parse recursivement un %POLYBLOCK_START ... %POLYBLOCK_END.
-** `it` doit etre positionne juste APRES la ligne %POLYBLOCK_START.
-** Retourne le bloc alloue dans ctx->blocks[], ou NULL en cas d'erreur. */
-static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
-        const char *identifier, t_polyblock *parent)
-{
-    t_polyblock *blk;
-    char        line[512];
-    t_accum     *current_accum = NULL;
-    int         in_ciphertext = 0;
-    int         in_plaintext = 0;
-    t_accum     cipher_acc;
-    t_accum     plain_acc;
-    t_sync_mode cipher_sync = SYNC_NONE;   /* DECLARE ICI, une seule fois */
-    t_sync_mode plain_sync = SYNC_NONE;
-
-    if (ctx->n_blocks >= MAX_POLYBLOCKS)
-    {
-        fprintf(stderr, "polyblock: MAX_POLYBLOCKS depasse\n");
-        return (NULL);
-    }
-    blk = &ctx->blocks[ctx->n_blocks++];
-    memset(blk, 0, sizeof(*blk));
-    strncpy(blk->identifier, identifier, MAX_POLYBLOCK_NAME - 1);
-    blk->parent = parent;
-    cipher_acc.len = 0; cipher_acc.buf[0] = '\0';
-    plain_acc.len = 0; plain_acc.buf[0] = '\0';
-
-    while (iter_next_line(it, line, sizeof(line)))
-    {
-        if (line_is_directive(line, "POLYBLOCK_END"))
-            break;
-
-        if (line_is_directive(line, "CIPHERTEXT"))
-        {
-            in_ciphertext = 1; in_plaintext = 0;
-            cipher_sync = parse_sync_flag(line);   /* AFFECTE, pas redeclare */
-            current_accum = &cipher_acc;
-            continue;
-        }
-        if (line_is_directive(line, "PLAINTEXT"))
-        {
-            in_ciphertext = 0; in_plaintext = 1;
-            plain_sync = parse_sync_flag(line);
-            current_accum = &plain_acc;
-            continue;
-        }
-        if (line_is_directive(line, "POLYBLOCK_START"))
-        {
-            char child_id[MAX_POLYBLOCK_NAME];
-            t_polyblock *child;
-
-            extract_id(line, "POLYBLOCK_START", child_id);
-            child = parse_polyblock(ctx, it, child_id, blk);
-            if (!child)
-                return (NULL);
-            if (blk->n_children >= MAX_CHILDREN)
-            {
-                fprintf(stderr, "polyblock: MAX_CHILDREN depasse dans '%s'\n", blk->identifier);
-                return (NULL);
-            }
-            blk->children[blk->n_children++] = child;
-            if (current_accum)
-            {
-                char ref[128];
-                snprintf(ref, sizeof(ref), "%%POLYBLOCK_REF %s", child_id);
-                accum_line(current_accum, ref);
-            }
-            continue;
-        }
-        if (line_is_directive(line, "DECRYPT"))
-        {
-            if (parse_decrypt_directive(ctx, blk, line,
-                    in_ciphertext ? &blk->ciphertext : &blk->plaintext) < 0)
-                return (NULL);
-            if (current_accum)
-                accum_line(current_accum, line);
-            continue;
-        }
-        if (current_accum)
-            accum_line(current_accum, line);
-    }
-
-    /* Fige les textes source ET les flags sync, UNE SEULE FOIS, apres la boucle */
-    blk->ciphertext.src = strdup(cipher_acc.buf);
-    blk->ciphertext.src_len = cipher_acc.len;
-    blk->ciphertext.sync = cipher_sync;
-    blk->plaintext.src = strdup(plain_acc.buf);
-    blk->plaintext.src_len = plain_acc.len;
-    blk->plaintext.sync = plain_sync;
-
-    strncpy(ctx->block_names[ctx->n_blocks - 1], identifier, MAX_POLYBLOCK_NAME - 1);
-    return (blk);
-}
-
 static t_decrypt_method method_from_str(const char *s)
 {
     if (!strcmp(s, "ADD")) return (METHOD_ADD);
@@ -264,6 +169,101 @@ static int parse_decrypt_directive(t_polyctx *ctx, t_polyblock *blk,
         }
     }
     return (0);
+}
+
+/* Parse recursivement un %POLYBLOCK_START ... %POLYBLOCK_END.
+** `it` doit etre positionne juste APRES la ligne %POLYBLOCK_START.
+** Retourne le bloc alloue dans ctx->blocks[], ou NULL en cas d'erreur. */
+static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
+        const char *identifier, t_polyblock *parent)
+{
+    t_polyblock *blk;
+    char        line[512];
+    t_accum     *current_accum = NULL;
+    int         in_ciphertext = 0;
+    //int         in_plaintext = 0;
+    t_accum     cipher_acc;
+    t_accum     plain_acc;
+    t_sync_mode cipher_sync = SYNC_NONE;   /* DECLARE ICI, une seule fois */
+    t_sync_mode plain_sync = SYNC_NONE;
+
+    if (ctx->n_blocks >= MAX_POLYBLOCKS)
+    {
+        fprintf(stderr, "polyblock: MAX_POLYBLOCKS depasse\n");
+        return (NULL);
+    }
+    blk = &ctx->blocks[ctx->n_blocks++];
+    memset(blk, 0, sizeof(*blk));
+    strncpy(blk->identifier, identifier, MAX_POLYBLOCK_NAME - 1);
+    blk->parent = parent;
+    cipher_acc.len = 0; cipher_acc.buf[0] = '\0';
+    plain_acc.len = 0; plain_acc.buf[0] = '\0';
+
+    while (iter_next_line(it, line, sizeof(line)))
+    {
+        if (line_is_directive(line, "POLYBLOCK_END"))
+            break;
+
+        if (line_is_directive(line, "CIPHERTEXT"))
+        {
+            in_ciphertext = 1; in_plaintext = 0;
+            cipher_sync = parse_sync_flag(line);   /* AFFECTE, pas redeclare */
+            current_accum = &cipher_acc;
+            continue;
+        }
+        if (line_is_directive(line, "PLAINTEXT"))
+        {
+            in_ciphertext = 0; in_plaintext = 1;
+            plain_sync = parse_sync_flag(line);
+            current_accum = &plain_acc;
+            continue;
+        }
+        if (line_is_directive(line, "POLYBLOCK_START"))
+        {
+            char child_id[MAX_POLYBLOCK_NAME];
+            t_polyblock *child;
+
+            extract_id(line, "POLYBLOCK_START", child_id);
+            child = parse_polyblock(ctx, it, child_id, blk);
+            if (!child)
+                return (NULL);
+            if (blk->n_children >= MAX_CHILDREN)
+            {
+                fprintf(stderr, "polyblock: MAX_CHILDREN depasse dans '%s'\n", blk->identifier);
+                return (NULL);
+            }
+            blk->children[blk->n_children++] = child;
+            if (current_accum)
+            {
+                char ref[128];
+                snprintf(ref, sizeof(ref), "%%POLYBLOCK_REF %s", child_id);
+                accum_line(current_accum, ref);
+            }
+            continue;
+        }
+        if (line_is_directive(line, "DECRYPT"))
+        {
+            if (parse_decrypt_directive(ctx, blk, line,
+                    in_ciphertext ? &blk->ciphertext : &blk->plaintext) < 0)
+                return (NULL);
+            if (current_accum)
+                accum_line(current_accum, line);
+            continue;
+        }
+        if (current_accum)
+            accum_line(current_accum, line);
+    }
+
+    /* Fige les textes source ET les flags sync, UNE SEULE FOIS, apres la boucle */
+    blk->ciphertext.src = strdup(cipher_acc.buf);
+    blk->ciphertext.src_len = cipher_acc.len;
+    blk->ciphertext.sync = cipher_sync;
+    blk->plaintext.src = strdup(plain_acc.buf);
+    blk->plaintext.src_len = plain_acc.len;
+    blk->plaintext.sync = plain_sync;
+
+    strncpy(ctx->block_names[ctx->n_blocks - 1], identifier, MAX_POLYBLOCK_NAME - 1);
+    return (blk);
 }
 
 static int is_direct_child(t_polyblock *blk, const char *target_id)
