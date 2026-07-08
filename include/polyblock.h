@@ -10,6 +10,8 @@
 # define MAX_POLYBLOCKS 128
 # define MAX_DECRYPT_SPECS 128
 
+typedef struct t_asm t_asm;
+
 typedef enum e_decrypt_method
 {
     METHOD_ADD,
