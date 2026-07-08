@@ -68,6 +68,7 @@ typedef struct s_block_variant
     int         label_range_end;
     int         fixup_range_start;
     int         fixup_range_end;
+    size_t      key_index_before;
 }   t_block_variant;
 
 /* Un bloc polymorphe complet : le noeud de l'arbre/DAG */
