@@ -310,6 +310,55 @@ void test_polyblock_final(void)
     run_polyblock_test(source_nested, "IMBRICATION SYNTAXIQUE");
 }
 
+const char *source_decrypt =
+"%POLYBLOCK_START secret_cipher\n"
+"%CIPHERTEXT NOSYNC\n"
+"    _SET eax, 99\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO eax\n"
+"%POLYBLOCK_END\n"
+"%POLYBLOCK_START anti_debug\n"
+"%CIPHERTEXT SYNC\n"
+"    %DECRYPT secret_cipher XOR\n"
+"    _SET edi, 1\n"
+"%PLAINTEXT SYNC\n"
+"    _ZERO edi\n"
+"%POLYBLOCK_END\n";
+
+static void run_polyblock_test_full(const char *source, const char *label)
+{
+    fprintf(stderr, "\n########## TEST: %s ##########\n", label);
+
+    t_polyctx *ctx = polyblock_parse_all(source);
+    if (!ctx) { fprintf(stderr, "ECHEC parsing\n"); return; }
+
+    t_asm a;
+    t_asm_result out;
+    t_crypto_ctx crypto;
+
+    memset(&a, 0, sizeof(a));
+    memset(&out, 0, sizeof(out));
+    memset(&crypto, 0, sizeof(crypto));
+    crypto.key_len = 16;
+    a.out = &out;
+    a.crypto = &crypto;
+    a.key_sync_enabled = 1;
+
+    if (polyblock_resolve_sizes(&a, ctx) < 0)
+    {
+        fprintf(stderr, "ECHEC resolve_sizes\n");
+        return;
+    }
+
+    if (polyblock_generate_decrypts(&a, ctx) < 0)
+    {
+        fprintf(stderr, "ECHEC generate_decrypts\n");
+        return;
+    }
+
+    fprintf(stderr, "OK: generate_decrypts termine sans erreur\n");
+}
+
 int main(int argc, char **argv)
 {
     t_elf_ctx       *ctx;
@@ -319,7 +368,8 @@ int main(int argc, char **argv)
 	//test_polyblock_parsing();
 	//test_polyblock_cycle_detection();
 	//test_polyblock_resolve_sizes();
-	test_polyblock_final();
+	//test_polyblock_final();
+	run_polyblock_test_full(source_decrypt, "DECRYPT XOR");
 	return 0;
     if (argc < 2)
 	{
