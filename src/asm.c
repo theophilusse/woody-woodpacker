@@ -121,7 +121,7 @@ void deflabel(t_asm *a, const char *name)
     a->nlabels++;
 }
 
-static int assemble_source(t_asm *a, const char *src)
+int assemble_source(t_asm *a, const char *src)
 {
     char    toks[8][64];
     char    line[256];
