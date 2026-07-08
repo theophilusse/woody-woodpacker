@@ -1793,7 +1793,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		int idx = atoi(toks[1]);
 		t_block_variant *variant = a->current_variant_is_cipher ? NULL : NULL;
 		/* TODO: recuperer le variant courant pour acceder a decrypts[idx].generated_bytecode */
-
+		(void)variant;
 		fprintf(stderr, "asm: %%decrypt_slot %d rencontre mais pas encore resolu\n", idx);
 		return (-1);   /* provisoire, a completer avec l'injection reelle */
 	}
