@@ -214,7 +214,8 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
         }
         if (line_is_directive(line, "PLAINTEXT"))
         {
-            in_ciphertext = 0; in_plaintext = 1;
+            in_ciphertext = 0;
+            //in_plaintext = 1;
             plain_sync = parse_sync_flag(line);
             current_accum = &plain_acc;
             continue;
