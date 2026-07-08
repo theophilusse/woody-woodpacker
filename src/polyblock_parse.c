@@ -273,7 +273,11 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
             continue;
         }
         if (current_accum)
-            accum_line(current_accum, line);
+        {
+            char ref[128];
+            snprintf(ref, sizeof(ref), "%%polyblock_ref %s", child_id);
+            accum_line(current_accum, ref);
+        }
     }
 
     /* Fige les textes source ET les flags sync, UNE SEULE FOIS, apres la boucle */

@@ -1632,7 +1632,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		return (0);
 	}
-	if (!strcmp(toks[0], "%POLYBLOCK_REF") && n == 2)
+	if (!strcmp(toks[0], "%polyblock_ref") && n == 2)
 	{
 		t_polyblock *child;
 		t_block_variant *child_variant;
