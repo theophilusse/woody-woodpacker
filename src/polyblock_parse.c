@@ -47,6 +47,12 @@ static void extract_id(const char *line, const char *keyword, char *out)
     const char *p = strstr(line, keyword);
     int i = 0;
 
+    out[0] = '\0';
+    if (!p)
+    {
+        fprintf(stderr, "polyblock: mot-cle '%s' introuvable dans la ligne\n", keyword);
+        return;
+    }
     p += strlen(keyword);
     while (*p == ' ' || *p == '\t')
         p++;
@@ -96,10 +102,22 @@ static int parse_decrypt_directive(t_polyctx *ctx, t_polyblock *blk,
     char        *tok;
     (void)ctx; (void)blk;
 
+    fprintf(stderr, "[DEBUG] parse_decrypt_directive line='%s'\n", line);
+
     extract_id(line, "DECRYPT", target_id);
+    if (target_id[0] == '\0')
+    {
+        fprintf(stderr, "polyblock: %%DECRYPT sans identifiant cible\n");
+        return (-1);
+    }
     /* rest = tout ce qui suit target_id */
     {
         const char *p = strstr(line, target_id);
+        if (!p)
+        {
+            fprintf(stderr, "polyblock: incoherence interne, target_id introuvable dans la ligne\n");
+            return (-1);
+        }
         p += strlen(target_id);
         while (*p == ' ' || *p == '\t') p++;
         strncpy(rest, p, sizeof(rest) - 1);
@@ -186,6 +204,8 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
     t_accum     plain_acc;
     t_sync_mode cipher_sync = SYNC_NONE;   /* DECLARE ICI, une seule fois */
     t_sync_mode plain_sync = SYNC_NONE;
+
+    fprintf(stderr, "[DEBUG] parse_polyblock('%s')\n", identifier);
 
     if (ctx->n_blocks >= MAX_POLYBLOCKS)
     {
