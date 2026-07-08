@@ -162,59 +162,6 @@ static int assemble_source(t_asm *a, const char *src)
     return (0);
 }
 
-static int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
-        t_block_variant *variant, int is_cipher)
-{
-    t_emitter   local_e;
-    t_emitter   saved_e;
-    int         label_start;
-    int         fixup_start;
-    t_polyctx   *saved_polyctx;
-    int         saved_is_cipher;
-    int         saved_sync;
-
-    variant->key_index_before = a->key_index;
-
-    memset(&local_e, 0, sizeof(local_e));
-    saved_e = a->out->e;
-    a->out->e = local_e;
-
-    saved_polyctx = a->polyctx;
-    saved_is_cipher = a->current_variant_is_cipher;
-    saved_sync = a->key_sync_enabled;
-    a->polyctx = ctx;
-    a->current_variant_is_cipher = is_cipher;
-    a->key_sync_enabled = (variant->sync == SYNC_ON);
-
-    label_start = a->nlabels;
-    fixup_start = a->nfixups;
-
-    if (is_cipher)
-        deflabel(a, blk->identifier);
-
-    if (assemble_source(a, variant->src) < 0)
-    {
-        a->out->e = saved_e;
-        a->polyctx = saved_polyctx;
-        a->current_variant_is_cipher = saved_is_cipher;
-        a->key_sync_enabled = saved_sync;
-        return (-1);
-    }
-
-    variant->bytecode = a->out->e.buf;
-    variant->bytecode_len = a->out->e.len;
-    variant->label_range_start = label_start;
-    variant->label_range_end = a->nlabels;
-    variant->fixup_range_start = fixup_start;
-    variant->fixup_range_end = a->nfixups;
-
-    a->out->e = saved_e;
-    a->polyctx = saved_polyctx;
-    a->current_variant_is_cipher = saved_is_cipher;
-    a->key_sync_enabled = saved_sync;
-    return (0);
-}
-
 static int equalize_sizes(t_asm *a, t_polyctx *ctx, t_polyblock *blk)
 {
     size_t max_len;

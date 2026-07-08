@@ -188,6 +188,7 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
     return (out_src);
 }
 
+/*
 static char *replace_placeholder(const char *src, const char *placeholder, const char *replacement)
 {
     char    *result;
@@ -211,39 +212,104 @@ static char *replace_placeholder(const char *src, const char *placeholder, const
     strcat(result, pos + strlen(placeholder));
     return (result);
 }
+*/
 
-int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx)
+int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
 {
-    t_polyblock *order[MAX_POLYBLOCKS];
-    int         n_order;
-    size_t      position = 0;
-    int         i;
+    int     i;
+    char    *new_src;
 
-    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
-        return (-1);
-
-    for (i = 0; i < n_order; i++)
+    for (i = 0; i < variant->n_decrypts; i++)
     {
-        t_polyblock *blk = order[i];
+        t_decrypt_spec  *spec = &variant->decrypts[i];
+        t_polyblock     *target;
+        t_diff_result   diff;
+        t_decrypt_method chosen;
+        char            *stub_src;
+        char            placeholder[64];
 
-        if (substitute_decrypt_slots(ctx, &blk->ciphertext) < 0)
+        target = find_block(ctx, spec->target_identifier);
+        if (!target)
+        {
+            fprintf(stderr, "polyblock: DECRYPT cible '%s' introuvable\n",
+                    spec->target_identifier);
             return (-1);
-        if (substitute_decrypt_slots(ctx, &blk->plaintext) < 0)
+        }
+        if (!target->ciphertext.bytecode || !target->plaintext.bytecode)
+        {
+            fprintf(stderr, "polyblock: DECRYPT cible '%s' pas encore resolue "
+                    "(ordre topologique incorrect)\n", spec->target_identifier);
+            return (-1);
+        }
+        if (compute_diff(&target->ciphertext, &target->plaintext, &diff) < 0)
             return (-1);
 
-        if (resolve_variant(a, ctx, blk, &blk->ciphertext, 1) < 0)
-            return (-1);
-        if (resolve_variant(a, ctx, blk, &blk->plaintext, 0) < 0)
-            return (-1);
-
-        if (equalize_sizes(a, ctx, blk) < 0)
+        chosen = spec->methods[rand() % spec->n_methods];
+        spec->chosen_method = chosen;
+        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
+        if (!stub_src)
             return (-1);
 
-        apply_offset_shift(a, &blk->ciphertext, position);
-        apply_offset_shift(a, &blk->plaintext, position);
-
-        blk->final_offset = position;
-        position += blk->final_size;
+        snprintf(placeholder, sizeof(placeholder), "%%decrypt_slot %d", i);
+        new_src = replace_placeholder(variant->src, placeholder, stub_src);
+        free(stub_src);
+        if (!new_src)
+            return (-1);
+        free(variant->src);
+        variant->src = new_src;
     }
+    return (0);
+}
+
+int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
+        t_block_variant *variant, int is_cipher)
+{
+    t_emitter   local_e;
+    t_emitter   saved_e;
+    int         label_start;
+    int         fixup_start;
+    t_polyctx   *saved_polyctx;
+    int         saved_is_cipher;
+    int         saved_sync;
+
+    variant->key_index_before = a->key_index;
+
+    memset(&local_e, 0, sizeof(local_e));
+    saved_e = a->out->e;
+    a->out->e = local_e;
+
+    saved_polyctx = a->polyctx;
+    saved_is_cipher = a->current_variant_is_cipher;
+    saved_sync = a->key_sync_enabled;
+    a->polyctx = ctx;
+    a->current_variant_is_cipher = is_cipher;
+    a->key_sync_enabled = (variant->sync == SYNC_ON);
+
+    label_start = a->nlabels;
+    fixup_start = a->nfixups;
+
+    if (is_cipher)
+        deflabel(a, blk->identifier);
+
+    if (assemble_source(a, variant->src) < 0)
+    {
+        a->out->e = saved_e;
+        a->polyctx = saved_polyctx;
+        a->current_variant_is_cipher = saved_is_cipher;
+        a->key_sync_enabled = saved_sync;
+        return (-1);
+    }
+
+    variant->bytecode = a->out->e.buf;
+    variant->bytecode_len = a->out->e.len;
+    variant->label_range_start = label_start;
+    variant->label_range_end = a->nlabels;
+    variant->fixup_range_start = fixup_start;
+    variant->fixup_range_end = a->nfixups;
+
+    a->out->e = saved_e;
+    a->polyctx = saved_polyctx;
+    a->current_variant_is_cipher = saved_is_cipher;
+    a->key_sync_enabled = saved_sync;
     return (0);
 }
