@@ -176,7 +176,8 @@ int main(int argc, char **argv)
     t_crypto_ctx    crypto;
 	struct s_opts	opts;
 
-	test_polyblock_parsing();
+	//test_polyblock_parsing();
+	test_polyblock_cycle_detection();
 	return 0;
     if (argc < 2)
 	{

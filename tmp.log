@@ -1,2 +1,33 @@
 [DEBUG] parse_polyblock('anti_debug')
 [DEBUG] parse_decrypt_directive line='    %DECRYPT secret_cipher SUB, ADD'
+[DEBUG] parse_decrypt_directive line='    %DECRYPT anti_debug XOR'
+[DEBUG] parse_polyblock('secret_cipher')
+=== POLYBLOCK CONTEXT DUMP (2 blocks total) ===
+POLYBLOCK 'anti_debug' (children=0, depends_on=1)
+  CIPHERTEXT [SYNC] (58 octets source):
+    ---
+    %DECRYPT secret_cipher SUB, ADD
+    jmp secret_cipher
+    ---
+  [CIPHERTEXT] DECRYPT -> target='secret_cipher' methods=[SUB,ADD]
+  PLAINTEXT [SYNC] (50 octets source):
+    ---
+    ; anti debug code
+    %DECRYPT anti_debug XOR
+    ---
+  [PLAINTEXT] DECRYPT -> target='anti_debug' methods=[XOR]
+  depends_on: secret_cipher
+POLYBLOCK 'secret_cipher' (children=0, depends_on=0)
+  CIPHERTEXT [NOSYNC] (48 octets source):
+    ---
+    ; contenu chiffre place ici a la generation
+    ---
+  PLAINTEXT [SYNC] (34 octets source):
+    ---
+    write("fuck you")
+    exit(0)
+    ---
+=== END DUMP ===
+=== ORDRE TOPOLOGIQUE ===
+0: secret_cipher
+1: anti_debug
