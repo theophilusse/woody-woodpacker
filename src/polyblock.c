@@ -107,38 +107,6 @@ static int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_
     return (0);
 }
 
-static char *emit_decrypt_xor_loop(t_polyblock *target_blk, t_diff_result *diff, char *out_src)
-{
-    size_t i;
-    char line[128];
-
-    /* Charge le pointeur de base vers le bloc cible (RIP-relative) */
-    strcat(out_src, "lea rdi, [target_block_start]\n");   /* label a definir dynamiquement */
-
-    for (i = 0; i < diff->n_entries; i++)
-    {
-        uint8_t xor_key = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
-
-        if (diff->entries[i].offset == (i > 0 ? diff->entries[i-1].offset + 1 : 0))
-        {
-            /* offset consecutif : xor [rdi], key puis inc rdi -- compact */
-            snprintf(line, sizeof(line), "xor byte [rdi], %u\n", xor_key);
-            strcat(out_src, line);
-            strcat(out_src, "_INC rdi\n");
-        }
-        else
-        {
-            /* saut non consecutif : recalcule le pointeur */
-            snprintf(line, sizeof(line), "lea rdi, [target_block_start+%zu]\n",
-                    diff->entries[i].offset);
-            strcat(out_src, line);
-            snprintf(line, sizeof(line), "xor byte [rdi], %u\n", xor_key);
-            strcat(out_src, line);
-        }
-    }
-    return (out_src);
-}
-
 static char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
         t_decrypt_method method, const char *target_label)
 {
@@ -147,6 +115,7 @@ static char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
     size_t  cap = 8192;
     size_t  i;
 
+    (void)target_blk;
     out_src = malloc(cap);
     if (!out_src)
         return (NULL);
@@ -217,4 +186,54 @@ static char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
         strcat(out_src, "_INC rdi\n");
     }
     return (out_src);
+}
+
+int polyblock_generate_decrypts(t_asm *a, t_polyctx *ctx)
+{
+    t_polyblock *order[MAX_POLYBLOCKS];
+    int         n_order;
+    int         i, j;
+
+    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
+        return (-1);
+
+    for (i = 0; i < n_order; i++)
+    {
+        t_polyblock *blk = order[i];
+        t_block_variant *variants[2] = { &blk->ciphertext, &blk->plaintext };
+
+        for (int v = 0; v < 2; v++)
+        {
+            t_block_variant *variant = variants[v];
+
+            for (j = 0; j < variant->n_decrypts; j++)
+            {
+                t_decrypt_spec *spec = &variant->decrypts[j];
+                t_polyblock *target = find_block(ctx, spec->target_identifier);
+                t_diff_result diff;
+                t_decrypt_method chosen;
+                char *stub_src;
+
+                if (!target)
+                {
+                    fprintf(stderr, "polyblock: DECRYPT cible '%s' introuvable\n",
+                            spec->target_identifier);
+                    return (-1);
+                }
+                if (compute_diff(&target->ciphertext, &target->plaintext, &diff) < 0)
+                    return (-1);
+
+                chosen = spec->methods[rand() % spec->n_methods];
+                stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
+                if (!stub_src)
+                    return (-1);
+
+                spec->chosen_method = chosen;
+                /* TODO: injecter stub_src dans le bytecode final a la position
+                ** du %DECRYPT (necessite de re-assembler ou d'injecter apres coup) */
+                free(stub_src);
+            }
+        }
+    }
+    return (0);
 }
