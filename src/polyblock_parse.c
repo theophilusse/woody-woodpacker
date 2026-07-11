@@ -366,6 +366,11 @@ t_polyctx *polyblock_parse_all(const char *source)
 
     while (iter_next_line(&it, line, sizeof(line)))
     {
+        if (line_is_directive(line, "POLYBLOCK_ENTRY"))
+        {
+            extract_id(line, "POLYBLOCK_ENTRY", ctx->entry_block_name);
+            continue;
+        }
         if (line_is_directive(line, "POLYBLOCK_START"))
         {
             char id[MAX_POLYBLOCK_NAME];

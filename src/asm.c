@@ -1785,7 +1785,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
         pctx = polyblock_parse_all(src);
         if (!pctx)
             return (-1);
-        if (polyblock_assemble(&a, pctx, "main") < 0)
+        if (polyblock_assemble(&a, pctx, pctx->entry_block_name) < 0)
             return (-1);
     }
     else
