@@ -1779,15 +1779,20 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
     a.key_sync_enabled = 1;
 
     if (strstr(src, "%POLYBLOCK_START"))
-    {
-        t_polyctx *pctx;
+	{
+		t_polyctx *pctx;
 
-        pctx = polyblock_parse_all(src);
-        if (!pctx)
-            return (-1);
-        if (polyblock_assemble(&a, pctx, pctx->entry_block_name) < 0)
-            return (-1);
-    }
+		pctx = polyblock_parse_all(src);
+		if (!pctx)
+			return (-1);
+		if (pctx->n_blocks == 0)
+		{
+			fprintf(stderr, "asm: aucun polyblock trouve\n");
+			return (-1);
+		}
+		if (polyblock_assemble(&a, pctx, pctx->blocks[0].identifier) < 0)
+			return (-1);
+	}
     else
     {
         if (assemble_source(&a, src) < 0)

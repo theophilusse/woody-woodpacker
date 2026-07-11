@@ -3,5 +3,5 @@
 [DEBUG] parse_polyblock('main_flow')
 [DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
 [DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
-asm: non resolu 'main'
+asm: non resolu ''
 error: stub generation failed

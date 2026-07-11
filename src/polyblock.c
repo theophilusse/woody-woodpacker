@@ -336,7 +336,12 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx, const char *entry_block)
     for (i = 0; i < n_order; i++)
     {
         t_polyblock *blk = order[i];
-        emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
+        int is_entry = !strcmp(blk->identifier, entry_block);
+
+        if (is_entry)
+            emit_raw(&a->out->e, blk->plaintext.bytecode, blk->plaintext.bytecode_len);
+        else
+            emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
     }
 
     if (ctx->trailing_data_src && assemble_source(a, ctx->trailing_data_src) < 0)
