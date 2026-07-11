@@ -98,15 +98,10 @@ typedef struct s_polyblock
 /* Contexte global du preprocesseur, une instance par assemblage */
 typedef struct s_polyctx
 {
-    t_polyblock     blocks[MAX_POLYBLOCKS];
-    int             n_blocks;
-    t_polyblock     *root;          /* point d'entree, si un seul bloc racine */
-
-    /* table de correspondance identifier -> index dans blocks[],
-    ** pour resolution rapide de %DECRYPT <identifier> */
-    char            block_names[MAX_POLYBLOCKS][MAX_POLYBLOCK_NAME];
-    char            entry_block_name[MAX_POLYBLOCK_NAME];
-    char            *trailing_data_src;
+    t_polyblock blocks[MAX_POLYBLOCKS];
+    int         n_blocks;
+    char        block_names[MAX_POLYBLOCKS][MAX_POLYBLOCK_NAME];
+    char        *root_src;   /* AJOUT : remplace trailing_data_src */
 }   t_polyctx;
 
 typedef struct s_diff_entry
@@ -128,7 +123,7 @@ int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order);
 t_polyctx *polyblock_parse_all(const char *source);
 void polyblock_dump(t_polyctx *ctx);
 int polyblock_generate_decrypts(t_asm *a, t_polyctx *ctx);
-int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result *diff);
+int compute_diff(t_block_variant *plain, t_block_variant *cipher, t_diff_result *diff);
 char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff, t_decrypt_method method, const char *target_label);
 int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant);
 int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk, t_block_variant *variant, int is_cipher);

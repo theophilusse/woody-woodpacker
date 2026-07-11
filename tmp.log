@@ -1,7 +1,15 @@
-[DEBUG] parse_polyblock('greeting')
-[DEBUG] parse_polyblock('farewell')
-[DEBUG] parse_polyblock('main_flow')
-[DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
-[DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
-asm: non resolu ''
-error: stub generation failed
+src/polyblock.c:75:12: error: static declaration of ‘compute_diff’ follows non-static declaration
+   75 | static int compute_diff(t_block_variant *plain, t_block_variant *cipher, t_diff_result *diff)
+      |            ^~~~~~~~~~~~
+In file included from src/polyblock.c:2:
+include/polyblock.h:131:5: note: previous declaration of ‘compute_diff’ with type ‘int(t_block_variant *, t_block_variant *, t_diff_result *)’ {aka ‘int(struct s_block_variant *, struct s_block_variant *, struct s_diff_result *)’}
+  131 | int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result *diff);
+      |     ^~~~~~~~~~~~
+src/polyblock.c: In function ‘polyblock_assemble’:
+src/polyblock.c:324:13: error: ‘t_polyctx’ {aka ‘struct s_polyctx’} has no member named ‘root_src’
+  324 |     if (!ctx->root_src)
+      |             ^~
+src/polyblock.c:329:31: error: ‘t_polyctx’ {aka ‘struct s_polyctx’} has no member named ‘root_src’
+  329 |     if (assemble_source(a, ctx->root_src) < 0)
+      |                               ^~
+make: *** [Makefile:30: obj/polyblock.o] Error 1
