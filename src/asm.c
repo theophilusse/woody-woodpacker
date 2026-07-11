@@ -1770,17 +1770,31 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
     int     lde_bit_log_len;
     int     bits;
 
-	a.key_sync_enabled = 1;
     g_bit_log_len = 0;
     lde_bit_log_len = 0;
     memset(&a, 0, sizeof(a));
     a.out    = out;
     a.crypto = crypto;
-    a.label_base_offset = 0;   /* stub principal : jamais decale */
+    a.label_base_offset = 0;
+    a.key_sync_enabled = 1;
 
-    if (assemble_source(&a, src) < 0)
-        return (-1);
-    /* resolution des fixups */
+    if (strstr(src, "%POLYBLOCK_START"))
+    {
+        t_polyctx *pctx;
+
+        pctx = polyblock_parse_all(src);
+        if (!pctx)
+            return (-1);
+        if (polyblock_assemble(&a, pctx, "main") < 0)
+            return (-1);
+    }
+    else
+    {
+        if (assemble_source(&a, src) < 0)
+            return (-1);
+    }
+
+    /* resolution des fixups -- COMMUNE aux deux chemins, inchangee */
     for (int i = 0; i < a.nfixups; i++) {
         int64_t target = sym(&a, a.fixups[i].name);
         if (target < 0) { fprintf(stderr, "asm: non resolu '%s'\n", a.fixups[i].name); return -1; }

@@ -1,45 +1,5 @@
-src/main.c: In function ‘test_polyblock_resolve_sizes’:
-src/main.c:207:9: error: too few arguments to function ‘polyblock_resolve_sizes’
-  207 |     if (polyblock_resolve_sizes(&a, ctx) < 0)
-      |         ^~~~~~~~~~~~~~~~~~~~~~~
-In file included from include/asm.h:7,
-                 from include/woody.h:67,
-                 from src/main.c:1:
-include/polyblock.h:133:5: note: declared here
-  133 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position);
-      |     ^~~~~~~~~~~~~~~~~~~~~~~
-src/main.c: In function ‘run_polyblock_test’:
-src/main.c:285:9: error: too few arguments to function ‘polyblock_resolve_sizes’
-  285 |     if (polyblock_resolve_sizes(&a, ctx) < 0)
-      |         ^~~~~~~~~~~~~~~~~~~~~~~
-In file included from include/asm.h:7,
-                 from include/woody.h:67,
-                 from src/main.c:1:
-include/polyblock.h:133:5: note: declared here
-  133 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position);
-      |     ^~~~~~~~~~~~~~~~~~~~~~~
-src/main.c: In function ‘run_polyblock_test_full’:
-src/main.c:347:9: error: too few arguments to function ‘polyblock_resolve_sizes’
-  347 |     if (polyblock_resolve_sizes(&a, ctx) < 0)
-      |         ^~~~~~~~~~~~~~~~~~~~~~~
-In file included from include/asm.h:7,
-                 from include/woody.h:67,
-                 from src/main.c:1:
-include/polyblock.h:133:5: note: declared here
-  133 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position);
-      |     ^~~~~~~~~~~~~~~~~~~~~~~
-src/main.c:353:13: error: too few arguments to function ‘polyblock_resolve_sizes’
-  353 |         if (polyblock_resolve_sizes(&a, ctx) < 0)
-      |             ^~~~~~~~~~~~~~~~~~~~~~~
-In file included from include/asm.h:7,
-                 from include/woody.h:67,
-                 from src/main.c:1:
-include/polyblock.h:133:5: note: declared here
-  133 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position);
-      |     ^~~~~~~~~~~~~~~~~~~~~~~
-At top level:
-src/main.c:328:13: error: ‘run_polyblock_test_full’ defined but not used [-Werror=unused-function]
-  328 | static void run_polyblock_test_full(const char *source, const char *label)
-      |             ^~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [Makefile:30: obj/main.o] Error 1
+asm: inconnu: '%polyblock_start' (2 tokens)
+  tok[0] = '%polyblock_start'
+  tok[1] = 'greeting'
+asm: %polyblock_start greeting 
+error: stub generation failed

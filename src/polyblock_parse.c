@@ -352,40 +352,41 @@ t_polyctx *polyblock_parse_all(const char *source)
     t_polyctx   *ctx;
     t_line_iter it;
     char        line[512];
-    t_polyblock *root_child;
+    t_accum     trailing;
 
     ctx = calloc(1, sizeof(t_polyctx));
     if (!ctx)
         return (NULL);
+    trailing.len = 0;
+    trailing.buf[0] = '\0';
 
     it.src = source;
     it.pos = 0;
     it.len = strlen(source);
 
-    /* Cherche le/les %POLYBLOCK_START de premier niveau, un par un */
     while (iter_next_line(&it, line, sizeof(line)))
     {
         if (line_is_directive(line, "POLYBLOCK_START"))
         {
             char id[MAX_POLYBLOCK_NAME];
-
             extract_id(line, "POLYBLOCK_START", id);
-            root_child = parse_polyblock(ctx, &it, id, NULL);
-            if (!root_child)
+            if (!parse_polyblock(ctx, &it, id, NULL))
             {
                 free(ctx);
                 return (NULL);
             }
         }
+        else
+            accum_line(&trailing, line);   /* donnees globales / labels hors bloc */
     }
 
-    /* Passe 1.5 : construit depends_on sur tout l'arbre */
+    ctx->trailing_data_src = strdup(trailing.buf);
+
     {
         int i;
         for (i = 0; i < ctx->n_blocks; i++)
-            if (!ctx->blocks[i].parent)   /* uniquement les racines, la recursion descend */
+            if (!ctx->blocks[i].parent)
                 build_dependencies(&ctx->blocks[i]);
     }
-
     return (ctx);
 }

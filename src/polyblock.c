@@ -311,3 +311,39 @@ int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
     a->key_sync_enabled = saved_sync;
     return (0);
 }
+
+int polyblock_assemble(t_asm *a, t_polyctx *ctx, const char *entry_block)
+{
+    t_polyblock *order[MAX_POLYBLOCKS];
+    int         n_order;
+    int         i;
+
+    //deflabel(a, "scan_start");
+
+    {
+        size_t dummy;
+        emit_jmp_rel32(&a->out->e, &dummy);
+        addfixup(a, entry_block, dummy, dummy + 4, 0);
+    }
+
+    if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
+        return (-1);
+
+    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
+        return (-1);
+    for (i = 0; i < n_order; i++)
+    {
+        t_polyblock *blk = order[i];
+        emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
+    }
+
+    //deflabel(a, "scan_end");
+
+    if (ctx->trailing_data_src && assemble_source(a, ctx->trailing_data_src) < 0)
+        return (-1);
+    /* Les donnees globales (.string, etc.) doivent maintenant faire partie
+    ** du MEME texte source que les %POLYBLOCK, plutot que d'etre passees
+    ** separement -- voir note ci-dessous */
+
+    return (0);
+}
