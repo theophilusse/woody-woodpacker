@@ -72,7 +72,7 @@ int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order)
     return (0);
 }
 
-static int compute_diff(t_block_variant *plain, t_block_variant *cipher, t_diff_result *diff)
+int compute_diff(t_block_variant *plain, t_block_variant *cipher, t_diff_result *diff)
 {
     size_t i;
 
