@@ -1649,19 +1649,19 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 				char sub_toks[3][64];
 				size_t before = a->out->e.len;
 
-				if (choice == 0 && remaining >= 3)      /* _INC r32 : 2 ou 3 octets max */
+				if (choice == 0 && remaining >= 6)      /* _INC r32 : jusqu'a 6 octets (forme longue bit=0) */
 				{
 					snprintf(sub_toks[0], 64, "_inc");
 					snprintf(sub_toks[1], 64, "%s", reg_name(reg, 32));
 					ainstr(a, sub_toks, 2);
 				}
-				else if (choice == 1 && remaining >= 3) /* _DEC r32 : 2 ou 3 octets max */
+				else if (choice == 1 && remaining >= 4) /* _DEC r32 : jusqu'a 4 octets */
 				{
 					snprintf(sub_toks[0], 64, "_dec");
 					snprintf(sub_toks[1], 64, "%s", reg_name(reg, 32));
 					ainstr(a, sub_toks, 2);
 				}
-				else if (choice == 2 && remaining >= 6) /* _ZERO r32 : 2 a 6 octets max (REX+AND long) */
+				else if (choice == 2 && remaining >= 6) /* _ZERO r32 : jusqu'a 6 octets */
 				{
 					snprintf(sub_toks[0], 64, "_zero");
 					snprintf(sub_toks[1], 64, "%s", reg_name(reg, 32));

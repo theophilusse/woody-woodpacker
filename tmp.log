@@ -3,6 +3,6 @@
 [DEBUG] parse_polyblock('main_flow')
 [DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
 [DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
-asm: %polyblock_ref hors contexte polyblock
-asm: %polyblock_ref greeting 
+asm: _JUNK depassement interne detecte, reduction du buffer non supportee — ajuste les seuils
+asm: _junk 502 
 error: stub generation failed
