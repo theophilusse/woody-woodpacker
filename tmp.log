@@ -1,5 +1,8 @@
-asm: inconnu: '%polyblock_start' (2 tokens)
-  tok[0] = '%polyblock_start'
-  tok[1] = 'greeting'
-asm: %polyblock_start greeting 
+[DEBUG] parse_polyblock('greeting')
+[DEBUG] parse_polyblock('farewell')
+[DEBUG] parse_polyblock('main_flow')
+[DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
+[DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
+asm: lea rdi,[greeting+4] (mt=0) non gere
+asm: lea rdi [greeting+4] 
 error: stub generation failed

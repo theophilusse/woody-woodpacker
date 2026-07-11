@@ -137,7 +137,11 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
             if (off == 0)
                 snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
             else
-                snprintf(line, sizeof(line), "lea rdi, [%s+%zu]\n", target_label, off);
+            {
+                snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
+                strcat(out_src, line);
+                snprintf(line, sizeof(line), "add rdi, %zu\n", off);
+            }
             strcat(out_src, line);
         }
 
