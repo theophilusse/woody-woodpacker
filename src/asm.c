@@ -1684,27 +1684,28 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		return (0);
 	}
-	if (!strcmp(toks[0], "%polyblock_ref") && n == 2)
+	if ((!strcmp(toks[0], "%polyblock_ref") || !strcmp(toks[0], "%polyblock_ref_cipher")) && n == 2)
 	{
-		t_polyblock *child;
+		t_polyblock     *child;
 		t_block_variant *child_variant;
+		int             want_cipher;
 
 		if (!a->polyctx)
 		{
-			fprintf(stderr, "asm: %%POLYBLOCK_REF hors contexte polyblock\n");
+			fprintf(stderr, "asm: %%polyblock_ref hors contexte polyblock\n");
 			return (-1);
 		}
 		child = find_block(a->polyctx, toks[1]);
 		if (!child)
 		{
-			fprintf(stderr, "asm: %%POLYBLOCK_REF '%s' introuvable\n", toks[1]);
+			fprintf(stderr, "asm: %%polyblock_ref '%s' introuvable\n", toks[1]);
 			return (-1);
 		}
-		child_variant = a->current_variant_is_cipher ? &child->ciphertext : &child->plaintext;
+		want_cipher = !strcmp(toks[0], "%polyblock_ref_cipher");
+		child_variant = want_cipher ? &child->ciphertext : &child->plaintext;
 		if (!child_variant->bytecode)
 		{
-			fprintf(stderr, "asm: %%POLYBLOCK_REF '%s' pas encore resolu "
-					"(ordre topologique incorrect ?)\n", toks[1]);
+			fprintf(stderr, "asm: %%polyblock_ref '%s' pas encore resolu\n", toks[1]);
 			return (-1);
 		}
 		emit_raw(&a->out->e, child_variant->bytecode, child_variant->bytecode_len);
@@ -1785,12 +1786,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
 		pctx = polyblock_parse_all(src);
 		if (!pctx)
 			return (-1);
-		if (pctx->n_blocks == 0)
-		{
-			fprintf(stderr, "asm: aucun polyblock trouve\n");
-			return (-1);
-		}
-		if (polyblock_assemble(&a, pctx, pctx->blocks[0].identifier) < 0)
+		if (polyblock_assemble(&a, pctx) < 0)
 			return (-1);
 	}
     else

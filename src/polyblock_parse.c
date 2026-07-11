@@ -352,13 +352,13 @@ t_polyctx *polyblock_parse_all(const char *source)
     t_polyctx   *ctx;
     t_line_iter it;
     char        line[512];
-    t_accum     trailing;
+    t_accum     root_accum;
 
     ctx = calloc(1, sizeof(t_polyctx));
     if (!ctx)
         return (NULL);
-    trailing.len = 0;
-    trailing.buf[0] = '\0';
+    root_accum.len = 0;
+    root_accum.buf[0] = '\0';
 
     it.src = source;
     it.pos = 0;
@@ -366,26 +366,27 @@ t_polyctx *polyblock_parse_all(const char *source)
 
     while (iter_next_line(&it, line, sizeof(line)))
     {
-        if (line_is_directive(line, "POLYBLOCK_ENTRY"))
-        {
-            extract_id(line, "POLYBLOCK_ENTRY", ctx->entry_block_name);
-            continue;
-        }
         if (line_is_directive(line, "POLYBLOCK_START"))
         {
             char id[MAX_POLYBLOCK_NAME];
+            t_polyblock *child;
+            char ref[64];
+
             extract_id(line, "POLYBLOCK_START", id);
-            if (!parse_polyblock(ctx, &it, id, NULL))
+            child = parse_polyblock(ctx, &it, id, NULL);
+            if (!child)
             {
                 free(ctx);
                 return (NULL);
             }
+            snprintf(ref, sizeof(ref), "%%polyblock_ref %s", id);
+            accum_line(&root_accum, ref);
         }
         else
-            accum_line(&trailing, line);
+            accum_line(&root_accum, line);
     }
 
-    ctx->trailing_data_src = strdup(trailing.buf);
+    ctx->root_src = strdup(root_accum.buf);   /* renomme, plus honnete que "trailing" */
 
     {
         int i;

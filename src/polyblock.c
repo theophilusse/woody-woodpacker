@@ -72,36 +72,36 @@ int polyblock_topo_sort(t_polyctx *ctx, t_polyblock **order, int *n_order)
     return (0);
 }
 
-int compute_diff(t_block_variant *cipher, t_block_variant *plain, t_diff_result *diff)
+static int compute_diff(t_block_variant *plain, t_block_variant *cipher, t_diff_result *diff)
 {
     size_t i;
 
-    if (cipher->bytecode_len != plain->bytecode_len)
+    if (plain->bytecode_len != cipher->bytecode_len)
     {
         fprintf(stderr, "polyblock: diff impossible, tailles differentes (%zu vs %zu)\n",
-                cipher->bytecode_len, plain->bytecode_len);
+                plain->bytecode_len, cipher->bytecode_len);
         return (-1);
     }
-    if (cipher->bytecode_len > 8192)
+    if (plain->bytecode_len > 8192)
     {
         fprintf(stderr, "polyblock: bloc trop grand pour le diff (%zu > 8192)\n",
-                cipher->bytecode_len);
+                plain->bytecode_len);
         return (-1);
     }
 
     diff->n_entries = 0;
-    for (i = 0; i < cipher->bytecode_len; i++)
+    for (i = 0; i < plain->bytecode_len; i++)
     {
-        uint8_t c = cipher->bytecode[i];
         uint8_t p = plain->bytecode[i];
+        uint8_t c = cipher->bytecode[i];
 
-        if (c == p)
-            continue;   /* octet deja identique, aucune transformation necessaire */
+        if (p == c)
+            continue;
 
         diff->entries[diff->n_entries].offset = i;
         diff->entries[diff->n_entries].cipher_byte = c;
         diff->entries[diff->n_entries].plain_byte = p;
-        diff->entries[diff->n_entries].delta = (uint8_t)(p - c);   /* wraparound naturel sur uint8_t */
+        diff->entries[diff->n_entries].delta = (uint8_t)(c - p);   /* INVERSE : cipher - plain */
         diff->n_entries++;
     }
     return (0);
@@ -149,7 +149,7 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
         {
             case METHOD_XOR:
             {
-                uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
+                uint8_t k = diff->entries[i].plain_byte ^ diff->entries[i].cipher_byte;
                 snprintf(line, sizeof(line), "xor [rdi], %u\n", k);
                 break;
             }
@@ -157,7 +157,7 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
             {
                 if (diff->entries[i].delta == 1)
                 {
-                    uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
+                    uint8_t k = diff->entries[i].plain_byte ^ diff->entries[i].cipher_byte;
                     snprintf(line, sizeof(line), "xor [rdi], %u\n", k);
                 }
                 else
@@ -169,7 +169,7 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
                 uint8_t neg = (uint8_t)(-(int)diff->entries[i].delta);
                 if (neg == 1)
                 {
-                    uint8_t k = diff->entries[i].cipher_byte ^ diff->entries[i].plain_byte;
+                    uint8_t k = diff->entries[i].plain_byte ^ diff->entries[i].cipher_byte;
                     snprintf(line, sizeof(line), "xor [rdi], %u\n", k);
                 }
                 else
@@ -178,7 +178,7 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
             }
             case METHOD_MOV:
             {
-                snprintf(line, sizeof(line), "mov [rdi], %u\n", diff->entries[i].plain_byte);
+                snprintf(line, sizeof(line), "mov [rdi], %u\n", diff->entries[i].cipher_byte);
                 break;
             }
             default:
@@ -243,7 +243,7 @@ int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
                     "(ordre topologique incorrect)\n", spec->target_identifier);
             return (-1);
         }
-        if (compute_diff(&target->ciphertext, &target->plaintext, &diff) < 0)
+        if (compute_diff(&target->plaintext, &target->ciphertext, &diff) < 0)
             return (-1);
 
         chosen = spec->methods[rand() % spec->n_methods];
@@ -316,35 +316,17 @@ int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
     return (0);
 }
 
-int polyblock_assemble(t_asm *a, t_polyctx *ctx, const char *entry_block)
+int polyblock_assemble(t_asm *a, t_polyctx *ctx)
 {
-    t_polyblock *order[MAX_POLYBLOCKS];
-    int         n_order;
-    int         i;
-
-    {
-        size_t dummy;
-        emit_jmp_rel32(&a->out->e, &dummy);
-        addfixup(a, entry_block, dummy, dummy + 4, 0);
-    }
-
-    if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
+    if (polyblock_resolve_sizes(a, ctx, 0) < 0)
         return (-1);
 
-    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
-        return (-1);
-    for (i = 0; i < n_order; i++)
+    if (!ctx->root_src)
     {
-        t_polyblock *blk = order[i];
-        int is_entry = !strcmp(blk->identifier, entry_block);
-
-        if (is_entry)
-            emit_raw(&a->out->e, blk->plaintext.bytecode, blk->plaintext.bytecode_len);
-        else
-            emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
+        fprintf(stderr, "polyblock: aucun texte racine a assembler\n");
+        return (-1);
     }
-
-    if (ctx->trailing_data_src && assemble_source(a, ctx->trailing_data_src) < 0)
+    if (assemble_source(a, ctx->root_src) < 0)
         return (-1);
 
     return (0);
