@@ -273,7 +273,7 @@ static t_polyblock *parse_polyblock(t_polyctx *ctx, t_line_iter *it,
             decrypt_index = (in_ciphertext ? blk->ciphertext.n_decrypts : blk->plaintext.n_decrypts) - 1;
             if (current_accum)
             {
-                char ref[64];
+                char ref[128];
                 snprintf(ref, sizeof(ref), "%%decrypt_slot %d", decrypt_index);
                 accum_line(current_accum, ref);
             }
@@ -370,7 +370,7 @@ t_polyctx *polyblock_parse_all(const char *source)
         {
             char id[MAX_POLYBLOCK_NAME];
             t_polyblock *child;
-            char ref[64];
+            char ref[128];
 
             extract_id(line, "POLYBLOCK_START", id);
             child = parse_polyblock(ctx, &it, id, NULL);
