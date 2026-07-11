@@ -121,7 +121,7 @@ void deflabel(t_asm *a, const char *name)
     a->nlabels++;
 }
 
-static void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
+void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8)
 {
     if (a->nfixups >= MAX_FIXUPS)
     {

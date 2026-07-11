@@ -318,8 +318,6 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx, const char *entry_block)
     int         n_order;
     int         i;
 
-    //deflabel(a, "scan_start");
-
     {
         size_t dummy;
         emit_jmp_rel32(&a->out->e, &dummy);
@@ -337,13 +335,8 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx, const char *entry_block)
         emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
     }
 
-    //deflabel(a, "scan_end");
-
     if (ctx->trailing_data_src && assemble_source(a, ctx->trailing_data_src) < 0)
         return (-1);
-    /* Les donnees globales (.string, etc.) doivent maintenant faire partie
-    ** du MEME texte source que les %POLYBLOCK, plutot que d'etre passees
-    ** separement -- voir note ci-dessous */
 
     return (0);
 }

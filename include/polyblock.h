@@ -105,6 +105,7 @@ typedef struct s_polyctx
     /* table de correspondance identifier -> index dans blocks[],
     ** pour resolution rapide de %DECRYPT <identifier> */
     char            block_names[MAX_POLYBLOCKS][MAX_POLYBLOCK_NAME];
+    char            *trailing_data_src;
 }   t_polyctx;
 
 typedef struct s_diff_entry

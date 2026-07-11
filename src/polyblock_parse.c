@@ -377,7 +377,7 @@ t_polyctx *polyblock_parse_all(const char *source)
             }
         }
         else
-            accum_line(&trailing, line);   /* donnees globales / labels hors bloc */
+            accum_line(&trailing, line);
     }
 
     ctx->trailing_data_src = strdup(trailing.buf);
