@@ -1,9 +1,8 @@
-src/polyblock_parse.c: In function ‘polyblock_parse_all’:
-src/polyblock_parse.c:382:57: error: ‘%s’ directive output may be truncated writing up to 63 bytes into a region of size 49 [-Werror=format-truncation=]
-  382 |             snprintf(ref, sizeof(ref), "%%polyblock_ref %s", id);
-      |                                                         ^~   ~~
-src/polyblock_parse.c:382:13: note: ‘snprintf’ output between 16 and 79 bytes into a destination of size 64
-  382 |             snprintf(ref, sizeof(ref), "%%polyblock_ref %s", id);
-      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [Makefile:30: obj/polyblock_parse.o] Error 1
+[DEBUG] parse_polyblock('greeting')
+[DEBUG] parse_polyblock('farewell')
+[DEBUG] parse_polyblock('main_flow')
+[DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
+[DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
+asm: %polyblock_ref hors contexte polyblock
+asm: %polyblock_ref greeting 
+error: stub generation failed

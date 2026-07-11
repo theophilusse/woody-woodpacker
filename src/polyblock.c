@@ -326,8 +326,14 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx)
         fprintf(stderr, "polyblock: aucun texte racine a assembler\n");
         return (-1);
     }
+
+    a->polyctx = ctx;   /* AJOUT : fixe le contexte AVANT d'assembler la racine */
     if (assemble_source(a, ctx->root_src) < 0)
+    {
+        a->polyctx = NULL;
         return (-1);
+    }
+    a->polyctx = NULL;
 
     return (0);
 }
