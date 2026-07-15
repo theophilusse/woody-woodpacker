@@ -263,13 +263,14 @@ int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
     return (0);
 }
 
-int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
+static int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
         t_block_variant *variant, int is_cipher)
 {
     t_emitter   local_e;
     t_emitter   saved_e;
     int         label_start;
     int         fixup_start;
+    int         bitlog_start;
     t_polyctx   *saved_polyctx;
     int         saved_is_cipher;
     int         saved_sync;
@@ -289,6 +290,7 @@ int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
 
     label_start = a->nlabels;
     fixup_start = a->nfixups;
+    bitlog_start = g_bit_log_len;
 
     if (is_cipher)
         deflabel(a, blk->identifier);
@@ -308,6 +310,8 @@ int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
     variant->label_range_end = a->nlabels;
     variant->fixup_range_start = fixup_start;
     variant->fixup_range_end = a->nfixups;
+    variant->bitlog_range_start = bitlog_start;
+    variant->bitlog_range_end = g_bit_log_len;
 
     a->out->e = saved_e;
     a->polyctx = saved_polyctx;

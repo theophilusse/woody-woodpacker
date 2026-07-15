@@ -2,7 +2,7 @@
 
 static int    g_bit_log[512];
 static char   g_bit_log_name[512][32];
-static size_t g_bit_log_off[512];
+extern size_t g_bit_log_off[512];
 static int    g_bit_log_len = 0;
 
 static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi",
@@ -221,6 +221,7 @@ static int equalize_sizes(t_asm *a, t_polyctx *ctx, t_polyblock *blk)
     ** assemblage (puisqu'on va tout refaire), en les retirant du pool global. */
     a->nlabels = shorter->label_range_start;
 	a->nfixups = shorter->fixup_range_start;
+	g_bit_log_len = shorter->bitlog_range_start;
 	a->key_index = shorter->key_index_before;
 	free(shorter->bytecode);
 	shorter->bytecode = NULL;
@@ -251,6 +252,8 @@ static void apply_offset_shift(t_asm *a, t_block_variant *variant, size_t final_
         a->fixups[i].off += final_offset;
         a->fixups[i].end += final_offset;
     }
+    for (i = variant->bitlog_range_start; i < variant->bitlog_range_end; i++)   /* NOUVEAU */
+        g_bit_log_off[i] += final_offset;
 }
 
 t_asm_result *polyblock_link(t_asm *a, t_polyctx *ctx, const char *entry_block,
