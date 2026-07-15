@@ -335,5 +335,8 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx)
     }
     a->polyctx = NULL;
 
+    fprintf(stderr, "[DEBUG] nlabels=%d\n", a->nlabels);
+    for (int i = 0; i < a->nlabels; i++)
+        fprintf(stderr, "  label[%d] = '%s' @ %zu\n", i, a->labels[i].name, a->labels[i].off);
     return (0);
 }
