@@ -1572,15 +1572,18 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		if (!preg(toks[1], &r1, &s1)) return (-1);
 		size_t off_before = a->out->e.len;
-		if (lsb_value) {
+		if (lsb_value)
+		{
 			if (s1 == 8)       emit_inc_r8(&a->out->e, r1);
 			else if (s1 == 32) emit_inc_r32(&a->out->e, r1);
 			else               emit_inc_r64(&a->out->e, r1);
 		} else {
 			if (s1 == 8)
 				emit_add_r8_imm8(&a->out->e, r1, 1);
-			else if (s1 == 32 || s1 == 64)
+			else if (s1 == 32)
 				emit_add_r32_imm32_long(&a->out->e, r1, 1);
+			else
+				emit_add_r64_imm32(&a->out->e, r1, 1);
 		}
 		char logname[32];
 		snprintf(logname, 32, "_INC %s", toks[1]);
