@@ -5,15 +5,15 @@
 [DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
 [DEBUG] nlabels=9
   label[0] = 'greeting' @ 0
-  label[1] = 'farewell' @ 35
-  label[2] = 'main_flow' @ 70
-  label[3] = 'back_from_greeting' @ 348
-  label[4] = 'back_from_farewell' @ 623
+  label[1] = 'farewell' @ 29
+  label[2] = 'main_flow' @ 58
+  label[3] = 'back_from_greeting' @ 275
+  label[4] = 'back_from_farewell' @ 515
   label[5] = 'scan_start' @ 0
-  label[6] = 'scan_end' @ 633
-  label[7] = 'greeting_msg' @ 633
-  label[8] = 'farewell_msg' @ 648
+  label[6] = 'scan_end' @ 528
+  label[7] = 'greeting_msg' @ 528
+  label[8] = 'farewell_msg' @ 543
 asm: call #6 (_INC rdi, off=22, bloc=scan_start) : LDE N'A DECODE AUCUN BIT a cette position exacte (fallback ou instruction jamais reconnue ici)
-  octets a cet offset (large): 00 00 00 48 8d 35 00 00 00 00 48 8d 14 25 0d 00 00 00 0f 05 e9 00 00 00 
-asm: MISMATCH cle simulee vs cle reelle
+  octets a cet offset (large): 48 8d 35 00 00 00 00 ba 0d 00 00 00 0f 05 e9 00 00 00 00 b8 01 00 00 00 
+asm: LDE simule n'a extrait que 123/128 bits
 error: stub generation failed

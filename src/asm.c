@@ -327,6 +327,20 @@ int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position)
         if (equalize_sizes(a, ctx, blk) < 0)
             return (-1);
 
+
+		/* ── DUMP TEMPORAIRE ── */
+        fprintf(stderr, "[DUMP] block '%s': ciphertext len=%zu, plaintext len=%zu\n",
+                blk->identifier, blk->ciphertext.bytecode_len, blk->plaintext.bytecode_len);
+        fprintf(stderr, "  ciphertext: ");
+        for (size_t k = 0; k < blk->ciphertext.bytecode_len; k++)
+            fprintf(stderr, "%02x ", blk->ciphertext.bytecode[k]);
+        fprintf(stderr, "\n  plaintext:  ");
+        for (size_t k = 0; k < blk->plaintext.bytecode_len; k++)
+            fprintf(stderr, "%02x ", blk->plaintext.bytecode[k]);
+        fprintf(stderr, "\n");
+        /* ── FIN DUMP ── */
+
+
         apply_offset_shift(a, &blk->ciphertext, position);
         apply_offset_shift(a, &blk->plaintext, position);
 
