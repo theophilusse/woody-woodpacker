@@ -45,7 +45,7 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 "    _ZERO eax\n"
 "    _ZERO edi\n"
 "%POLYBLOCK_END\n"
-"scan_end:";
+"scan_end:\n";
 
 static const char STUB_POLY_DEMO_DATA[] =
 "greeting_msg:\n"
