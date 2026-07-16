@@ -1,5 +1,72 @@
-[DUMP] block 'greeting': ciphertext len=47, plaintext len=47
-[DUMP] block 'farewell': ciphertext len=32, plaintext len=32
-[DUMP] block 'main_flow': ciphertext len=551, plaintext len=551
-error: stub too large for available padding (5763 bytes needed, 3743 available)
-chiffrement : vaddr=0x401000 len=353 key[0]=4F
+A4A556815FD8D7CD244A09BBE4FDAA9B
+')
+[DEBUG] parse_polyblock('farewell')
+[DEBUG] parse_polyblock('main_flow')
+[DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
+[DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
+[DUMP] block 'greeting': ciphertext len=53, plaintext len=53
+  ciphertext: 48 8d 04 25 6f 00 00 00 48 8d 3c 25 6f 00 00 00 be 6f 00 00 00 41 83 ef 01 41 83 ef 01 41 ff cf 41 81 c6 01 00 00 00 41 ff cf 41 ff ce 41 83 ee 01 41 ff cf 90 
+  plaintext:  48 8d 04 25 01 00 00 00 48 8d 3c 25 01 00 00 00 48 8d 35 00 00 00 00 48 8d 14 25 0d 00 00 00 0f 05 eb 00 e9 00 00 00 00 41 81 c6 01 00 00 00 41 83 ee 01 90 90 
+[DUMP] block 'farewell': ciphertext len=37, plaintext len=37
+  ciphertext: 48 8d 04 25 de 00 00 00 48 8d 3c 25 de 00 00 00 45 31 ff 41 81 c7 01 00 00 00 45 31 f6 41 83 ee 01 41 83 ef 01 
+  plaintext:  48 8d 04 25 01 00 00 00 48 8d 3c 25 01 00 00 00 48 8d 35 00 00 00 00 ba 09 00 00 00 0f 05 eb 00 e9 00 00 00 00 
+[DUMP] block 'main_flow': ciphertext len=744, plaintext len=744
+  ciphertext: 48 8d 3d 00 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 04 80 77 00 6e 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 0c 80 77 00 6e 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 10 80 77 00 f6 48 81 c7 01 00 00 00 80 77 00 e2 48 81 c7 01 00 00 00 80 77 00 35 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 15 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 83 48 81 c7 01 00 00 00 80 77 00 a7 48 81 c7 01 00 00 00 80 77 00 8c 48 81 c7 01 00 00 00 80 77 00 55 48 81 c7 01 00 00 00 80 77 00 a6 48 81 c7 01 00 00 00 80 77 00 e2 48 81 c7 01 00 00 00 80 77 00 01 48 81 c7 01 00 00 00 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 ff 48 81 c7 01 00 00 00 80 77 00 c0 48 81 c7 01 00 00 00 80 77 00 44 48 81 c7 01 00 00 00 80 77 00 6a 48 81 c7 01 00 00 00 80 77 00 c6 48 81 c7 01 00 00 00 80 77 00 e8 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 27 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 be 48 81 c7 01 00 00 00 80 77 00 4e 48 81 c7 01 00 00 00 80 77 00 87 48 81 c7 01 00 00 00 80 77 00 fe 48 81 c7 01 00 00 00 80 77 00 ce 48 81 c7 01 00 00 00 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 83 48 81 c7 01 00 00 00 80 77 00 af 48 81 c7 01 00 00 00 80 77 00 82 48 81 c7 01 00 00 00 80 77 00 af 48 81 c7 01 00 00 00 80 77 00 fe 48 81 c7 01 00 00 00 80 77 00 5f 48 81 c7 01 00 00 00 eb 00 e9 00 00 00 00 48 8d 3d 00 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 04 80 47 00 dd 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 0c 80 47 00 dd 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 10 80 47 00 fd 48 81 c7 01 00 00 00 80 47 00 a4 48 81 c7 01 00 00 00 80 47 00 ca 48 81 c7 01 00 00 00 80 47 00 41 48 81 c7 01 00 00 00 80 47 00 81 48 81 c7 01 00 00 00 80 47 00 c7 48 81 c7 01 00 00 00 80 77 00 01 48 81 c7 01 00 00 00 80 47 00 46 48 81 c7 01 00 00 00 80 47 00 f7 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 1a 80 47 00 45 48 81 c7 01 00 00 00 80 47 00 31 48 81 c7 01 00 00 00 80 47 00 e7 48 81 c7 01 00 00 00 80 47 00 3c 48 81 c7 01 00 00 00 80 47 00 98 48 81 c7 01 00 00 00 80 47 00 ee 48 81 c7 01 00 00 00 80 47 00 18 48 81 c7 01 00 00 00 80 47 00 41 48 81 c7 01 00 00 00 80 47 00 83 48 81 c7 01 00 00 00 80 47 00 ef 48 81 c7 01 00 00 00 80 77 00 01 48 81 c7 01 00 00 00 eb 00 e9 00 00 00 00 48 8d 04 25 3c 00 00 00 31 ff 0f 05 
+  plaintext:  83 e0 00 83 e7 00 41 ff c6 41 ff c7 41 ff cf 41 ff cf 41 ff c7 41 83 e7 00 41 ff ce 41 83 e6 00 41 ff c7 41 ff cf 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff ce 41 ff c7 41 ff c6 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff c6 41 ff c6 41 ff c6 41 83 e6 00 41 83 e7 00 41 ff c7 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff ce 41 ff c6 41 ff c6 41 ff cf 41 ff c6 41 83 e6 00 41 ff cf 41 ff ce 41 ff c7 41 83 e7 00 41 ff c7 41 83 e6 00 41 83 e7 00 41 ff ce 41 83 e7 00 41 83 e6 00 41 ff c6 41 ff cf 41 83 e7 00 41 83 e7 00 41 ff cf 41 ff cf 41 ff c7 41 83 e6 00 41 83 e6 00 41 83 e7 00 41 ff c6 41 83 e6 00 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff ce 41 ff c6 41 83 e7 00 41 ff cf 41 83 e6 00 41 83 e7 00 41 ff cf 41 ff ce 41 ff ce 41 83 e7 00 41 ff c7 41 ff cf 41 ff cf 41 83 e6 00 41 ff cf 41 83 e7 00 41 ff ce 41 ff ce 41 ff cf 41 ff cf 41 83 e6 00 41 ff c7 41 ff c6 41 ff ce 41 ff cf 41 83 e7 00 41 ff ce 41 ff ce 41 ff c6 41 ff c7 41 ff c7 41 ff c6 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff ce 41 83 e7 00 41 83 e6 00 41 ff c7 41 ff cf 41 83 e6 00 41 ff c6 41 ff c7 41 83 e6 00 41 ff ce 41 ff cf 41 ff cf 41 ff c7 41 83 e6 00 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff cf 41 83 e6 00 41 83 e7 00 41 ff cf 41 83 e7 00 41 ff c6 41 83 e7 00 41 ff cf 41 ff c7 41 ff c7 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c6 41 ff ce 41 ff c7 41 ff c7 41 83 e7 00 41 ff ce 41 ff c7 41 83 e6 00 41 83 e6 00 41 ff c6 41 ff c7 41 ff cf 41 ff cf 41 83 e7 00 41 ff cf 41 83 e6 00 41 ff c7 41 83 e7 00 41 ff ce 41 ff ce 41 83 e6 00 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c7 41 ff ce 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 ff c7 41 ff cf 41 ff ce 41 ff ce 41 83 e7 00 41 83 e7 00 41 ff ce 41 ff ce 41 ff cf 41 ff cf 41 ff cf 41 ff ce 41 83 e7 00 41 ff c6 41 ff ce 41 83 e6 00 41 ff ce 41 ff c6 41 ff ce 41 ff c6 41 ff c6 41 ff c6 41 83 e7 00 41 ff cf 41 83 e7 00 41 ff c6 41 ff c7 41 ff c6 41 ff c6 41 83 e6 00 41 ff cf 41 ff cf 41 83 e7 00 41 ff cf 41 ff c6 41 ff ce 41 83 e7 00 41 ff c7 41 ff c6 41 ff c6 41 83 e6 00 41 ff ce 41 83 e6 00 41 83 e6 00 41 ff c6 41 ff cf 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff c7 41 83 e7 00 41 83 e7 00 90 90 
+[DEBUG] sym(greeting)=0 sym(farewell)=53 nfixups=56
+  fixup[0] name='greeting_msg' off=19 end=23
+  fixup[1] name='next_block' off=36 end=40
+  fixup[2] name='greeting' off=93 end=97
+  fixup[3] name='greeting' off=100 end=104
+  fixup[4] name='greeting' off=122 end=126
+  fixup[5] name='greeting' off=144 end=148
+  fixup[6] name='greeting' off=188 end=192
+  fixup[7] name='greeting' off=364 end=368
+  fixup[8] name='greeting' off=518 end=522
+  fixup[9] name='farewell' off=525 end=529
+  fixup[10] name='farewell' off=532 end=536
+  fixup[11] name='farewell' off=554 end=558
+  fixup[12] name='farewell' off=576 end=580
+  fixup[13] name='farewell' off=686 end=690
+  fixup[14] name='farewell' off=818 end=822
+  fixup[15] name='main_flow' off=93 end=97
+  fixup[16] name='main_flow' off=143 end=147
+  fixup[17] name='main_flow' off=520 end=524
+  fixup[18] name='main_flow' off=625 end=629
+  fixup[19] name='main_flow' off=839 end=843
+  fixup[20] name='main_flow' off=940 end=944
+  fixup[21] name='main_flow' off=997 end=1001
+  fixup[22] name='main_flow' off=1079 end=1083
+  fixup[23] name='main_flow' off=1306 end=1310
+  fixup[24] name='main_flow' off=1349 end=1353
+  fixup[25] name='main_flow' off=1449 end=1453
+  fixup[26] name='main_flow' off=1582 end=1586
+  fixup[27] name='main_flow' off=1736 end=1740
+  fixup[28] name='main_flow' off=1995 end=1999
+  fixup[29] name='main_flow' off=2049 end=2053
+  fixup[30] name='main_flow' off=2346 end=2350
+  fixup[31] name='main_flow' off=3043 end=3047
+  fixup[32] name='main_flow' off=3155 end=3159
+  fixup[33] name='main_flow' off=3267 end=3271
+  fixup[34] name='main_flow' off=3306 end=3310
+  fixup[35] name='main_flow' off=3363 end=3367
+  fixup[36] name='main_flow' off=3456 end=3460
+  fixup[37] name='main_flow' off=3595 end=3599
+  fixup[38] name='main_flow' off=3695 end=3699
+  fixup[39] name='main_flow' off=3767 end=3771
+  fixup[40] name='main_flow' off=3961 end=3965
+  fixup[41] name='main_flow' off=4008 end=4012
+  fixup[42] name='main_flow' off=4576 end=4580
+  fixup[43] name='main_flow' off=4597 end=4601
+  fixup[44] name='main_flow' off=4937 end=4941
+  fixup[45] name='main_flow' off=5034 end=5038
+  fixup[46] name='main_flow' off=5102 end=5106
+  fixup[47] name='main_flow' off=5199 end=5203
+  fixup[48] name='main_flow' off=5310 end=5314
+  fixup[49] name='main_flow' off=6032 end=6036
+  fixup[50] name='main_flow' off=6392 end=6396
+  fixup[51] name='main_flow' off=6510 end=6514
+  fixup[52] name='main_flow' off=6610 end=6614
+  fixup[53] name='main_flow' off=6699 end=6703
+  fixup[54] name='main_flow' off=6767 end=6771
+  fixup[55] name='main_flow' off=6839 end=6843
