@@ -498,14 +498,15 @@ int	emit_add_r32_imm8(t_emitter *e, t_reg reg, int8_t imm)
 }
 
 /* ADD r32, imm32 : 81 /0 id (6 octets, distinct de 83 pour le LDE) */
-int	emit_add_r32_imm32_long(t_emitter *e, t_reg dst, uint32_t imm)
+int emit_add_r32_imm32_long(t_emitter *e, t_reg dst, uint32_t imm)
 {
-	uint8_t b[7]; int n = 0;
-	uint8_t r = mk_rex(0, 0, dst);
-	if (r != 0x40) b[n++] = r;
-	b[n++] = 0x81; b[n++] = MODRM11(0, dst);
-	memcpy(b + n, &imm, 4); n += 4;
-	return emit_raw(e, b, n);
+    uint8_t b[7]; int n = 0;
+    uint8_t r = mk_rex(0, 0, dst);
+    if (r != 0x40) b[n++] = r;      /* +1 octet SI REX necessaire */
+    b[n++] = 0x81;                   /* opcode */
+    b[n++] = MODRM11(0, dst);        /* modrm */
+    memcpy(b + n, &imm, 4); n += 4;  /* imm32 */
+    return emit_raw(e, b, n);
 }
 
 int	emit_add_r64_imm8(t_emitter *e, t_reg reg, int8_t imm)
