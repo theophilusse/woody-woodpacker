@@ -48,7 +48,7 @@ typedef struct s_asm
 }	t_asm;
 
 extern int g_bit_log_len;
-extern int g_bit_log_off[512];
+extern size_t g_bit_log_off[512];
 extern int g_bit_log[512];
 extern char g_bit_log_name[512][32];
 
