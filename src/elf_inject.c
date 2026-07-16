@@ -80,6 +80,9 @@ int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
 		return (-1);
 	}
 
+	fprintf(stderr, "[DEBUG] stub->len=%zu padding=%zu p_offset=0x%lx p_filesz=0x%lx\n",
+        stub->len, padding_available(ctx, p), p->p_offset, p->p_filesz);
+
     stub_offset = p->p_offset + p->p_filesz;
 
     tmp = realloc(ctx->raw, ctx->size + stub->len);
