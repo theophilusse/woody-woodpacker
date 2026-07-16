@@ -1,9 +1,9 @@
 #include "asm.h"
 
 int g_bit_log_len = 0;
-size_t g_bit_log_off[512];
-int g_bit_log[512];
-char g_bit_log_name[512][32];
+size_t g_bit_log_off[MAX_BIT_LOG];
+int g_bit_log[MAX_BIT_LOG];
+char g_bit_log_name[MAX_BIT_LOG][32];
 
 static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi",
                              "r8","r9","r10","r11","r12","r13","r14","r15"};
@@ -442,6 +442,11 @@ static void log_bit(t_asm *a, const char *name, size_t off, int bit)
 {
     if (!a->key_sync_enabled)
         return;
+    if (g_bit_log_len >= MAX_BIT_LOG)
+    {
+        fprintf(stderr, "asm: g_bit_log plein (MAX_BIT_LOG=%d depasse)\n", MAX_BIT_LOG);
+        return;
+    }
     snprintf(g_bit_log_name[g_bit_log_len], 32, "%s", name);
     g_bit_log_off[g_bit_log_len] = off;
     g_bit_log[g_bit_log_len++] = bit;

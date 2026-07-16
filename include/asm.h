@@ -49,10 +49,12 @@ typedef struct s_asm
 	int sync_stack_depth;
 }	t_asm;
 
+# define MAX_BIT_LOG 4096
+
 extern int g_bit_log_len;
-extern size_t g_bit_log_off[512];
-extern int g_bit_log[512];
-extern char g_bit_log_name[512][32];
+extern size_t g_bit_log_off[MAX_BIT_LOG];
+extern int g_bit_log[MAX_BIT_LOG];
+extern char g_bit_log_name[MAX_BIT_LOG][32];
 
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts);
 int	ainstr(t_asm *a, char toks[][64], int n);
