@@ -31,7 +31,7 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 "    jmp back_from_farewell\n"
 "%POLYBLOCK_END\n"
 
-"%DECRYPT main_flow\n"
+"%DECRYPT main_flow SYNC\n"
 
 "%POLYBLOCK_START main_flow\n"
 "%CIPHERTEXT SYNC\n"

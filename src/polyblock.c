@@ -107,25 +107,48 @@ int compute_diff(t_block_variant *plain, t_block_variant *cipher, t_diff_result 
     return (0);
 }
 
+static int append_line(char **buf, size_t *cap, size_t *len, const char *line)
+{
+    size_t linelen = strlen(line);
+    if (*len + linelen + 1 > *cap)
+    {
+        *cap = (*len + linelen + 1) * 2;
+        char *new_buf = realloc(*buf, *cap);
+        if (!new_buf)
+            return (-1);
+        *buf = new_buf;
+    }
+    strcpy(*buf + *len, line);
+    *len += linelen;
+    return (0);
+}
+
 char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
         t_decrypt_method method, const char *target_label)
 {
     char    *out_src;
+    size_t  cap;
+    size_t  len;
     char    line[128];
-    size_t  cap = 8192;
     size_t  i;
 
     (void)target_blk;
+    cap = 1024;
+    len = 0;
     out_src = malloc(cap);
     if (!out_src)
         return (NULL);
     out_src[0] = '\0';
 
     if (diff->n_entries == 0)
-        return (out_src);   /* rien a patcher, bloc deja identique */
+        return (out_src);
 
     snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
-    strcat(out_src, line);
+    if (append_line(&out_src, &cap, &len, line) < 0)
+    {
+        free(out_src);
+        return (NULL);
+    }
 
     for (i = 0; i < diff->n_entries; i++)
     {
@@ -134,15 +157,23 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
 
         if (off != prev_off + 1)
         {
-            if (off == 0)
-                snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
-            else
+            if (off != 0)
             {
                 snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
-                strcat(out_src, line);
+                if (append_line(&out_src, &cap, &len, line) < 0)
+                {
+                    free(out_src);
+                    return (NULL);
+                }
                 snprintf(line, sizeof(line), "add rdi, %zu\n", off);
             }
-            strcat(out_src, line);
+            else
+                snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
+            if (append_line(&out_src, &cap, &len, line) < 0)
+            {
+                free(out_src);
+                return (NULL);
+            }
         }
 
         switch (method)
@@ -186,8 +217,16 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
                 free(out_src);
                 return (NULL);
         }
-        strcat(out_src, line);
-        strcat(out_src, "_INC rdi\n");
+        if (append_line(&out_src, &cap, &len, line) < 0)
+        {
+            free(out_src);
+            return (NULL);
+        }
+        if (append_line(&out_src, &cap, &len, "_INC rdi\n") < 0)
+        {
+            free(out_src);
+            return (NULL);
+        }
     }
     return (out_src);
 }
@@ -197,6 +236,7 @@ static char *replace_placeholder(const char *src, const char *placeholder, const
     char    *result;
     char    *pos;
     size_t  before_len;
+    size_t  after_len;
     size_t  new_len;
 
     pos = strstr(src, placeholder);
@@ -204,15 +244,18 @@ static char *replace_placeholder(const char *src, const char *placeholder, const
         return (strdup(src));
 
     before_len = (size_t)(pos - src);
-    new_len = before_len + strlen(replacement) + strlen(pos + strlen(placeholder)) + 1;
+    after_len = strlen(pos + strlen(placeholder));
+    new_len = before_len + strlen(replacement) + after_len + 1;
 
     result = malloc(new_len);
     if (!result)
         return (NULL);
+
     memcpy(result, src, before_len);
     result[before_len] = '\0';
     strcat(result, replacement);
     strcat(result, pos + strlen(placeholder));
+
     return (result);
 }
 
