@@ -407,21 +407,12 @@ static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *dis
 }
 
 /* ── lea avec label et fixup si necessaire ──────────────────────── */
-static void	lea_label(t_asm *a, t_reg dst, const char *label)
+static void lea_label(t_asm *a, t_reg dst, const char *label)
 {
-	size_t	patch;
-	int32_t	disp;
-	int64_t	val;
+    size_t patch;
 
-	emit_lea_rip(&a->out->e, dst, &patch);
-	val = sym(a, label);
-	if (val >= 0)
-	{
-		disp = (int32_t)(val - (int64_t)(patch + 4));
-		patch_disp32(&a->out->e, patch, disp);
-	}
-	else
-		addfixup(a, label, patch, patch + 4, 0);
+    emit_lea_rip(&a->out->e, dst, &patch);
+    addfixup(a, label, patch, patch + 4, 0);
 }
 
 static uint8_t jcc_opcode(const char *m)
@@ -474,32 +465,11 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		{ emit_rdtsc(&a->out->e); return 0; }
 	if (n == 2 && (op = jcc_opcode(toks[0])))
 	{
-		int64_t lval = sym(a, toks[1]);
-		if (lval >= 0)
-		{
-			int64_t disp = lval - (int64_t)(a->out->e.len + 2);
-			if (disp >= -128 && disp <= 127)
-			{
-				emit_jcc_rel8_direct(&a->out->e, op, (int8_t)disp);
-			}
-			else
-			{
-				/* backward mais trop loin pour rel8 : forme near 0F 8x rel32 */
-				int32_t d32 = (int32_t)(lval - (int64_t)(a->out->e.len + 6));
-				uint8_t bytes[6] = {0x0F, (uint8_t)(0x80 | (op & 0x0F)), 0,0,0,0};
-				memcpy(bytes + 2, &d32, 4);
-				emit_raw(&a->out->e, bytes, 6);
-			}
-		}
-		else
-		{
-			/* forward, distance inconnue : trampoline (condition inversée + jmp rel32) */
-			uint8_t bytes[2] = { (uint8_t)(op ^ 1), 5 };
-			emit_raw(&a->out->e, bytes, 2);
-			size_t dummy;
-			emit_jmp_rel32(&a->out->e, &dummy);
-			addfixup(a, toks[1], dummy, dummy + 4, 0);   /* is_rel8 = 0 */
-		}
+		uint8_t bytes[2] = { (uint8_t)(op ^ 1), 5 };
+		size_t dummy;
+		emit_raw(&a->out->e, bytes, 2);
+		emit_jmp_rel32(&a->out->e, &dummy);
+		addfixup(a, toks[1], dummy, dummy + 4, 0);
 		return 0;
 	}
 	if (!strcmp(toks[0], "ret") && n == 1)
@@ -543,22 +513,13 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 				return 0;
 			}
 		}
-		else // Cas 1: CALL direct (rel32)
+		else // Cas 1: CALL direct (rel32, forme trampoline pour rester coherent avec le reste)
 		{
-			int64_t lval = sym(a, toks[1]);
-			if (lval >= 0)
-			{
-				int64_t disp = lval - (int64_t)(a->out->e.len + 5);
-				emit_call_direct(&a->out->e, (int32_t)disp);
-			}
-			else
-			{
-				uint8_t bytes[2] = {0xEB, 0};
-				emit_raw(&a->out->e, bytes, 2);
-				size_t dummy;
-				emit_jmp_rel32(&a->out->e, &dummy);
-				addfixup(a, toks[1], dummy, dummy + 4, 0);   /* RETIRE le +1 */
-			}
+			uint8_t bytes[2] = {0xEB, 0};
+			size_t dummy;
+			emit_raw(&a->out->e, bytes, 2);
+			emit_jmp_rel32(&a->out->e, &dummy);
+			addfixup(a, toks[1], dummy, dummy + 4, 0);
 			return 0;
 		}
 		fprintf(stderr, "asm: call %s non gere\n", toks[1]);
@@ -1201,31 +1162,17 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_jmp_rel32(&a->out->e, &a->out->patch_jmp_oep);
 			return (0);
 		}
-		/* label deja defini (saut arriere) */
-		val = sym(a, toks[1]);
-		if (val >= 0)
+		/* toujours en fixup differe, jamais de resolution/patch immediat :
+		** un label deja resolu par sym() peut encore etre decale plus tard
+		** par apply_offset_shift (cas des blocs polymorphes), donc on ne
+		** peut jamais faire confiance a une valeur "deja finale" ici */
 		{
-			int64_t disp = val - (int64_t)(a->out->e.len + 2);
-			if (disp >= -128 && disp <= 127)
-			{
-				uint8_t bytes[2] = {0xEB, (uint8_t)(int8_t)disp};
-				return emit_raw(&a->out->e, bytes, 2);
-			}
-			else
-			{
-				int32_t d32 = (int32_t)(val - (int64_t)(a->out->e.len + 5));
-				uint8_t bytes[5] = {0xE9, 0, 0, 0, 0};
-				memcpy(bytes + 1, &d32, 4);
-				return emit_raw(&a->out->e, bytes, 5);
-			}
-		}
-		/* label pas encore defini (saut avant) : fixup rel32 */
-		{
-			size_t poff = a->out->e.len + 1;
-			size_t pend = a->out->e.len + 5;
 			size_t dummy;
+			uint8_t bytes[2] = {0xEB, 0};
+
+			emit_raw(&a->out->e, bytes, 2);
 			emit_jmp_rel32(&a->out->e, &dummy);
-			addfixup(a, toks[1], poff, pend, 0);
+			addfixup(a, toks[1], dummy, dummy + 4, 0);
 		}
 		return (0);
 	}
