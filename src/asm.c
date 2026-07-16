@@ -1696,8 +1696,8 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 				/* Verifie qu'on n'a PAS depasse remaining malgre le garde ci-dessus */
 				if (a->out->e.len - before > remaining)
 				{
-					fprintf(stderr, "asm: _JUNK depassement interne detecte, "
-							"reduction du buffer non supportee — ajuste les seuils\n");
+					fprintf(stderr, "asm: _JUNK depassement: choice=%d remaining=%zu produit=%zu\n",
+							choice, remaining, a->out->e.len - before);
 					return (-1);
 				}
 			}
