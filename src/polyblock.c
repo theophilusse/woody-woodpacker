@@ -263,7 +263,7 @@ int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
     return (0);
 }
 
-static int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
+int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
         t_block_variant *variant, int is_cipher)
 {
     t_emitter   local_e;

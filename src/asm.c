@@ -3,7 +3,7 @@
 static int    g_bit_log[512];
 static char   g_bit_log_name[512][32];
 extern size_t g_bit_log_off[512];
-static int    g_bit_log_len = 0;
+extern int    g_bit_log_len = 0;
 
 static const char *R64[] = {"rax","rcx","rdx","rbx","rsp","rbp","rsi","rdi",
                              "r8","r9","r10","r11","r12","r13","r14","r15"};
