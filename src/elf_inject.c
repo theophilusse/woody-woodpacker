@@ -23,11 +23,28 @@ int	elf_find_injection_point(t_elf_ctx *ctx)
 	return (1);
 }
 
-size_t padding_available(Elf64_Phdr *p)
+size_t padding_available(t_elf_ctx *ctx, Elf64_Phdr *p)
 {
-    size_t used = p->p_filesz % p->p_align;
-    if (used == 0) return (0);
-    return (p->p_align - used);
+    size_t  end_of_segment;
+    size_t  next_segment_offset;
+    Elf64_Half i;
+
+    end_of_segment = p->p_offset + p->p_filesz;
+    next_segment_offset = ctx->size;   /* par defaut : fin du fichier */
+
+    for (i = 0; i < ctx->ehdr->e_phnum; i++)
+    {
+        Elf64_Phdr *other = &ctx->phdrs[i];
+
+        if (other == p || other->p_type != PT_LOAD)
+            continue;
+        if (other->p_offset > p->p_offset && (size_t)other->p_offset < next_segment_offset)
+            next_segment_offset = other->p_offset;
+    }
+
+    if (next_segment_offset <= end_of_segment)
+        return (0);
+    return (next_segment_offset - end_of_segment);
 }
 
 int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
@@ -55,13 +72,13 @@ int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
         }
     }
 
-    if (stub->len > padding_available(p))
-    {
-        fprintf(stderr, "error: stub too large for available padding "
-                "(%zu bytes needed, %zu available)\n",
-                stub->len, padding_available(p));
-        return (-1);
-    }
+    if (stub->len > padding_available(ctx, p))
+	{
+		fprintf(stderr, "error: stub too large for available padding "
+				"(%zu bytes needed, %zu available)\n",
+				stub->len, padding_available(ctx, p));
+		return (-1);
+	}
 
     stub_offset = p->p_offset + p->p_filesz;
 
