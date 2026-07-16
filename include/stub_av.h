@@ -15,7 +15,7 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 "    lea rsi, [greeting_msg]\n"
 "    _SET edx, 13\n"
 "    syscall\n"
-"    jmp back_from_greeting\n"
+"    jmp next_block\n"
 "%POLYBLOCK_END\n"
 
 "%POLYBLOCK_START farewell\n"
@@ -31,6 +31,7 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 "    jmp back_from_farewell\n"
 "%POLYBLOCK_END\n"
 
+"next_block:"
 "%DECRYPT main_flow SYNC\n"
 
 "%POLYBLOCK_START main_flow\n"
