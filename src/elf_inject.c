@@ -47,6 +47,118 @@ size_t padding_available(t_elf_ctx *ctx, Elf64_Phdr *p)
     return (next_segment_offset - end_of_segment);
 }
 
+static int elf_patch_new_segment(t_elf_ctx *ctx, t_stub *stub, t_opts *opts)
+{
+    Elf64_Phdr  *new_phdrs;
+    Elf64_Phdr  *new_seg;
+    Elf64_Phdr  saved_phdrs[64];   /* copie de securite AVANT tout realloc/ecriture */
+    size_t      new_phdr_count;
+    size_t      new_phdr_table_offset;
+    size_t      new_seg_vaddr;
+    size_t      new_seg_offset;
+    uint8_t     *tmp;
+    size_t      old_file_size;
+    size_t      old_phnum;
+    size_t      align;
+    int32_t     disp;
+
+    old_file_size = ctx->size;
+    old_phnum = ctx->ehdr->e_phnum;
+    if (old_phnum >= 64)
+    {
+        fprintf(stderr, "elf_patch_new_segment: trop de program headers existants\n");
+        return (-1);
+    }
+
+    /* ── Sauvegarde l'ancienne table PHDR AVANT tout realloc/ecriture,
+    ** pour ne jamais dependre d'un pointeur qui pourrait devenir invalide
+    ** ou d'une zone qui pourrait etre ecrasee plus tard ── */
+    memcpy(saved_phdrs, ctx->phdrs, old_phnum * sizeof(Elf64_Phdr));
+
+    new_phdr_count = old_phnum + 1;
+
+    /* Nouvelle adresse virtuelle : apres le dernier segment existant, alignee page */
+    new_seg_vaddr = 0;
+    for (size_t i = 0; i < old_phnum; i++)
+    {
+        size_t end = saved_phdrs[i].p_vaddr + saved_phdrs[i].p_memsz;
+        if (end > new_seg_vaddr)
+            new_seg_vaddr = end;
+    }
+    align = 0x1000;
+    new_seg_vaddr = (new_seg_vaddr + align - 1) & ~(align - 1);
+
+    /* Position dans le fichier : a la fin, avec alignement fichier/memoire coherent */
+    new_seg_offset = old_file_size;
+    {
+        size_t rem_vaddr = new_seg_vaddr % align;
+        size_t rem_offset = new_seg_offset % align;
+        if (rem_offset != rem_vaddr)
+            new_seg_offset += (rem_vaddr + align - rem_offset) % align;
+    }
+
+    new_phdr_table_offset = new_seg_offset + stub->len;
+    size_t total_new_size = new_phdr_table_offset + new_phdr_count * sizeof(Elf64_Phdr);
+
+    /* ── Realloc : si ca echoue, ctx->raw original reste intact ── */
+    tmp = realloc(ctx->raw, total_new_size);
+    if (!tmp)
+        return (-1);
+    ctx->raw = tmp;
+    ctx->ehdr = (Elf64_Ehdr *)ctx->raw;
+
+    /* Zero le padding entre l'ancienne fin de fichier et new_seg_offset */
+    memset(ctx->raw + old_file_size, 0, new_seg_offset - old_file_size);
+
+    /* ── Patch patch_jmp_oep AVANT d'ecrire le stub, sur stub->bytes en memoire ── */
+    stub->load_vaddr = new_seg_vaddr;
+    stub->original_oep = ctx->ehdr->e_entry;   /* capture avant modification */
+
+    if (stub->patch_jmp_oep != (size_t)-1)
+    {
+        disp = (int32_t)(stub->original_oep - (stub->load_vaddr + stub->patch_jmp_oep + 4));
+        if (opts->verbose)
+            fprintf(stderr, "elf_patch_new_segment: original_oep=0x%lx load_vaddr=0x%lx "
+                    "patch_jmp_oep=%zu disp=%d\n",
+                    stub->original_oep, stub->load_vaddr, stub->patch_jmp_oep, disp);
+        patch_disp32_buf(stub->bytes, stub->patch_jmp_oep, disp);
+    }
+    else if (opts->verbose)
+        fprintf(stderr, "elf_patch_new_segment: pas de jmp @oep dans ce stub, patch ignore\n");
+
+    /* Ecrit le stub (deja patche) a sa position finale */
+    memcpy(ctx->raw + new_seg_offset, stub->bytes, stub->len);
+
+    /* Construit la nouvelle table PHDR : ancienne (sauvegardee) + nouvelle entree */
+    new_phdrs = (Elf64_Phdr *)(ctx->raw + new_phdr_table_offset);
+    memcpy(new_phdrs, saved_phdrs, old_phnum * sizeof(Elf64_Phdr));
+
+    new_seg = &new_phdrs[old_phnum];
+    memset(new_seg, 0, sizeof(*new_seg));
+    new_seg->p_type   = PT_LOAD;
+    new_seg->p_flags  = PF_R | PF_X;
+    new_seg->p_offset = new_seg_offset;
+    new_seg->p_vaddr  = new_seg_vaddr;
+    new_seg->p_paddr  = new_seg_vaddr;
+    new_seg->p_filesz = stub->len;
+    new_seg->p_memsz  = stub->len;
+    new_seg->p_align  = align;
+
+    ctx->ehdr->e_phoff = new_phdr_table_offset;
+    ctx->ehdr->e_phnum = (Elf64_Half)new_phdr_count;
+    ctx->ehdr->e_entry = new_seg_vaddr;
+
+    ctx->phdrs = new_phdrs;
+    ctx->size = total_new_size;
+
+    if (opts->verbose)
+        fprintf(stderr, "elf_patch_new_segment: nouveau segment a vaddr=0x%zx offset=0x%zx "
+                "taille=%zu, e_phoff deplace a 0x%zx (%zu entrees)\n",
+                new_seg_vaddr, new_seg_offset, stub->len, new_phdr_table_offset, new_phdr_count);
+
+    return (0);
+}
+
 int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
 {
     Elf64_Phdr  *p;
@@ -60,31 +172,21 @@ int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
     new_align = 0x4000;
     if (p->p_align < new_align)
     {
-        if ((p->p_vaddr % new_align) != (p->p_offset % new_align))
-        {
-            fprintf(stderr, "error: alignement incompatible, p_vaddr/p_offset "
-                    "ne correspondent pas modulo 0x%lx (p_align inchange)\n",
-                    new_align);
-        }
-        else
-        {
+        if ((p->p_vaddr % new_align) == (p->p_offset % new_align))
             p->p_align = new_align;
-        }
     }
 
     if (stub->len > padding_available(ctx, p))
-	{
-		fprintf(stderr, "error: stub too large for available padding "
-				"(%zu bytes needed, %zu available)\n",
-				stub->len, padding_available(ctx, p));
-		return (-1);
-	}
+    {
+        if (opts->verbose)
+            fprintf(stderr, "elf_patch: padding insuffisant (%zu dispo, %zu requis), "
+                    "fallback vers nouveau segment PT_LOAD\n",
+                    padding_available(ctx, p), stub->len);
+        return (elf_patch_new_segment(ctx, stub, opts));
+    }
 
-	fprintf(stderr, "[DEBUG] stub->len=%zu padding=%zu p_offset=0x%lx p_filesz=0x%lx\n",
-        stub->len, padding_available(ctx, p), p->p_offset, p->p_filesz);
-
+    /* ── chemin existant, injection dans le padding, inchange ── */
     stub_offset = p->p_offset + p->p_filesz;
-
     tmp = realloc(ctx->raw, ctx->size + stub->len);
     if (!tmp)
         return (-1);
@@ -102,22 +204,16 @@ int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
     {
         int32_t disp = (int32_t)(stub->original_oep - (stub->load_vaddr + stub->patch_jmp_oep + 4));
         if (opts->verbose)
-        {
             fprintf(stderr, "original_oep=0x%lx load_vaddr=0x%lx patch_jmp_oep=%zu disp=%d\n",
                     stub->original_oep, stub->load_vaddr, stub->patch_jmp_oep, disp);
-        }
         patch_disp32_buf(stub->bytes, stub->patch_jmp_oep, disp);
         memcpy(ctx->raw + stub_offset, stub->bytes, stub->len);
     }
-    else
-    {
-        if (opts->verbose)
-            fprintf(stderr, "elf_patch: pas de jmp @oep dans ce stub, patch ignore\n");
-    }
+    else if (opts->verbose)
+        fprintf(stderr, "elf_patch: pas de jmp @oep dans ce stub, patch ignore\n");
 
     p->p_filesz += stub->len;
     p->p_memsz  += stub->len;
-
     ctx->ehdr->e_entry = stub->load_vaddr;
     ctx->size += stub->len;
 
