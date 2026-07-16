@@ -30,25 +30,24 @@ size_t padding_available(Elf64_Phdr *p)
     return (p->p_align - used);
 }
 
-int	elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
+int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
 {
-	Elf64_Phdr	*p;
-	size_t		stub_offset;
-	uint8_t		*tmp;
-	uint64_t	new_align;
+    Elf64_Phdr  *p;
+    size_t      stub_offset;
+    uint8_t     *tmp;
+    uint64_t    new_align;
 
-	(void)crypto;
-	p = &ctx->phdrs[ctx->target_phdr_idx];
+    (void)crypto;
+    p = &ctx->phdrs[ctx->target_phdr_idx];
 
-	new_align = 0x4000;
+    new_align = 0x4000;
     if (p->p_align < new_align)
     {
         if ((p->p_vaddr % new_align) != (p->p_offset % new_align))
         {
             fprintf(stderr, "error: alignement incompatible, p_vaddr/p_offset "
-                "ne correspondent pas modulo 0x%lx (p_align inchange)\n",
-                new_align);
-            /* on continue avec l'ancien p_align plutot que d'echouer */
+                    "ne correspondent pas modulo 0x%lx (p_align inchange)\n",
+                    new_align);
         }
         else
         {
@@ -56,44 +55,53 @@ int	elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
         }
     }
 
-	if (stub->len > padding_available(p))
-	{
-		fprintf(stderr, "error: stub too large for available padding "
-			"(%zu bytes needed, %zu available)\n",
-			stub->len, padding_available(p));
-		return (-1);
-	}
+    if (stub->len > padding_available(p))
+    {
+        fprintf(stderr, "error: stub too large for available padding "
+                "(%zu bytes needed, %zu available)\n",
+                stub->len, padding_available(p));
+        return (-1);
+    }
 
-	stub_offset = p->p_offset + p->p_filesz;
+    stub_offset = p->p_offset + p->p_filesz;
 
-	tmp = realloc(ctx->raw, ctx->size + stub->len);
-	if (!tmp)
-		return (-1);
-	ctx->raw = tmp;
-	ctx->ehdr = (Elf64_Ehdr *)ctx->raw;
-	ctx->phdrs = (Elf64_Phdr *)(ctx->raw + ctx->ehdr->e_phoff);
-	p = &ctx->phdrs[ctx->target_phdr_idx];
+    tmp = realloc(ctx->raw, ctx->size + stub->len);
+    if (!tmp)
+        return (-1);
+    ctx->raw = tmp;
+    ctx->ehdr = (Elf64_Ehdr *)ctx->raw;
+    ctx->phdrs = (Elf64_Phdr *)(ctx->raw + ctx->ehdr->e_phoff);
+    p = &ctx->phdrs[ctx->target_phdr_idx];
 
-	memmove(ctx->raw + stub_offset, stub->bytes, stub->len);
+    memmove(ctx->raw + stub_offset, stub->bytes, stub->len);
 
-	stub->load_vaddr = p->p_vaddr + p->p_filesz;
-	stub->original_oep = ctx->ehdr->e_entry;
-	int32_t disp = (int32_t)(stub->original_oep - (stub->load_vaddr + stub->patch_jmp_oep + 4));
-	if (opts->verbose)
-	{
-		fprintf(stderr, "original_oep=0x%lx load_vaddr=0x%lx patch_jmp_oep=%zu disp=%d\n",
-				stub->original_oep, stub->load_vaddr, stub->patch_jmp_oep, disp);
-	}
-	patch_disp32_buf(stub->bytes, stub->patch_jmp_oep, disp);
-	memcpy(ctx->raw + stub_offset, stub->bytes, stub->len);
+    stub->load_vaddr = p->p_vaddr + p->p_filesz;
+    stub->original_oep = ctx->ehdr->e_entry;
 
-	p->p_filesz += stub->len;
-	p->p_memsz  += stub->len;
+    if (stub->patch_jmp_oep != (size_t)-1)
+    {
+        int32_t disp = (int32_t)(stub->original_oep - (stub->load_vaddr + stub->patch_jmp_oep + 4));
+        if (opts->verbose)
+        {
+            fprintf(stderr, "original_oep=0x%lx load_vaddr=0x%lx patch_jmp_oep=%zu disp=%d\n",
+                    stub->original_oep, stub->load_vaddr, stub->patch_jmp_oep, disp);
+        }
+        patch_disp32_buf(stub->bytes, stub->patch_jmp_oep, disp);
+        memcpy(ctx->raw + stub_offset, stub->bytes, stub->len);
+    }
+    else
+    {
+        if (opts->verbose)
+            fprintf(stderr, "elf_patch: pas de jmp @oep dans ce stub, patch ignore\n");
+    }
 
-	ctx->ehdr->e_entry = stub->load_vaddr;
-	ctx->size += stub->len;
+    p->p_filesz += stub->len;
+    p->p_memsz  += stub->len;
 
-	return (0);
+    ctx->ehdr->e_entry = stub->load_vaddr;
+    ctx->size += stub->len;
+
+    return (0);
 }
 
 int	elf_write(t_elf_ctx *ctx, const char *out_path)

@@ -10,6 +10,7 @@ t_stub *stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_opts *opts)
     if (!src)
         return (NULL);
     memset(&res, 0, sizeof(res));
+    res.patch_jmp_oep = (size_t)-1;
     if (asm_build(src, crypto, &res, opts) < 0)
     {
         free(src);

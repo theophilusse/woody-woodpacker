@@ -1,0 +1,8 @@
+Starting program: /home/lfs/woody-woodpacker/woody 
+
+Program received signal SIGSEGV, Segmentation fault.
+audit_list_add_dynamic_tag (tag=1879047932, main_map=0x7ffff7ffe2e0, list=0x7fffffffe100) at ./elf/rtld.c:233
+233	./elf/rtld.c: No such file or directory.
+Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
+Use 'set logging enabled off'.
+
