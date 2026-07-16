@@ -47,6 +47,11 @@ typedef struct s_asm
 	int				key_sync_enabled;
 }	t_asm;
 
+extern int g_bit_log_len;
+extern int g_bit_log_off[512];
+extern int g_bit_log[512];
+extern char g_bit_log_name[512][32];
+
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts);
 int	ainstr(t_asm *a, char toks[][64], int n);
 void deflabel(t_asm *a, const char *name);
