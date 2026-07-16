@@ -1740,6 +1740,23 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		fprintf(stderr, "asm: %%decrypt_slot %d rencontre mais pas encore resolu\n", idx);
 		return (-1);   /* provisoire, a completer avec l'injection reelle */
 	}
+	if (!strcmp(toks[0], "%decrypt_slot_root") && n == 2)
+	{
+		fprintf(stderr, "asm: %%decrypt_slot_root %s rencontre mais jamais substitue "
+				"(bug dans substitute_root_decrypt_slots)\n", toks[1]);
+		return (-1);
+	}
+	if (!strcmp(toks[0], "%sync_push") && n == 2)
+	{
+		a->saved_sync_stack[a->sync_stack_depth++] = a->key_sync_enabled;
+		a->key_sync_enabled = atoi(toks[1]);
+		return (0);
+	}
+	if (!strcmp(toks[0], "%sync_pop") && n == 1)
+	{
+		a->key_sync_enabled = a->saved_sync_stack[--a->sync_stack_depth];
+		return (0);
+	}
 	fprintf(stderr, "asm: inconnu: '%s' (%d tokens)\n", toks[0], n);
 	for (int i = 0; i < n; i++)
 		fprintf(stderr, "  tok[%d] = '%s'\n", i, toks[i]);

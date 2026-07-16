@@ -45,6 +45,8 @@ typedef struct s_asm
 	t_polyctx       *polyctx;          /* contexte polyblock global, NULL si stub principal */
     int             current_variant_is_cipher;
 	int				key_sync_enabled;
+	int saved_sync_stack[16];
+	int sync_stack_depth;
 }	t_asm;
 
 extern int g_bit_log_len;

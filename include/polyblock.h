@@ -51,6 +51,7 @@ typedef struct s_decrypt_spec
     t_decrypt_method chosen_method;   /* resolu apres tirage aleatoire */
     size_t          emitted_offset;   /* position dans le buffer final, une fois assemble */
     size_t          emitted_len;
+    t_sync_mode     sync;
 }   t_decrypt_spec;
 
 /* Un bloc CIPHERTEXT ou PLAINTEXT : une des deux representations
@@ -103,7 +104,9 @@ typedef struct s_polyctx
     t_polyblock blocks[MAX_POLYBLOCKS];
     int         n_blocks;
     char        block_names[MAX_POLYBLOCKS][MAX_POLYBLOCK_NAME];
-    char        *root_src;   /* AJOUT : remplace trailing_data_src */
+    char        *root_src;
+    t_decrypt_spec  root_decrypts[MAX_DECRYPT_SPECS];
+    int             n_root_decrypts;
 }   t_polyctx;
 
 typedef struct s_diff_entry

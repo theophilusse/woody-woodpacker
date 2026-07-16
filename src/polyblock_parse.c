@@ -152,6 +152,18 @@ static int parse_decrypt_directive(t_polyctx *ctx, t_polyblock *blk,
     tok = strtok(methods_part, ", \t");
     while (tok && spec->n_methods < MAX_DECRYPT_METHODS)
     {
+        if (!strcmp(tok, "SYNC"))
+        {
+            spec->sync = SYNC_ON;
+            tok = strtok(NULL, ", \t");
+            continue;
+        }
+        if (!strcmp(tok, "NOSYNC"))
+        {
+            spec->sync = SYNC_NONE;
+            tok = strtok(NULL, ", \t");
+            continue;
+        }
         int m = method_from_str(tok);
         if (m < 0)
         {
@@ -165,6 +177,105 @@ static int parse_decrypt_directive(t_polyctx *ctx, t_polyblock *blk,
     {
         fprintf(stderr, "polyblock: aucune methode DECRYPT specifiee pour '%s'\n", target_id);
         return (-1);
+    }
+
+    if (breakpoints_part[0])
+    {
+        tok = strtok(breakpoints_part, ", \t");
+        while (tok && spec->n_breakpoints < MAX_BREAKPOINTS)
+        {
+            char *colon = strchr(tok, ':');
+            if (!colon)
+            {
+                fprintf(stderr, "polyblock: breakpoint DECRYPT mal forme '%s'\n", tok);
+                return (-1);
+            }
+            *colon = '\0';
+            spec->breakpoints[spec->n_breakpoints].byte_index = (size_t)strtoull(tok, NULL, 0);
+            strncpy(spec->breakpoints[spec->n_breakpoints].label, colon + 1,
+                    MAX_POLYBLOCK_NAME - 1);
+            spec->n_breakpoints++;
+            tok = strtok(NULL, ", \t");
+        }
+    }
+    return (0);
+}
+
+static int parse_decrypt_directive_root(t_polyctx *ctx, const char *line)
+{
+    char            target_id[MAX_POLYBLOCK_NAME];
+    char            rest[256];
+    char            *qmark;
+    char            methods_part[128];
+    char            breakpoints_part[128];
+    t_decrypt_spec  *spec;
+    char            *tok;
+
+    extract_id(line, "DECRYPT", target_id);
+    if (target_id[0] == '\0')
+    {
+        fprintf(stderr, "polyblock: %%DECRYPT sans identifiant cible\n");
+        return (-1);
+    }
+    {
+        const char *p = strstr(line, target_id);
+        if (!p)
+        {
+            fprintf(stderr, "polyblock: incoherence interne, target_id introuvable dans la ligne\n");
+            return (-1);
+        }
+        p += strlen(target_id);
+        while (*p == ' ' || *p == '\t')
+            p++;
+        strncpy(rest, p, sizeof(rest) - 1);
+        rest[sizeof(rest) - 1] = '\0';
+    }
+
+    if (ctx->n_root_decrypts >= MAX_DECRYPT_SPECS)
+    {
+        fprintf(stderr, "polyblock: MAX_DECRYPT_SPECS depasse (racine)\n");
+        return (-1);
+    }
+    spec = &ctx->root_decrypts[ctx->n_root_decrypts++];
+    memset(spec, 0, sizeof(*spec));
+    strncpy(spec->target_identifier, target_id, MAX_POLYBLOCK_NAME - 1);
+
+    qmark = strchr(rest, '?');
+    if (qmark)
+    {
+        size_t mlen = (size_t)(qmark - rest);
+        strncpy(methods_part, rest, mlen);
+        methods_part[mlen] = '\0';
+        strncpy(breakpoints_part, qmark + 1, sizeof(breakpoints_part) - 1);
+        breakpoints_part[sizeof(breakpoints_part) - 1] = '\0';
+    }
+    else
+    {
+        strncpy(methods_part, rest, sizeof(methods_part) - 1);
+        methods_part[sizeof(methods_part) - 1] = '\0';
+        breakpoints_part[0] = '\0';
+    }
+
+    tok = strtok(methods_part, ", \t");
+    while (tok && spec->n_methods < MAX_DECRYPT_METHODS)
+    {
+        int m = method_from_str(tok);
+        if (m < 0)
+        {
+            fprintf(stderr, "polyblock: methode DECRYPT inconnue '%s'\n", tok);
+            return (-1);
+        }
+        spec->methods[spec->n_methods++] = (t_decrypt_method)m;
+        tok = strtok(NULL, ", \t");
+    }
+    if (spec->n_methods == 0)
+    {
+        /* aucune methode precisee : toutes disponibles, tirage aleatoire */
+        spec->methods[0] = METHOD_ADD;
+        spec->methods[1] = METHOD_SUB;
+        spec->methods[2] = METHOD_XOR;
+        spec->methods[3] = METHOD_MOV;
+        spec->n_methods = 4;
     }
 
     if (breakpoints_part[0])
@@ -380,6 +491,20 @@ t_polyctx *polyblock_parse_all(const char *source)
                 return (NULL);
             }
             snprintf(ref, sizeof(ref), "%%polyblock_ref %s", id);
+            accum_line(&root_accum, ref);
+        }
+        else if (line_is_directive(line, "DECRYPT"))
+        {
+            int decrypt_index;
+            char ref[128];
+
+            if (parse_decrypt_directive_root(ctx, line) < 0)
+            {
+                free(ctx);
+                return (NULL);
+            }
+            decrypt_index = ctx->n_root_decrypts - 1;
+            snprintf(ref, sizeof(ref), "%%decrypt_slot_root %d", decrypt_index);
             accum_line(&root_accum, ref);
         }
         else

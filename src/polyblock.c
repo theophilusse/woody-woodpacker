@@ -228,6 +228,7 @@ int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
         t_diff_result   diff;
         t_decrypt_method chosen;
         char            *stub_src;
+        char            *wrapped;
         char            placeholder[64];
 
         target = find_block(ctx, spec->target_identifier);
@@ -239,8 +240,8 @@ int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
         }
         if (!target->ciphertext.bytecode || !target->plaintext.bytecode)
         {
-            fprintf(stderr, "polyblock: DECRYPT cible '%s' pas encore resolue "
-                    "(ordre topologique incorrect)\n", spec->target_identifier);
+            fprintf(stderr, "polyblock: DECRYPT cible '%s' pas encore resolue\n",
+                    spec->target_identifier);
             return (-1);
         }
         if (compute_diff(&target->plaintext, &target->ciphertext, &diff) < 0)
@@ -252,9 +253,19 @@ int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
         if (!stub_src)
             return (-1);
 
-        snprintf(placeholder, sizeof(placeholder), "%%decrypt_slot %d", i);
-        new_src = replace_placeholder(variant->src, placeholder, stub_src);
+        wrapped = malloc(strlen(stub_src) + 64);
+        if (!wrapped)
+        {
+            free(stub_src);
+            return (-1);
+        }
+        snprintf(wrapped, strlen(stub_src) + 64, "%%sync_push %d\n%s%%sync_pop\n",
+                spec->sync == SYNC_ON ? 1 : 0, stub_src);
         free(stub_src);
+
+        snprintf(placeholder, sizeof(placeholder), "%%decrypt_slot %d", i);
+        new_src = replace_placeholder(variant->src, placeholder, wrapped);
+        free(wrapped);
         if (!new_src)
             return (-1);
         free(variant->src);
@@ -320,9 +331,60 @@ int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
     return (0);
 }
 
+static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx)
+{
+    int     i;
+    char    *new_src;
+
+    (void)a;
+    for (i = 0; i < ctx->n_root_decrypts; i++)
+    {
+        t_decrypt_spec  *spec = &ctx->root_decrypts[i];
+        t_polyblock     *target;
+        t_diff_result   diff;
+        t_decrypt_method chosen;
+        char            *stub_src;
+        char            placeholder[64];
+
+        target = find_block(ctx, spec->target_identifier);
+        if (!target)
+        {
+            fprintf(stderr, "polyblock: DECRYPT (racine) cible '%s' introuvable\n",
+                    spec->target_identifier);
+            return (-1);
+        }
+        if (!target->ciphertext.bytecode || !target->plaintext.bytecode)
+        {
+            fprintf(stderr, "polyblock: DECRYPT (racine) cible '%s' pas encore resolue\n",
+                    spec->target_identifier);
+            return (-1);
+        }
+        if (compute_diff(&target->plaintext, &target->ciphertext, &diff) < 0)
+            return (-1);
+
+        chosen = spec->methods[rand() % spec->n_methods];
+        spec->chosen_method = chosen;
+        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
+        if (!stub_src)
+            return (-1);
+
+        snprintf(placeholder, sizeof(placeholder), "%%decrypt_slot_root %d", i);
+        new_src = replace_placeholder(ctx->root_src, placeholder, stub_src);
+        free(stub_src);
+        if (!new_src)
+            return (-1);
+        free(ctx->root_src);
+        ctx->root_src = new_src;
+    }
+    return (0);
+}
+
 int polyblock_assemble(t_asm *a, t_polyctx *ctx)
 {
     if (polyblock_resolve_sizes(a, ctx, 0) < 0)
+        return (-1);
+
+    if (substitute_root_decrypt_slots(a, ctx) < 0)
         return (-1);
 
     if (!ctx->root_src)
@@ -331,7 +393,7 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx)
         return (-1);
     }
 
-    a->polyctx = ctx;   /* AJOUT : fixe le contexte AVANT d'assembler la racine */
+    a->polyctx = ctx;
     if (assemble_source(a, ctx->root_src) < 0)
     {
         a->polyctx = NULL;
@@ -339,8 +401,5 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx)
     }
     a->polyctx = NULL;
 
-    fprintf(stderr, "[DEBUG] nlabels=%d\n", a->nlabels);
-    for (int i = 0; i < a->nlabels; i++)
-        fprintf(stderr, "  label[%d] = '%s' @ %zu\n", i, a->labels[i].name, a->labels[i].off);
     return (0);
 }

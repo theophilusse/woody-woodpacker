@@ -4,11 +4,12 @@
 static const char STUB_POLY_DEMO_BLOCKS[] =
 "scan_start:\n"
 "%POLYBLOCK_START greeting\n"
-"%CIPHERTEXT NOSYNC\n"
+"%CIPHERTEXT SYNC\n"
 "    _SET eax, 111\n"
 "    _SET edi, 111\n"
 "    _SET esi, 111\n"
-"%PLAINTEXT SYNC\n"
+"    _JUNK 32\n"
+"%PLAINTEXT NOSYNC\n"
 "    _SET eax, 1\n"
 "    _SET edi, 1\n"
 "    lea rsi, [greeting_msg]\n"
@@ -30,6 +31,8 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 "    jmp back_from_farewell\n"
 "%POLYBLOCK_END\n"
 
+"%DECRYPT main_flow\n"
+
 "%POLYBLOCK_START main_flow\n"
 "%CIPHERTEXT SYNC\n"
 "    %DECRYPT greeting XOR\n"
@@ -41,7 +44,7 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 "    _SET eax, 60\n"
 "    _ZERO edi\n"
 "    syscall\n"
-"%PLAINTEXT SYNC\n"
+"%PLAINTEXT NOSYNC\n"
 "    _ZERO eax\n"
 "    _ZERO edi\n"
 "%POLYBLOCK_END\n"
