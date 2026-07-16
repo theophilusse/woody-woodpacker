@@ -1,7 +1,7 @@
 #include "asm.h"
 
 int g_bit_log_len = 0;
-int g_bit_log_off[512];
+size_t g_bit_log_off[512];
 int g_bit_log[512];
 char g_bit_log_name[512][32];
 
