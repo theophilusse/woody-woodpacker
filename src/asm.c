@@ -1912,6 +1912,8 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
 				fprintf(stderr, "asm: %d bits attendus retrouves, %d bits fantomes detectes\n",
 						expected_count, phantom_count);
 		}
+		fprintf(stderr, "[DEBUG] g_bit_log[1]=%d g_bit_log_off[1]=%zu buf[5..9]=%02x %02x %02x %02x %02x\n",
+			g_bit_log[1], g_bit_log_off[1], a.out->e.buf[5], a.out->e.buf[6], a.out->e.buf[7], a.out->e.buf[8], a.out->e.buf[9]);
         {
 			int mismatch_at = -1;
 			for (int i = 0; i < g_bit_log_len; i++)
