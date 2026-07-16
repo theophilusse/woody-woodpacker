@@ -1837,6 +1837,9 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
             return (-1);
     }
 
+	fprintf(stderr, "[DEBUG] sym(farewell) = %ld, sym(greeting) = %ld\n",
+        (long)sym(&a, "farewell"), (long)sym(&a, "greeting"));
+
     /* resolution des fixups -- COMMUNE aux deux chemins, inchangee */
     for (int i = 0; i < a.nfixups; i++) {
         int64_t target = sym(&a, a.fixups[i].name);
