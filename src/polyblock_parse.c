@@ -259,6 +259,18 @@ static int parse_decrypt_directive_root(t_polyctx *ctx, const char *line)
     tok = strtok(methods_part, ", \t");
     while (tok && spec->n_methods < MAX_DECRYPT_METHODS)
     {
+        if (!strcmp(tok, "SYNC"))
+        {
+            spec->sync = SYNC_ON;
+            tok = strtok(NULL, ", \t");
+            continue;
+        }
+        if (!strcmp(tok, "NOSYNC"))
+        {
+            spec->sync = SYNC_NONE;
+            tok = strtok(NULL, ", \t");
+            continue;
+        }
         int m = method_from_str(tok);
         if (m < 0)
         {
