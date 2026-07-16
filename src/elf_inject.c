@@ -133,6 +133,21 @@ static int elf_patch_new_segment(t_elf_ctx *ctx, t_stub *stub, t_opts *opts)
     new_phdrs = (Elf64_Phdr *)(ctx->raw + new_phdr_table_offset);
     memcpy(new_phdrs, saved_phdrs, old_phnum * sizeof(Elf64_Phdr));
 
+	/* met a jour l'entree PT_PHDR existante pour pointer
+    ** vers la nouvelle position de la table, dans le nouveau segment */
+    for (size_t i = 0; i < old_phnum; i++)
+    {
+        if (new_phdrs[i].p_type == PT_PHDR)
+        {
+            new_phdrs[i].p_offset = new_phdr_table_offset;
+            new_phdrs[i].p_vaddr  = new_seg_vaddr + stub->len;
+            new_phdrs[i].p_paddr  = new_phdrs[i].p_vaddr;
+            new_phdrs[i].p_filesz = new_phdr_count * sizeof(Elf64_Phdr);
+            new_phdrs[i].p_memsz  = new_phdrs[i].p_filesz;
+            break;
+        }
+    }
+
     new_seg = &new_phdrs[old_phnum];
     memset(new_seg, 0, sizeof(*new_seg));
     new_seg->p_type   = PT_LOAD;
@@ -140,8 +155,8 @@ static int elf_patch_new_segment(t_elf_ctx *ctx, t_stub *stub, t_opts *opts)
     new_seg->p_offset = new_seg_offset;
     new_seg->p_vaddr  = new_seg_vaddr;
     new_seg->p_paddr  = new_seg_vaddr;
-    new_seg->p_filesz = stub->len;
-    new_seg->p_memsz  = stub->len;
+    new_seg->p_filesz = stub->len + new_phdr_count * sizeof(Elf64_Phdr);
+    new_seg->p_memsz  = new_seg->p_filesz;
     new_seg->p_align  = align;
 
     ctx->ehdr->e_phoff = new_phdr_table_offset;
