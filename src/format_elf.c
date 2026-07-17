@@ -6,8 +6,8 @@ static const char *elf_emit_make_writable_asm(t_reg addr_reg, t_reg len_reg)
     static char buf[256];
     snprintf(buf, sizeof(buf),
         "push rax\npush rdi\npush rsi\npush rdx\n"
-        "_SET rdi, %d\n"
-        "_SET rsi, %d\n"
+        "_SET rdi, %s\n"
+        "_SET rsi, %s\n"
         "_SET edx, 7\n"
         "_SET eax, 10\n"
         "syscall\n"
@@ -21,8 +21,8 @@ static const char *elf_emit_make_executable_asm(t_reg addr_reg, t_reg len_reg)
     static char buf[256];
     snprintf(buf, sizeof(buf),
         "push rax\npush rdi\npush rsi\npush rdx\n"
-        "_SET rdi, %d\n"
-        "_SET rsi, %d\n"
+        "_SET rdi, %s\n"
+        "_SET rsi, %s\n"
         "_SET edx, 5\n"       /* PROT_READ|PROT_EXEC, sans W */
         "_SET eax, 10\n"
         "syscall\n"

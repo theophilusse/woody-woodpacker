@@ -33,8 +33,8 @@ typedef struct s_format_backend
 
     /* Genere le texte assembleur de la primitive "rendre memoire modifiable"
     ** specifique a ce format, injecte dans le stub avant chaque DECRYPT */
-    const char *(*emit_make_writable_asm)(size_t addr_reg, size_t len_reg);
-    const char *(*emit_make_executable_asm)(size_t addr_reg, size_t len_reg);
+    const char *(*emit_make_writable_asm)(t_reg addr_reg, t_reg len_reg);
+    const char *(*emit_make_executable_asm)(t_reg addr_reg, t_reg len_reg);
 }   t_format_backend;
 
 extern t_format_backend g_elf_backend;

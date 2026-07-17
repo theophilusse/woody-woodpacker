@@ -1,42 +1,16 @@
-src/format_elf.c:2:47: error: unknown type name ‘t_reg’
-    2 | static const char *elf_emit_make_writable_asm(t_reg addr_reg, t_reg len_reg)
-      |                                               ^~~~~
-src/format_elf.c:2:63: error: unknown type name ‘t_reg’
-    2 | static const char *elf_emit_make_writable_asm(t_reg addr_reg, t_reg len_reg)
-      |                                                               ^~~~~
-src/format_elf.c:17:49: error: unknown type name ‘t_reg’
-   17 | static const char *elf_emit_make_executable_asm(t_reg addr_reg, t_reg len_reg)
-      |                                                 ^~~~~
-src/format_elf.c:17:65: error: unknown type name ‘t_reg’
-   17 | static const char *elf_emit_make_executable_asm(t_reg addr_reg, t_reg len_reg)
-      |                                                                 ^~~~~
-src/format_elf.c:32:1: error: unknown type name ‘t_format_backend’
-   32 | t_format_backend g_elf_backend = {
-      | ^~~~~~~~~~~~~~~~
-src/format_elf.c:33:5: error: field name not in record or union initializer
-   33 |     .format = FORMAT_ELF,
-      |     ^
-src/format_elf.c:33:5: note: (near initialization for ‘g_elf_backend’)
-src/format_elf.c:33:15: error: ‘FORMAT_ELF’ undeclared here (not in a function)
-   33 |     .format = FORMAT_ELF,
-      |               ^~~~~~~~~~
-src/format_elf.c:34:5: error: field name not in record or union initializer
-   34 |     .emit_make_writable_asm = elf_emit_make_writable_asm,
-      |     ^
-src/format_elf.c:34:5: note: (near initialization for ‘g_elf_backend’)
-src/format_elf.c:34:31: error: ‘elf_emit_make_writable_asm’ undeclared here (not in a function)
-   34 |     .emit_make_writable_asm = elf_emit_make_writable_asm,
+src/format_elf.c: In function ‘elf_emit_make_writable_asm’:
+src/format_elf.c:15:9: error: implicit declaration of function ‘reg_name’; did you mean ‘rename’? [-Werror=implicit-function-declaration]
+   15 |         reg_name(addr_reg, 64), reg_name(len_reg, 64));
+      |         ^~~~~~~~
+      |         rename
+src/format_elf.c: At top level:
+src/format_elf.c:36:31: error: initialization of ‘const char * (*)(size_t,  size_t)’ {aka ‘const char * (*)(long unsigned int,  long unsigned int)’} from incompatible pointer type ‘const char * (*)(t_reg,  t_reg)’ {aka ‘const char * (*)(enum e_reg,  enum e_reg)’} [-Werror=incompatible-pointer-types]
+   36 |     .emit_make_writable_asm = elf_emit_make_writable_asm,
       |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~
-src/format_elf.c:34:31: error: excess elements in scalar initializer [-Werror]
-src/format_elf.c:34:31: note: (near initialization for ‘g_elf_backend’)
-src/format_elf.c:35:5: error: field name not in record or union initializer
-   35 |     .emit_make_executable_asm = elf_emit_make_executable_asm,
-      |     ^
-src/format_elf.c:35:5: note: (near initialization for ‘g_elf_backend’)
-src/format_elf.c:35:33: error: ‘elf_emit_make_executable_asm’ undeclared here (not in a function)
-   35 |     .emit_make_executable_asm = elf_emit_make_executable_asm,
+src/format_elf.c:36:31: note: (near initialization for ‘g_elf_backend.emit_make_writable_asm’)
+src/format_elf.c:37:33: error: initialization of ‘const char * (*)(size_t,  size_t)’ {aka ‘const char * (*)(long unsigned int,  long unsigned int)’} from incompatible pointer type ‘const char * (*)(t_reg,  t_reg)’ {aka ‘const char * (*)(enum e_reg,  enum e_reg)’} [-Werror=incompatible-pointer-types]
+   37 |     .emit_make_executable_asm = elf_emit_make_executable_asm,
       |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/format_elf.c:35:33: error: excess elements in scalar initializer [-Werror]
-src/format_elf.c:35:33: note: (near initialization for ‘g_elf_backend’)
+src/format_elf.c:37:33: note: (near initialization for ‘g_elf_backend.emit_make_executable_asm’)
 cc1: all warnings being treated as errors
 make: *** [Makefile:30: obj/format_elf.o] Error 1

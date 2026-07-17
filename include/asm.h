@@ -61,5 +61,6 @@ int	ainstr(t_asm *a, char toks[][64], int n);
 void deflabel(t_asm *a, const char *name);
 void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8);
 int assemble_source(t_asm *a, const char *src);
+const char *reg_name(t_reg r, int size);
 
 #endif

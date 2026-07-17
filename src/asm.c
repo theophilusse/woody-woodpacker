@@ -79,7 +79,7 @@ static int preg(const char *s, t_reg *r, int *sz)
     return 0;
 }
 
-static const char *reg_name(t_reg r, int size)
+const char *reg_name(t_reg r, int size)
 {
     if (size == 32) return (R32[r]);
     if (size == 64) return (R64[r]);
