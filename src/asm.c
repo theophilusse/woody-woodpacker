@@ -1797,7 +1797,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
 	for (int k = 85; k < 100; k++) fprintf(stderr, "%02x ", a.out->e.buf[k]);
 	fprintf(stderr, "\n");
 
-	
+
     /* resolution des fixups -- COMMUNE aux deux chemins, inchangee */
     for (int i = 0; i < a.nfixups; i++) {
         int64_t target = sym(&a, a.fixups[i].name);
@@ -1810,6 +1810,13 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
             patch_disp32_buf(a.out->e.buf, a.fixups[i].off, d);
         }
     }
+
+
+	fprintf(stderr, "[DEBUG] buf[85..100] APRES resolution = ");
+	for (int k = 85; k < 100; k++) fprintf(stderr, "%02x ", a.out->e.buf[k]);
+	fprintf(stderr, "\n");
+
+
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
 	if (opts->use_lde)
