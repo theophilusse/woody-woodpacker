@@ -1,13 +1,23 @@
-=> 0x405051:	lea    0x14db(%rip),%rdi        # 0x406533
-   0x405058:	addb   $0xc5,0x0(%rdi)
-   0x40505c:	inc    %rdi
-   0x40505f:	addb   $0xad,0x0(%rdi)
-   0x405063:	add    $0x1,%rdi
-   0x40506a:	addb   $0x3d,0x0(%rdi)
-   0x40506e:	inc    %rdi
-   0x405071:	addb   $0x7d,0x0(%rdi)
-   0x405075:	add    $0x1,%rdi
-   0x40507c:	addb   $0x19,0x0(%rdi)
+=> 0x40507d:	syscall 
+   0x40507f:	pop    %rdx
+   0x405080:	pop    %rsi
+   0x405081:	pop    %rdi
+   0x405082:	jp     0x405083
+   0x405084:	(bad)  
+   0x405085:	jmp    *-0xffffe6(%rax)
+   0x40508b:	(bad)  
+   0x40508c:	decl   0x48(%rax)
+   0x40508f:	inc    %edi
+   0x405091:	movb   $0x8d,0x0(%rdi)
+   0x405095:	add    $0x61000001,%rdi
+   0x40509c:	(bad)  
+   0x40509d:	(bad)  
+   0x40509e:	(bad)  
+   0x40509f:	cmp    $0x1c78148,%eax
+   0x4050a4:	add    %al,(%rax)
+   0x4050a6:	add    %al,%dh
+   0x4050a8:	rex.RXB add %r8b,(%r8)
+   0x4050ab:	decq   -0x1(%rdi)
 Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
 Use 'set logging enabled off'.
 

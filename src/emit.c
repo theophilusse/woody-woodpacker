@@ -61,13 +61,13 @@ void	patch_disp32_buf(uint8_t *buf, size_t at, int32_t value)
 	{ memcpy(buf + at, &value, 4); }
 
 /* ── pile ────────────────────────────────────────────────────── */
-int	emit_push_r64(t_emitter *e, t_reg reg)
+int emit_push_r64(t_emitter *e, t_reg reg)
 {
-	uint8_t b[2]; int n = 0;
-	uint8_t r = mk_rex(0, 0, reg);
-	if (r != 0x40) b[n++] = r;
-	b[n++] = 0x50 + (reg & 7);
-	return emit_raw(e, b, n);
+    uint8_t b[2]; int n = 0;
+    uint8_t r = mk_rex(0, 0, reg);
+    if (r != 0x40) b[n++] = r;
+    b[n++] = 0x50 + (reg & 7);
+    return emit_raw(e, b, n);
 }
 
 int	emit_pop_r64(t_emitter *e, t_reg reg)
