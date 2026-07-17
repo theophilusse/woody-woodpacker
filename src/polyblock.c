@@ -284,7 +284,7 @@ static char *replace_placeholder(const char *src, const char *placeholder, const
     return (result);
 }
 
-int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant, t_format_backend *backend);
+int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant, t_format_backend *backend)
 {
     int     i;
     char    *new_src;
