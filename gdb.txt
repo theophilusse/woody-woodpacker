@@ -1,46 +1,15 @@
-=> 0x40507d:	syscall 
-   0x40507f:	pop    %rdx
-   0x405080:	pop    %rsi
-   0x405081:	pop    %rdi
-   0x405082:	jp     0x405083
-   0x405084:	(bad)  
-   0x405085:	jmp    *-0xffffe6(%rax)
-   0x40508b:	(bad)  
-   0x40508c:	decl   0x48(%rax)
-   0x40508f:	inc    %edi
-   0x405091:	movb   $0x8d,0x0(%rdi)
-   0x405095:	add    $0x61000001,%rdi
-   0x40509c:	(bad)  
-   0x40509d:	(bad)  
-   0x40509e:	(bad)  
-   0x40509f:	cmp    $0x1c78148,%eax
-   0x4050a4:	add    %al,(%rax)
-   0x4050a6:	add    %al,%dh
-   0x4050a8:	rex.RXB add %r8b,(%r8)
-   0x4050ab:	decq   -0x1(%rdi)
-Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
-Use 'set logging enabled off'.
-
-   0x40507f:	pop    %rdx
-   0x405080:	pop    %rsi
-   0x405081:	pop    %rdi
-   0x405082:	pop    %rax
-   0x405083:	lea    0x26ef(%rip),%rdi        # 0x407779
-   0x40508a:	xorb   $0xff,-0x1(%rcx)
-   0x40508e:	(bad)  
-   0x40508f:	inc    %edi
-   0x405091:	xorb   $0x4d,0x0(%rdi)
-   0x405095:	add    $0x1,%rdi
-   0x40509c:	xorb   $0xc,0x0(%rdi)
-   0x4050a0:	inc    %rdi
-   0x4050a3:	xorb   $0xff,0x0(%rdi)
-   0x4050a7:	inc    %rdi
-   0x4050aa:	xorb   $0x41,0x0(%rdi)
-   0x4050ae:	inc    %rdi
-   0x4050b1:	xorb   $0x81,0x0(%rdi)
-   0x4050b5:	inc    %rdi
-   0x4050b8:	xorb   $0xc7,0x0(%rdi)
-   0x4050bc:	inc    %rdi
-Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
-Use 'set logging enabled off'.
-
+   0x405000:	lea    -0x7(%rip),%rdi        # 0x405000
+   0x405007:	lea    0x1e81033c,%rsi
+=> 0x40500f:	add    %al,(%rax)
+   0x405011:	push   %rsi
+   0x405012:	push   %rdx
+   0x405013:	lea    0x0(%rdi),%rdi
+   0x405017:	lea    0x0(%rsi),%rsi
+   0x40501b:	imul   $0x70000,(%rax),%eax
+   0x405021:	add    %al,(%rax)
+   0x405023:	mov    $0xa,%eax
+   0x405028:	syscall 
+   0x40502a:	pop    %rdx
+   0x40502b:	pop    %rsi
+   0x40502c:	pop    %rdi
+   0x40502d:	pop    %rax

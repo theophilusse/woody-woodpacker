@@ -471,6 +471,27 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
             total_size = end;
     }
 
+    /* ═══════════ BLOC DEBUG COMPLET — a placer juste avant l'insertion du mprotect_block dans polyblock_assemble ═══════════ */
+    fprintf(stderr, "\n[DEBUG] ===== ETAT AVANT INSERTION MPROTECT =====\n");
+    for (int i = 0; i < ctx->n_blocks; i++)
+    {
+        fprintf(stderr, "  block[%d] '%s': final_offset=%zu final_size=%zu (fin=%zu)\n",
+                i, ctx->blocks[i].identifier,
+                ctx->blocks[i].final_offset, ctx->blocks[i].final_size,
+                ctx->blocks[i].final_offset + ctx->blocks[i].final_size);
+    }
+    fprintf(stderr, "[DEBUG] total_size calcule = %zu (0x%zx)\n", total_size, total_size);
+
+    {
+        char *dbg_mprotect_block = build_mprotect_block(total_size);
+        fprintf(stderr, "[DEBUG] mprotect_block genere:\n---\n%s\n---\n", dbg_mprotect_block);
+    }
+
+    fprintf(stderr, "[DEBUG] root_src AVANT insertion (100 premiers caracteres):\n---\n%.100s\n---\n",
+            ctx->root_src);
+    fprintf(stderr, "[DEBUG] ===== FIN ETAT =====\n\n");
+    /* ═══════════ FIN BLOC DEBUG ═══════════ */
+
     /* Insere le bloc mprotect juste apres la premiere ligne (scan_start:) de root_src */
     {
         char        *mprotect_block;
@@ -479,6 +500,21 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
         size_t      prefix_len;
 
         mprotect_block = build_mprotect_block(total_size);
+        /* ═══════════ BLOC DEBUG COMPLET — a placer juste apres mprotect_block = build_mprotect_block(total_size); ═══════════ */
+        fprintf(stderr, "\n[DEBUG] ===== ETAT APRES CALCUL MPROTECT =====\n");
+        for (int i = 0; i < ctx->n_blocks; i++)
+        {
+            fprintf(stderr, "  block[%d] '%s': final_offset=%zu final_size=%zu (fin=%zu)\n",
+                    i, ctx->blocks[i].identifier,
+                    ctx->blocks[i].final_offset, ctx->blocks[i].final_size,
+                    ctx->blocks[i].final_offset + ctx->blocks[i].final_size);
+        }
+        fprintf(stderr, "[DEBUG] total_size calcule = %zu (0x%zx)\n", total_size, total_size);
+        fprintf(stderr, "[DEBUG] mprotect_block (deja calcule) =\n---\n%s\n---\n", mprotect_block);
+        fprintf(stderr, "[DEBUG] root_src AVANT insertion (100 premiers caracteres):\n---\n%.100s\n---\n",
+                ctx->root_src);
+        fprintf(stderr, "[DEBUG] ===== FIN ETAT =====\n\n");
+        /* ═══════════ FIN BLOC DEBUG ═══════════ */
         first_newline = strchr(ctx->root_src, '\n');
         if (!first_newline)
         {
