@@ -1,16 +1,12 @@
-src/format_elf.c: In function ‘elf_emit_make_writable_asm’:
-src/format_elf.c:15:9: error: implicit declaration of function ‘reg_name’; did you mean ‘rename’? [-Werror=implicit-function-declaration]
-   15 |         reg_name(addr_reg, 64), reg_name(len_reg, 64));
-      |         ^~~~~~~~
-      |         rename
-src/format_elf.c: At top level:
-src/format_elf.c:36:31: error: initialization of ‘const char * (*)(size_t,  size_t)’ {aka ‘const char * (*)(long unsigned int,  long unsigned int)’} from incompatible pointer type ‘const char * (*)(t_reg,  t_reg)’ {aka ‘const char * (*)(enum e_reg,  enum e_reg)’} [-Werror=incompatible-pointer-types]
-   36 |     .emit_make_writable_asm = elf_emit_make_writable_asm,
-      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~
-src/format_elf.c:36:31: note: (near initialization for ‘g_elf_backend.emit_make_writable_asm’)
-src/format_elf.c:37:33: error: initialization of ‘const char * (*)(size_t,  size_t)’ {aka ‘const char * (*)(long unsigned int,  long unsigned int)’} from incompatible pointer type ‘const char * (*)(t_reg,  t_reg)’ {aka ‘const char * (*)(enum e_reg,  enum e_reg)’} [-Werror=incompatible-pointer-types]
-   37 |     .emit_make_executable_asm = elf_emit_make_executable_asm,
-      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/format_elf.c:37:33: note: (near initialization for ‘g_elf_backend.emit_make_executable_asm’)
+src/polyblock.c: In function ‘substitute_root_decrypt_slots’:
+src/polyblock.c:438:20: error: too few arguments to function ‘generate_decrypt_stub’
+  438 |         stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
+      |                    ^~~~~~~~~~~~~~~~~~~~~
+src/polyblock.c:126:7: note: declared here
+  126 | char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
+      |       ^~~~~~~~~~~~~~~~~~~~~
+src/polyblock.c:402:86: error: unused parameter ‘backend’ [-Werror=unused-parameter]
+  402 | static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
+      |                                                                    ~~~~~~~~~~~~~~~~~~^~~~~~~
 cc1: all warnings being treated as errors
-make: *** [Makefile:30: obj/format_elf.o] Error 1
+make: *** [Makefile:30: obj/polyblock.o] Error 1

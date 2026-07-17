@@ -124,7 +124,7 @@ static int append_line(char **buf, size_t *cap, size_t *len, const char *line)
 }
 
 char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
-        t_decrypt_method method, const char *target_label, t_format_backend *backend)
+    t_decrypt_method method, const char *target_label, t_format_backend *backend)
 {
     char    *out_src;
     size_t  cap = 1024;
@@ -435,7 +435,7 @@ static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx, t_format_back
 
         chosen = spec->methods[rand() % spec->n_methods];
         spec->chosen_method = chosen;
-        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
+        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier, backend);
         if (!stub_src)
             return (-1);
 
