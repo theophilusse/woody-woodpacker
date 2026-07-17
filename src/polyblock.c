@@ -140,21 +140,7 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
     if (diff->n_entries == 0)
         return (out_src);
 
-    /* ── Rend la zone writable AVANT tout patch ── */
-    snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
-    if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
-    snprintf(line, sizeof(line), "_SET rsi, %zu\n", target_blk->final_size);
-    if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
-    if (backend && backend->emit_make_writable_asm)
-    {
-        if (append_line(&out_src, &cap, &len,
-                backend->emit_make_writable_asm(REG_RDI, REG_RSI)) < 0)
-        {
-            free(out_src);
-            return (NULL);
-        }
-        fprintf(stderr, "[DEBUG] writable_asm genere:\n---\n%s\n---\n", backend->emit_make_writable_asm(REG_RDI, REG_RSI));
-    }
+    (void)backend;
     /* ── Recharge rdi (ecrase par le mprotect) avant de patcher ── */
     snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
     if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
@@ -450,6 +436,24 @@ static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx, t_format_back
     return (0);
 }
 
+static char *build_mprotect_block(size_t scan_size)
+{
+    static char buf[256];
+
+    snprintf(buf, sizeof(buf),
+        "lea rdi, [scan_start]\n"
+        "_SET rsi, %zu\n"
+        "push rax\npush rdi\npush rsi\npush rdx\n"
+        "_SET rdi, rdi\n"
+        "_SET rsi, rsi\n"
+        "_SET edx, 7\n"
+        "_SET eax, 10\n"
+        "syscall\n"
+        "pop rdx\npop rsi\npop rdi\npop rax\n",
+        scan_size);
+    return (buf);
+}
+
 int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
 {
     if (polyblock_resolve_sizes(a, ctx, 0, backend) < 0)
@@ -458,12 +462,42 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
     if (substitute_root_decrypt_slots(a, ctx, backend) < 0)
         return (-1);
 
-    fprintf(stderr, "[DEBUG] root_src apres substitution:\n---\n%s\n---\n", ctx->root_src);
-
-    if (!ctx->root_src)
+    /* Calcule la taille totale du stub polymorphe */
+    size_t total_size = 0;
+    for (int i = 0; i < ctx->n_blocks; i++)
     {
-        fprintf(stderr, "polyblock: aucun texte racine a assembler\n");
-        return (-1);
+        size_t end = ctx->blocks[i].final_offset + ctx->blocks[i].final_size;
+        if (end > total_size)
+            total_size = end;
+    }
+
+    /* Insere le bloc mprotect juste apres la premiere ligne (scan_start:) de root_src */
+    {
+        char        *mprotect_block;
+        char        *new_root_src;
+        char        *first_newline;
+        size_t      prefix_len;
+
+        mprotect_block = build_mprotect_block(total_size);
+        first_newline = strchr(ctx->root_src, '\n');
+        if (!first_newline)
+        {
+            fprintf(stderr, "polyblock: root_src malforme, pas de scan_start ?\n");
+            return (-1);
+        }
+        prefix_len = (size_t)(first_newline - ctx->root_src) + 1;
+
+        new_root_src = malloc(prefix_len + strlen(mprotect_block)
+                + strlen(ctx->root_src + prefix_len) + 1);
+        if (!new_root_src)
+            return (-1);
+        memcpy(new_root_src, ctx->root_src, prefix_len);
+        new_root_src[prefix_len] = '\0';
+        strcat(new_root_src, mprotect_block);
+        strcat(new_root_src, ctx->root_src + prefix_len);
+
+        free(ctx->root_src);
+        ctx->root_src = new_root_src;
     }
 
     a->polyctx = ctx;

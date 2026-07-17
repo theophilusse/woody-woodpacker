@@ -1,9 +1,11 @@
 #ifndef STUB_H
 # define STUB_H
 
+static const char STUB_SCAN_START[] =
+	"scan_start:\n";
+
 static const char STUB_HEADER[] =
 	// preserves _dl_fini que le kernel passe dans rdx
-	"scan_start:\n"
 	"push rdx\n"
 	"push rbp\n";
 
@@ -697,8 +699,10 @@ static const char STUB_FREE[] =
 	"pop rdx\n"
 	"pop rbp\n";
 
+static const char STUB_SCAN_END[] =
+	"scan_end:\n";
+
 static const char STUB_FOOTER[] =
-	"scan_end:\n"
 	"jmp @oep\n";
 
 static const char STUB_DATA_EVAMSG[] =

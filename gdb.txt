@@ -21,3 +21,26 @@
 Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
 Use 'set logging enabled off'.
 
+   0x40507f:	pop    %rdx
+   0x405080:	pop    %rsi
+   0x405081:	pop    %rdi
+   0x405082:	pop    %rax
+   0x405083:	lea    0x26ef(%rip),%rdi        # 0x407779
+   0x40508a:	xorb   $0xff,-0x1(%rcx)
+   0x40508e:	(bad)  
+   0x40508f:	inc    %edi
+   0x405091:	xorb   $0x4d,0x0(%rdi)
+   0x405095:	add    $0x1,%rdi
+   0x40509c:	xorb   $0xc,0x0(%rdi)
+   0x4050a0:	inc    %rdi
+   0x4050a3:	xorb   $0xff,0x0(%rdi)
+   0x4050a7:	inc    %rdi
+   0x4050aa:	xorb   $0x41,0x0(%rdi)
+   0x4050ae:	inc    %rdi
+   0x4050b1:	xorb   $0x81,0x0(%rdi)
+   0x4050b5:	inc    %rdi
+   0x4050b8:	xorb   $0xc7,0x0(%rdi)
+   0x4050bc:	inc    %rdi
+Warning: 'set logging off', an alias for the command 'set logging enabled', is deprecated.
+Use 'set logging enabled off'.
+

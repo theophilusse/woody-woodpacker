@@ -9,7 +9,9 @@ char *build_stub_source(const t_opts *opts)
     int         i;
 
     n = 0;
+    blocks[n++] = STUB_SCAN_START;
     blocks[n++] = STUB_POLY_DEMO_BLOCKS;
+    blocks[n++] = STUB_SCAN_END;
     blocks[n++] = STUB_POLY_DEMO_DATA;
     if (0)
     {
@@ -19,6 +21,7 @@ char *build_stub_source(const t_opts *opts)
     }
     if (0)
     {
+        blocks[n++] = STUB_SCAN_START;
         blocks[n++] = STUB_HEADER;
 
         /* ── Anti-debug (ptrace) ── */
@@ -71,6 +74,7 @@ char *build_stub_source(const t_opts *opts)
         blocks[n++] = STUB_MPROTECT;
         blocks[n++] = STUB_KSA;
         blocks[n++] = STUB_PRGA;
+        blocks[n++] = STUB_SCAN_END;
         blocks[n++] = STUB_FOOTER;
 
         /* ── Données embarquées ── */
