@@ -153,10 +153,8 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
             free(out_src);
             return (NULL);
         }
+        fprintf(stderr, "[DEBUG] writable_asm genere:\n---\n%s\n---\n", backend->emit_make_writable_asm(REG_RDI, REG_RSI));
     }
-
-    fprintf(stderr, "[DEBUG] writable_asm genere:\n---\n%s\n---\n", backend->emit_make_writable_asm(REG_RDI, REG_RSI));
-
     /* ── Recharge rdi (ecrase par le mprotect) avant de patcher ── */
     snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
     if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
