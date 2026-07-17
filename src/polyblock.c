@@ -430,6 +430,8 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx)
     if (substitute_root_decrypt_slots(a, ctx) < 0)
         return (-1);
 
+    fprintf(stderr, "[DEBUG] root_src apres substitution:\n---\n%s\n---\n", ctx->root_src);
+
     if (!ctx->root_src)
     {
         fprintf(stderr, "polyblock: aucun texte racine a assembler\n");
