@@ -302,7 +302,8 @@ t_asm_result *polyblock_link(t_asm *a, t_polyctx *ctx, const char *entry_block,
     return (a->out);
 }
 
-int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position)
+int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position,
+        t_format_backend *backend)
 {
     t_polyblock *order[MAX_POLYBLOCKS];
     int         n_order;
@@ -317,9 +318,9 @@ int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position)
     {
         t_polyblock *blk = order[i];
 
-        if (substitute_decrypt_slots(ctx, &blk->ciphertext) < 0)
+        if (substitute_decrypt_slots(ctx, &blk->ciphertext, backend) < 0)
             return (-1);
-        if (substitute_decrypt_slots(ctx, &blk->plaintext) < 0)
+        if (substitute_decrypt_slots(ctx, &blk->plaintext, backend) < 0)
             return (-1);
 
         if (resolve_variant(a, ctx, blk, &blk->ciphertext, 1) < 0)
@@ -1757,7 +1758,8 @@ void dump_all_blocks(t_asm *a)
 }
 
 /* ── entree publique ────────────────────────────────────────────── */
-int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts)
+int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
+        const t_opts *opts, t_format_backend *backend)
 {
     t_asm   a;
     int     lde_bit_log[512];
@@ -1775,11 +1777,10 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
     if (strstr(src, "%POLYBLOCK_START"))
 	{
 		t_polyctx *pctx;
-
 		pctx = polyblock_parse_all(src);
 		if (!pctx)
 			return (-1);
-		if (polyblock_assemble(&a, pctx) < 0)
+		if (polyblock_assemble(&a, pctx, backend) < 0)
 			return (-1);
 	}
     else

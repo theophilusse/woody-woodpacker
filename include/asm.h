@@ -56,7 +56,7 @@ extern size_t g_bit_log_off[MAX_BIT_LOG];
 extern int g_bit_log[MAX_BIT_LOG];
 extern char g_bit_log_name[MAX_BIT_LOG][32];
 
-int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts);
+int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_opts *opts, t_format_backend *backend);
 int	ainstr(t_asm *a, char toks[][64], int n);
 void deflabel(t_asm *a, const char *name);
 void addfixup(t_asm *a, const char *name, size_t off, size_t end, int is_rel8);

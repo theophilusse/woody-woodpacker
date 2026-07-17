@@ -124,17 +124,14 @@ static int append_line(char **buf, size_t *cap, size_t *len, const char *line)
 }
 
 char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
-        t_decrypt_method method, const char *target_label)
+        t_decrypt_method method, const char *target_label, t_format_backend *backend)
 {
     char    *out_src;
-    size_t  cap;
-    size_t  len;
-    char    line[128];
+    size_t  cap = 1024;
+    size_t  len = 0;
+    char    line[256];
     size_t  i;
 
-    (void)target_blk;
-    cap = 1024;
-    len = 0;
     out_src = malloc(cap);
     if (!out_src)
         return (NULL);
@@ -143,12 +140,24 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
     if (diff->n_entries == 0)
         return (out_src);
 
+    /* ── Rend la zone writable AVANT tout patch ── */
     snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
-    if (append_line(&out_src, &cap, &len, line) < 0)
+    if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
+    snprintf(line, sizeof(line), "_SET rsi, %zu\n", target_blk->final_size);
+    if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
+    if (backend && backend->emit_make_writable_asm)
     {
-        free(out_src);
-        return (NULL);
+        if (append_line(&out_src, &cap, &len,
+                backend->emit_make_writable_asm(REG_RDI, REG_RSI)) < 0)
+        {
+            free(out_src);
+            return (NULL);
+        }
     }
+
+    /* ── Recharge rdi (ecrase par le mprotect) avant de patcher ── */
+    snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
+    if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
 
     for (i = 0; i < diff->n_entries; i++)
     {
@@ -228,6 +237,22 @@ char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff,
             return (NULL);
         }
     }
+
+    /* ── Rend la zone executable a nouveau APRES le patch ── */
+    snprintf(line, sizeof(line), "lea rdi, [%s]\n", target_label);
+    if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
+    snprintf(line, sizeof(line), "_SET rsi, %zu\n", target_blk->final_size);
+    if (append_line(&out_src, &cap, &len, line) < 0) { free(out_src); return (NULL); }
+    if (backend && backend->emit_make_executable_asm)
+    {
+        if (append_line(&out_src, &cap, &len,
+                backend->emit_make_executable_asm(REG_RDI, REG_RSI)) < 0)
+        {
+            free(out_src);
+            return (NULL);
+        }
+    }
+
     return (out_src);
 }
 
@@ -259,7 +284,7 @@ static char *replace_placeholder(const char *src, const char *placeholder, const
     return (result);
 }
 
-int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
+int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant, t_format_backend *backend);
 {
     int     i;
     char    *new_src;
@@ -292,7 +317,7 @@ int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant)
 
         chosen = spec->methods[rand() % spec->n_methods];
         spec->chosen_method = chosen;
-        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);
+        stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier, backend);
         if (!stub_src)
             return (-1);
 
@@ -374,7 +399,7 @@ int resolve_variant(t_asm *a, t_polyctx *ctx, t_polyblock *blk,
     return (0);
 }
 
-static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx)
+static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
 {
     int     i;
     char    *new_src;
@@ -425,12 +450,12 @@ static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx)
     return (0);
 }
 
-int polyblock_assemble(t_asm *a, t_polyctx *ctx)
+int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
 {
-    if (polyblock_resolve_sizes(a, ctx, 0) < 0)
+    if (polyblock_resolve_sizes(a, ctx, 0, backend) < 0)
         return (-1);
 
-    if (substitute_root_decrypt_slots(a, ctx) < 0)
+    if (substitute_root_decrypt_slots(a, ctx, backend) < 0)
         return (-1);
 
     fprintf(stderr, "[DEBUG] root_src apres substitution:\n---\n%s\n---\n", ctx->root_src);

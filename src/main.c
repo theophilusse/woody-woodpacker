@@ -66,7 +66,8 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
 {
     t_stub *stub;
 
-    stub = stub_build(ctx, crypto, opts);
+    t_format_backend *backend = &g_elf_backend;   /* seul backend disponible pour l'instant */
+    stub = stub_build(ctx, &crypto, opts, backend);
     if (!stub)
     {
         fprintf(stderr, "error: stub generation failed\n");

@@ -1,6 +1,7 @@
 #include "woody.h"
 
-t_stub *stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_opts *opts)
+t_stub *stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_opts *opts,
+        t_format_backend *backend)
 {
     t_asm_result    res;
     t_stub          *stub;
@@ -11,7 +12,7 @@ t_stub *stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_opts *opts)
         return (NULL);
     memset(&res, 0, sizeof(res));
     res.patch_jmp_oep = (size_t)-1;
-    if (asm_build(src, crypto, &res, opts) < 0)
+    if (asm_build(src, crypto, &res, opts, backend) < 0)
     {
         free(src);
         free(res.e.buf);
