@@ -1,6 +1,7 @@
 #ifndef FORMAT_BACKEND_H
 # define FORMAT_BACKEND_H
 
+# include "asm.h"
 # include "woody.h"
 
 typedef struct s_format_backend

@@ -1,54 +1,42 @@
-
-Elf file type is EXEC (Executable file)
-Entry point 0x405000
-There are 14 program headers, starting at offset 22422
-
-Program Headers:
-  Type           Offset             VirtAddr           PhysAddr
-                 FileSiz            MemSiz              Flags  Align
-  PHDR           0x0000000000005796 0x0000000000406796 0x0000000000406796
-                 0x0000000000000310 0x0000000000000310  R      0x8
-  INTERP         0x0000000000000318 0x0000000000400318 0x0000000000400318
-                 0x000000000000001c 0x000000000000001c  R      0x1
-      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]
-  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
-                 0x00000000000004f8 0x00000000000004f8  R      0x1000
-  LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
-                 0x0000000000000161 0x0000000000000161  R E    0x4000
-  LOAD           0x0000000000002000 0x0000000000402000 0x0000000000402000
-                 0x00000000000000ec 0x00000000000000ec  R      0x1000
-  LOAD           0x0000000000002e10 0x0000000000403e10 0x0000000000403e10
-                 0x0000000000000220 0x0000000000000228  RW     0x1000
-  DYNAMIC        0x0000000000002e20 0x0000000000403e20 0x0000000000403e20
-                 0x00000000000001d0 0x00000000000001d0  RW     0x8
-  NOTE           0x0000000000000338 0x0000000000400338 0x0000000000400338
-                 0x0000000000000030 0x0000000000000030  R      0x8
-  NOTE           0x0000000000000368 0x0000000000400368 0x0000000000400368
-                 0x0000000000000044 0x0000000000000044  R      0x4
-  GNU_PROPERTY   0x0000000000000338 0x0000000000400338 0x0000000000400338
-                 0x0000000000000030 0x0000000000000030  R      0x8
-  GNU_EH_FRAME   0x0000000000002014 0x0000000000402014 0x0000000000402014
-                 0x0000000000000034 0x0000000000000034  R      0x4
-  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
-                 0x0000000000000000 0x0000000000000000  RW     0x10
-  GNU_RELRO      0x0000000000002e10 0x0000000000403e10 0x0000000000403e10
-                 0x00000000000001f0 0x00000000000001f0  R      0x1
-  LOAD           0x0000000000004000 0x0000000000405000 0x0000000000405000
-                 0x0000000000001aa6 0x0000000000001aa6  R E    0x1000
-
- Section to Segment mapping:
-  Segment Sections...
-   00     
-   01     .interp 
-   02     .interp .note.gnu.property .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt 
-   03     .init .plt .plt.sec .text .fini 
-   04     .rodata .eh_frame_hdr .eh_frame 
-   05     .init_array .fini_array .dynamic .got .got.plt .data .bss 
-   06     .dynamic 
-   07     .note.gnu.property 
-   08     .note.gnu.build-id .note.ABI-tag 
-   09     .note.gnu.property 
-   10     .eh_frame_hdr 
-   11     
-   12     .init_array .fini_array .dynamic .got 
-   13     
+In file included from include/woody.h:71,
+                 from include/opts.h:4,
+                 from include/asm.h:6,
+                 from src/asm.c:1:
+include/polyblock.h:132:126: error: unknown type name ‘t_format_backend’
+  132 | char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff, t_decrypt_method method, const char *target_label, t_format_backend *backend);
+      |                                                                                                                              ^~~~~~~~~~~~~~~~
+In file included from include/woody.h:71,
+                 from include/opts.h:4,
+                 from include/asm.h:6,
+                 from src/asm.c:1:
+include/polyblock.h:133:72: error: unknown type name ‘t_format_backend’
+  133 | int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant, t_format_backend *backend);
+      |                                                                        ^~~~~~~~~~~~~~~~
+include/polyblock.h:135:80: error: unknown type name ‘t_format_backend’
+  135 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position, t_format_backend *backend);
+      |                                                                                ^~~~~~~~~~~~~~~~
+include/polyblock.h:136:50: error: unknown type name ‘t_format_backend’
+  136 | int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend);
+      |                                                  ^~~~~~~~~~~~~~~~
+In file included from include/woody.h:72,
+                 from include/opts.h:4,
+                 from include/asm.h:6,
+                 from src/asm.c:1:
+include/format_backend.h:8:5: error: unknown type name ‘t_target_format’
+    8 |     t_target_format format;
+      |     ^~~~~~~~~~~~~~~
+src/asm.c: In function ‘polyblock_link’:
+src/asm.c:274:9: error: implicit declaration of function ‘polyblock_resolve_sizes’ [-Werror=implicit-function-declaration]
+  274 |     if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+src/asm.c: In function ‘polyblock_resolve_sizes’:
+src/asm.c:321:13: error: implicit declaration of function ‘substitute_decrypt_slots’ [-Werror=implicit-function-declaration]
+  321 |         if (substitute_decrypt_slots(ctx, &blk->ciphertext, backend) < 0)
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~
+src/asm.c: In function ‘asm_build’:
+src/asm.c:1783:21: error: implicit declaration of function ‘polyblock_assemble’; did you mean ‘polyblock_parse_all’? [-Werror=implicit-function-declaration]
+ 1783 |                 if (polyblock_assemble(&a, pctx, backend) < 0)
+      |                     ^~~~~~~~~~~~~~~~~~
+      |                     polyblock_parse_all
+cc1: all warnings being treated as errors
+make: *** [Makefile:30: obj/asm.o] Error 1

@@ -256,52 +256,6 @@ static void apply_offset_shift(t_asm *a, t_block_variant *variant, size_t final_
         g_bit_log_off[i] += final_offset;
 }
 
-t_asm_result *polyblock_link(t_asm *a, t_polyctx *ctx, const char *entry_block,
-        const char *data_src)
-{
-    t_polyblock *order[MAX_POLYBLOCKS];
-    int         n_order;
-    int         i;
-
-    deflabel(a, "scan_start");   /* AJOUT : englobe tout depuis le tout debut */
-
-    {
-        size_t dummy;
-        emit_jmp_rel32(&a->out->e, &dummy);
-        addfixup(a, entry_block, dummy, dummy + 4, 0);
-    }
-
-    if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
-        return (NULL);
-
-    if (polyblock_topo_sort(ctx, order, &n_order) < 0)
-        return (NULL);
-    for (i = 0; i < n_order; i++)
-    {
-        t_polyblock *blk = order[i];
-        emit_raw(&a->out->e, blk->ciphertext.bytecode, blk->ciphertext.bytecode_len);
-    }
-
-    deflabel(a, "scan_end");     /* AJOUT : juste avant les donnees */
-
-    if (data_src && assemble_source(a, data_src) < 0)
-        return (NULL);
-
-    for (i = 0; i < a->nfixups; i++)
-    {
-        int64_t target = sym(a, a->fixups[i].name);
-        if (target < 0)
-        {
-            fprintf(stderr, "polyblock: fixup non resolu '%s'\n", a->fixups[i].name);
-            return (NULL);
-        }
-        int32_t d = (int32_t)(target - (int64_t)a->fixups[i].end);
-        patch_disp32_buf(a->out->e.buf, a->fixups[i].off, d);
-    }
-
-    return (a->out);
-}
-
 int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position,
         t_format_backend *backend)
 {

@@ -2,6 +2,7 @@
 # define POLYBLOCK_H
 
 # include "asm.h"
+# include "format_backend.h"
 # include "woody.h"
 # define MAX_POLYBLOCK_NAME 64
 # define MAX_DECRYPT_METHODS 8
