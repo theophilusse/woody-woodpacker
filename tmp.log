@@ -1,1 +1,2 @@
-[DEBUG] buf[85..100] = 00 00 48 8d 3d 00 00 00 00 80 77 00 79 48 81 
+[DEBUG] buf[85..100] = 00 00 48 8d 3d 00 00 00 00 80 6f 00 3b 48 ff 
+[DEBUG] buf[85..100] APRES resolution = 00 00 48 8d 3d f9 ff ff ff 80 6f 00 9b ff ff 

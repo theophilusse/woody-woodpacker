@@ -1793,9 +1793,45 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
 	fprintf(stderr, "[DEBUG] sym(main_flow)=%ld sym(greeting)=%ld sym(farewell)=%ld\n",
         (long)sym(&a, "main_flow"), (long)sym(&a, "greeting"), (long)sym(&a, "farewell"));
 	*/
-	fprintf(stderr, "[DEBUG] buf[85..100] = ");
-	for (int k = 85; k < 100; k++) fprintf(stderr, "%02x ", a.out->e.buf[k]);
-	fprintf(stderr, "\n");
+	/* ═══════════ BLOC DEBUG COMPLET — a placer juste avant la resolution des fixups ═══════════ */
+	fprintf(stderr, "\n[DEBUG] ===== ETAT AVANT RESOLUTION DES FIXUPS =====\n");
+
+	/* 1. Toutes les definitions du label "main_flow" (detecte les doublons) */
+	fprintf(stderr, "[DEBUG] labels nommes 'main_flow':\n");
+	for (int i = 0; i < a.nlabels; i++)
+		if (!strcmp(a.labels[i].name, "main_flow"))
+			fprintf(stderr, "  labels[%d] off=%zu\n", i, a.labels[i].off);
+
+	/* 2. Verifie aussi greeting/farewell pour la meme raison */
+	fprintf(stderr, "[DEBUG] labels nommes 'greeting':\n");
+	for (int i = 0; i < a.nlabels; i++)
+		if (!strcmp(a.labels[i].name, "greeting"))
+			fprintf(stderr, "  labels[%d] off=%zu\n", i, a.labels[i].off);
+	fprintf(stderr, "[DEBUG] labels nommes 'farewell':\n");
+	for (int i = 0; i < a.nlabels; i++)
+		if (!strcmp(a.labels[i].name, "farewell"))
+			fprintf(stderr, "  labels[%d] off=%zu\n", i, a.labels[i].off);
+
+	/* 3. Nombre total de labels et fixups */
+	fprintf(stderr, "[DEBUG] nlabels=%d nfixups=%d\n", a.nlabels, a.nfixups);
+
+	/* 4. Le fixup precis qui nous interesse (off=93), avant patch */
+	fprintf(stderr, "[DEBUG] fixup off=93 attendu -> recherche dans a.fixups[]:\n");
+	for (int i = 0; i < a.nfixups; i++)
+		if (a.fixups[i].off == 93)
+			fprintf(stderr, "  fixups[%d] name='%s' off=%zu end=%zu\n",
+					i, a.fixups[i].name, a.fixups[i].off, a.fixups[i].end);
+
+	/* 5. Simule le calcul EXACT que la boucle de resolution va faire, pour ce fixup precis */
+	{
+		int64_t target_dbg = sym(&a, "main_flow");
+		fprintf(stderr, "[DEBUG] sym(main_flow) au moment de la resolution = %ld\n", (long)target_dbg);
+		fprintf(stderr, "[DEBUG] calcul attendu pour off=93,end=97: disp = %ld - 97 = %ld\n",
+				(long)target_dbg, (long)(target_dbg - 97));
+	}
+
+	fprintf(stderr, "[DEBUG] ===== FIN ETAT =====\n\n");
+	/* ═══════════ FIN BLOC DEBUG ═══════════ */
 
 
     /* resolution des fixups -- COMMUNE aux deux chemins, inchangee */
