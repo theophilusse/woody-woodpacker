@@ -67,7 +67,7 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
     t_stub *stub;
 
     t_format_backend *backend = &g_elf_backend;   /* seul backend disponible pour l'instant */
-    stub = stub_build(ctx, &crypto, opts, backend);
+    stub = stub_build(ctx, crypto, opts, backend);
     if (!stub)
     {
         fprintf(stderr, "error: stub generation failed\n");
@@ -107,7 +107,7 @@ static void print_key(t_crypto_ctx *crypto)
     printf("\n");
 }
 
-/* test_polyblock.c, ou directement dans main.c en mode debug */
+/*
 void test_polyblock_parsing(void)
 {
     const char *source =
@@ -205,7 +205,7 @@ void test_polyblock_resolve_sizes(void)
     a.key_sync_enabled = 1;
     a.label_base_offset = 0;
 
-    if (polyblock_resolve_sizes(&a, ctx, 0) < 0)
+    if (polyblock_resolve_sizes(&a, ctx, 0, backend) < 0)
     {
         fprintf(stderr, "ECHEC resolve_sizes\n");
         return;
@@ -325,6 +325,8 @@ const char *source_decrypt =
 "%PLAINTEXT SYNC\n"
 "    _ZERO edi\n"
 "%POLYBLOCK_END\n";
+
+*/
 
 int main(int argc, char **argv)
 {
