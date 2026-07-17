@@ -1,42 +1,42 @@
-In file included from include/woody.h:71,
-                 from include/opts.h:4,
-                 from include/asm.h:6,
-                 from src/asm.c:1:
-include/polyblock.h:132:126: error: unknown type name ‘t_format_backend’
-  132 | char *generate_decrypt_stub(t_polyblock *target_blk, t_diff_result *diff, t_decrypt_method method, const char *target_label, t_format_backend *backend);
-      |                                                                                                                              ^~~~~~~~~~~~~~~~
-In file included from include/woody.h:71,
-                 from include/opts.h:4,
-                 from include/asm.h:6,
-                 from src/asm.c:1:
-include/polyblock.h:133:72: error: unknown type name ‘t_format_backend’
-  133 | int substitute_decrypt_slots(t_polyctx *ctx, t_block_variant *variant, t_format_backend *backend);
-      |                                                                        ^~~~~~~~~~~~~~~~
-include/polyblock.h:135:80: error: unknown type name ‘t_format_backend’
-  135 | int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position, t_format_backend *backend);
-      |                                                                                ^~~~~~~~~~~~~~~~
-include/polyblock.h:136:50: error: unknown type name ‘t_format_backend’
-  136 | int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend);
-      |                                                  ^~~~~~~~~~~~~~~~
-In file included from include/woody.h:72,
-                 from include/opts.h:4,
-                 from include/asm.h:6,
-                 from src/asm.c:1:
-include/format_backend.h:8:5: error: unknown type name ‘t_target_format’
-    8 |     t_target_format format;
-      |     ^~~~~~~~~~~~~~~
-src/asm.c: In function ‘polyblock_link’:
-src/asm.c:274:9: error: implicit declaration of function ‘polyblock_resolve_sizes’ [-Werror=implicit-function-declaration]
-  274 |     if (polyblock_resolve_sizes(a, ctx, a->out->e.len) < 0)
-      |         ^~~~~~~~~~~~~~~~~~~~~~~
-src/asm.c: In function ‘polyblock_resolve_sizes’:
-src/asm.c:321:13: error: implicit declaration of function ‘substitute_decrypt_slots’ [-Werror=implicit-function-declaration]
-  321 |         if (substitute_decrypt_slots(ctx, &blk->ciphertext, backend) < 0)
-      |             ^~~~~~~~~~~~~~~~~~~~~~~~
-src/asm.c: In function ‘asm_build’:
-src/asm.c:1783:21: error: implicit declaration of function ‘polyblock_assemble’; did you mean ‘polyblock_parse_all’? [-Werror=implicit-function-declaration]
- 1783 |                 if (polyblock_assemble(&a, pctx, backend) < 0)
-      |                     ^~~~~~~~~~~~~~~~~~
-      |                     polyblock_parse_all
+src/format_elf.c:2:47: error: unknown type name ‘t_reg’
+    2 | static const char *elf_emit_make_writable_asm(t_reg addr_reg, t_reg len_reg)
+      |                                               ^~~~~
+src/format_elf.c:2:63: error: unknown type name ‘t_reg’
+    2 | static const char *elf_emit_make_writable_asm(t_reg addr_reg, t_reg len_reg)
+      |                                                               ^~~~~
+src/format_elf.c:17:49: error: unknown type name ‘t_reg’
+   17 | static const char *elf_emit_make_executable_asm(t_reg addr_reg, t_reg len_reg)
+      |                                                 ^~~~~
+src/format_elf.c:17:65: error: unknown type name ‘t_reg’
+   17 | static const char *elf_emit_make_executable_asm(t_reg addr_reg, t_reg len_reg)
+      |                                                                 ^~~~~
+src/format_elf.c:32:1: error: unknown type name ‘t_format_backend’
+   32 | t_format_backend g_elf_backend = {
+      | ^~~~~~~~~~~~~~~~
+src/format_elf.c:33:5: error: field name not in record or union initializer
+   33 |     .format = FORMAT_ELF,
+      |     ^
+src/format_elf.c:33:5: note: (near initialization for ‘g_elf_backend’)
+src/format_elf.c:33:15: error: ‘FORMAT_ELF’ undeclared here (not in a function)
+   33 |     .format = FORMAT_ELF,
+      |               ^~~~~~~~~~
+src/format_elf.c:34:5: error: field name not in record or union initializer
+   34 |     .emit_make_writable_asm = elf_emit_make_writable_asm,
+      |     ^
+src/format_elf.c:34:5: note: (near initialization for ‘g_elf_backend’)
+src/format_elf.c:34:31: error: ‘elf_emit_make_writable_asm’ undeclared here (not in a function)
+   34 |     .emit_make_writable_asm = elf_emit_make_writable_asm,
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/format_elf.c:34:31: error: excess elements in scalar initializer [-Werror]
+src/format_elf.c:34:31: note: (near initialization for ‘g_elf_backend’)
+src/format_elf.c:35:5: error: field name not in record or union initializer
+   35 |     .emit_make_executable_asm = elf_emit_make_executable_asm,
+      |     ^
+src/format_elf.c:35:5: note: (near initialization for ‘g_elf_backend’)
+src/format_elf.c:35:33: error: ‘elf_emit_make_executable_asm’ undeclared here (not in a function)
+   35 |     .emit_make_executable_asm = elf_emit_make_executable_asm,
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/format_elf.c:35:33: error: excess elements in scalar initializer [-Werror]
+src/format_elf.c:35:33: note: (near initialization for ‘g_elf_backend’)
 cc1: all warnings being treated as errors
-make: *** [Makefile:30: obj/asm.o] Error 1
+make: *** [Makefile:30: obj/format_elf.o] Error 1

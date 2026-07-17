@@ -1,4 +1,6 @@
-/* format_elf.c */
+#include "woody.h"
+#include "format_backend.h"
+
 static const char *elf_emit_make_writable_asm(t_reg addr_reg, t_reg len_reg)
 {
     static char buf[256];
