@@ -1476,7 +1476,17 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		else
 		{
 			val = sym(a, toks[2]);
+			if (!strcmp(toks[1], "rsi") && !strcmp(toks[2], "864"))
+			{
+				fprintf(stderr, "[DEBUG-SET] toks[2]='%s' sym()=%ld strtoll()=%ld s1=%d lsb_value=%u r1=%d off_before=%zu\n",
+						toks[2], (long)val, (long)strtoll(toks[2], NULL, 0), s1, lsb_value, r1, a->out->e.len);
+			}
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (!strcmp(toks[1], "rsi") && !strcmp(toks[2], "864"))
+			{
+				fprintf(stderr, "[DEBUG-SET] val final=%ld (0x%lx) cast int32_t=%d (0x%x)\n",
+						(long)val, (long)val, (int32_t)val, (uint32_t)(int32_t)val);
+			}
 			if (s1 == 64)
 			{
 				if (lsb_value) emit_mov_r64_imm64(&a->out->e, r1, (uint64_t)val);
@@ -1486,6 +1496,13 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			{
 				if (lsb_value) emit_mov_r32_imm32(&a->out->e, r1, (uint32_t)val);
 				else           emit_lea_abs(&a->out->e, r1, (int32_t)val);
+			}
+			if (!strcmp(toks[1], "rsi") && !strcmp(toks[2], "864"))
+			{
+				fprintf(stderr, "[DEBUG-SET] octets emis: ");
+				for (size_t k = a->out->e.len >= 8 ? a->out->e.len - 8 : 0; k < a->out->e.len; k++)
+					fprintf(stderr, "%02x ", a->out->e.buf[k]);
+				fprintf(stderr, "\n");
 			}
 		}
 		snprintf(logname, 32, "_SET %s", toks[1]);
