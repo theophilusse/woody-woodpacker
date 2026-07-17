@@ -100,7 +100,7 @@ static int64_t	sym(t_asm *a, const char *n)
 	if (!strcmp(n,"text_len"))    return (int64_t)a->crypto->text_len;
 	if (!strcmp(n,"key_mask"))    return (int64_t)(a->crypto->key_len - 1);
 	if (!strcmp(n, "stub_load_vaddr")) return (int64_t)a->crypto->stub_load_vaddr;
-	for (i = 0; i < a->nlabels; i++)
+	for (i = a->nlabels - 1; i >= 0; i--)
 		if (!strcmp(a->labels[i].name, n)) return (int64_t)a->labels[i].off;
 	return -1;
 }
@@ -1656,11 +1656,10 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		return (0);
 	}
-	if ((!strcmp(toks[0], "%polyblock_ref") || !strcmp(toks[0], "%polyblock_ref_cipher")) && n == 2)
+	if (!strcmp(toks[0], "%polyblock_ref") && n == 2)
 	{
 		t_polyblock     *child;
 		t_block_variant *child_variant;
-		int             want_cipher;
 
 		if (!a->polyctx)
 		{
@@ -1673,13 +1672,18 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			fprintf(stderr, "asm: %%polyblock_ref '%s' introuvable\n", toks[1]);
 			return (-1);
 		}
-		want_cipher = !strcmp(toks[0], "%polyblock_ref_cipher");
-		child_variant = want_cipher ? &child->ciphertext : &child->plaintext;
+		child_variant = &child->plaintext;
 		if (!child_variant->bytecode)
 		{
 			fprintf(stderr, "asm: %%polyblock_ref '%s' pas encore resolu\n", toks[1]);
 			return (-1);
 		}
+
+		/* NOUVEAU : redefinit le label a sa VRAIE position, celle ou il est
+		** REELLEMENT injecte dans le buffer final (root_src), pas celle
+		** calculee prematurement pendant resolve_variant */
+		deflabel(a, toks[1]);
+
 		emit_raw(&a->out->e, child_variant->bytecode, child_variant->bytecode_len);
 		return (0);
 	}
