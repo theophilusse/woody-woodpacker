@@ -1784,6 +1784,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
             return (-1);
     }
 
+	/*
 	fprintf(stderr, "[DEBUG] sym(greeting)=%ld sym(farewell)=%ld nfixups=%d\n",
 			(long)sym(&a, "greeting"), (long)sym(&a, "farewell"), a.nfixups);
 	for (int i = 0; i < a.nfixups; i++)
@@ -1791,7 +1792,12 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out, const t_
 				i, a.fixups[i].name, a.fixups[i].off, a.fixups[i].end);
 	fprintf(stderr, "[DEBUG] sym(main_flow)=%ld sym(greeting)=%ld sym(farewell)=%ld\n",
         (long)sym(&a, "main_flow"), (long)sym(&a, "greeting"), (long)sym(&a, "farewell"));
+	*/
+	fprintf(stderr, "[DEBUG] buf[85..100] = ");
+	for (int k = 85; k < 100; k++) fprintf(stderr, "%02x ", a.out->e.buf[k]);
+	fprintf(stderr, "\n");
 
+	
     /* resolution des fixups -- COMMUNE aux deux chemins, inchangee */
     for (int i = 0; i < a.nfixups; i++) {
         int64_t target = sym(&a, a.fixups[i].name);
