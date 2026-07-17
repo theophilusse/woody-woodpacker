@@ -405,6 +405,9 @@ static int substitute_root_decrypt_slots(t_asm *a, t_polyctx *ctx)
         if (compute_diff(&target->plaintext, &target->ciphertext, &diff) < 0)
             return (-1);
 
+        fprintf(stderr, "[DEBUG] diff.n_entries=%zu target->ciphertext.bytecode_len=%zu\n",
+            diff.n_entries, target->ciphertext.bytecode_len);
+
         chosen = spec->methods[rand() % spec->n_methods];
         spec->chosen_method = chosen;
         stub_src = generate_decrypt_stub(target, &diff, chosen, target->identifier);

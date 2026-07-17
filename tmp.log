@@ -1,72 +1,1262 @@
-A4A556815FD8D7CD244A09BBE4FDAA9B
+D1F7CE1587F1EDE40197696C4FC9EBE5
 ')
 [DEBUG] parse_polyblock('farewell')
 [DEBUG] parse_polyblock('main_flow')
 [DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
 [DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
 [DUMP] block 'greeting': ciphertext len=53, plaintext len=53
-  ciphertext: 48 8d 04 25 6f 00 00 00 48 8d 3c 25 6f 00 00 00 be 6f 00 00 00 41 83 ef 01 41 83 ef 01 41 ff cf 41 81 c6 01 00 00 00 41 ff cf 41 ff ce 41 83 ee 01 41 ff cf 90 
-  plaintext:  48 8d 04 25 01 00 00 00 48 8d 3c 25 01 00 00 00 48 8d 35 00 00 00 00 48 8d 14 25 0d 00 00 00 0f 05 eb 00 e9 00 00 00 00 41 81 c6 01 00 00 00 41 83 ee 01 90 90 
-[DUMP] block 'farewell': ciphertext len=37, plaintext len=37
-  ciphertext: 48 8d 04 25 de 00 00 00 48 8d 3c 25 de 00 00 00 45 31 ff 41 81 c7 01 00 00 00 45 31 f6 41 83 ee 01 41 83 ef 01 
-  plaintext:  48 8d 04 25 01 00 00 00 48 8d 3c 25 01 00 00 00 48 8d 35 00 00 00 00 ba 09 00 00 00 0f 05 eb 00 e9 00 00 00 00 
-[DUMP] block 'main_flow': ciphertext len=744, plaintext len=744
-  ciphertext: 48 8d 3d 00 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 04 80 77 00 6e 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 0c 80 77 00 6e 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 10 80 77 00 f6 48 81 c7 01 00 00 00 80 77 00 e2 48 81 c7 01 00 00 00 80 77 00 35 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 15 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 83 48 81 c7 01 00 00 00 80 77 00 a7 48 81 c7 01 00 00 00 80 77 00 8c 48 81 c7 01 00 00 00 80 77 00 55 48 81 c7 01 00 00 00 80 77 00 a6 48 81 c7 01 00 00 00 80 77 00 e2 48 81 c7 01 00 00 00 80 77 00 01 48 81 c7 01 00 00 00 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 ff 48 81 c7 01 00 00 00 80 77 00 c0 48 81 c7 01 00 00 00 80 77 00 44 48 81 c7 01 00 00 00 80 77 00 6a 48 81 c7 01 00 00 00 80 77 00 c6 48 81 c7 01 00 00 00 80 77 00 e8 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 27 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 be 48 81 c7 01 00 00 00 80 77 00 4e 48 81 c7 01 00 00 00 80 77 00 87 48 81 c7 01 00 00 00 80 77 00 fe 48 81 c7 01 00 00 00 80 77 00 ce 48 81 c7 01 00 00 00 80 77 00 41 48 81 c7 01 00 00 00 80 77 00 83 48 81 c7 01 00 00 00 80 77 00 af 48 81 c7 01 00 00 00 80 77 00 82 48 81 c7 01 00 00 00 80 77 00 af 48 81 c7 01 00 00 00 80 77 00 fe 48 81 c7 01 00 00 00 80 77 00 5f 48 81 c7 01 00 00 00 eb 00 e9 00 00 00 00 48 8d 3d 00 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 04 80 47 00 dd 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 0c 80 47 00 dd 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 10 80 47 00 fd 48 81 c7 01 00 00 00 80 47 00 a4 48 81 c7 01 00 00 00 80 47 00 ca 48 81 c7 01 00 00 00 80 47 00 41 48 81 c7 01 00 00 00 80 47 00 81 48 81 c7 01 00 00 00 80 47 00 c7 48 81 c7 01 00 00 00 80 77 00 01 48 81 c7 01 00 00 00 80 47 00 46 48 81 c7 01 00 00 00 80 47 00 f7 48 81 c7 01 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 1a 80 47 00 45 48 81 c7 01 00 00 00 80 47 00 31 48 81 c7 01 00 00 00 80 47 00 e7 48 81 c7 01 00 00 00 80 47 00 3c 48 81 c7 01 00 00 00 80 47 00 98 48 81 c7 01 00 00 00 80 47 00 ee 48 81 c7 01 00 00 00 80 47 00 18 48 81 c7 01 00 00 00 80 47 00 41 48 81 c7 01 00 00 00 80 47 00 83 48 81 c7 01 00 00 00 80 47 00 ef 48 81 c7 01 00 00 00 80 77 00 01 48 81 c7 01 00 00 00 eb 00 e9 00 00 00 00 48 8d 04 25 3c 00 00 00 31 ff 0f 05 
-  plaintext:  83 e0 00 83 e7 00 41 ff c6 41 ff c7 41 ff cf 41 ff cf 41 ff c7 41 83 e7 00 41 ff ce 41 83 e6 00 41 ff c7 41 ff cf 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff ce 41 ff c7 41 ff c6 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff c6 41 ff c6 41 ff c6 41 83 e6 00 41 83 e7 00 41 ff c7 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff ce 41 ff c6 41 ff c6 41 ff cf 41 ff c6 41 83 e6 00 41 ff cf 41 ff ce 41 ff c7 41 83 e7 00 41 ff c7 41 83 e6 00 41 83 e7 00 41 ff ce 41 83 e7 00 41 83 e6 00 41 ff c6 41 ff cf 41 83 e7 00 41 83 e7 00 41 ff cf 41 ff cf 41 ff c7 41 83 e6 00 41 83 e6 00 41 83 e7 00 41 ff c6 41 83 e6 00 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff ce 41 ff c6 41 83 e7 00 41 ff cf 41 83 e6 00 41 83 e7 00 41 ff cf 41 ff ce 41 ff ce 41 83 e7 00 41 ff c7 41 ff cf 41 ff cf 41 83 e6 00 41 ff cf 41 83 e7 00 41 ff ce 41 ff ce 41 ff cf 41 ff cf 41 83 e6 00 41 ff c7 41 ff c6 41 ff ce 41 ff cf 41 83 e7 00 41 ff ce 41 ff ce 41 ff c6 41 ff c7 41 ff c7 41 ff c6 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff ce 41 83 e7 00 41 83 e6 00 41 ff c7 41 ff cf 41 83 e6 00 41 ff c6 41 ff c7 41 83 e6 00 41 ff ce 41 ff cf 41 ff cf 41 ff c7 41 83 e6 00 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff cf 41 83 e6 00 41 83 e7 00 41 ff cf 41 83 e7 00 41 ff c6 41 83 e7 00 41 ff cf 41 ff c7 41 ff c7 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c6 41 ff ce 41 ff c7 41 ff c7 41 83 e7 00 41 ff ce 41 ff c7 41 83 e6 00 41 83 e6 00 41 ff c6 41 ff c7 41 ff cf 41 ff cf 41 83 e7 00 41 ff cf 41 83 e6 00 41 ff c7 41 83 e7 00 41 ff ce 41 ff ce 41 83 e6 00 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c7 41 ff ce 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 ff c7 41 ff cf 41 ff ce 41 ff ce 41 83 e7 00 41 83 e7 00 41 ff ce 41 ff ce 41 ff cf 41 ff cf 41 ff cf 41 ff ce 41 83 e7 00 41 ff c6 41 ff ce 41 83 e6 00 41 ff ce 41 ff c6 41 ff ce 41 ff c6 41 ff c6 41 ff c6 41 83 e7 00 41 ff cf 41 83 e7 00 41 ff c6 41 ff c7 41 ff c6 41 ff c6 41 83 e6 00 41 ff cf 41 ff cf 41 83 e7 00 41 ff cf 41 ff c6 41 ff ce 41 83 e7 00 41 ff c7 41 ff c6 41 ff c6 41 83 e6 00 41 ff ce 41 83 e6 00 41 83 e6 00 41 ff c6 41 ff cf 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff c7 41 83 e7 00 41 83 e7 00 90 90 
-[DEBUG] sym(greeting)=0 sym(farewell)=53 nfixups=56
-  fixup[0] name='greeting_msg' off=19 end=23
-  fixup[1] name='next_block' off=36 end=40
-  fixup[2] name='greeting' off=93 end=97
-  fixup[3] name='greeting' off=100 end=104
-  fixup[4] name='greeting' off=122 end=126
-  fixup[5] name='greeting' off=144 end=148
-  fixup[6] name='greeting' off=188 end=192
-  fixup[7] name='greeting' off=364 end=368
-  fixup[8] name='greeting' off=518 end=522
-  fixup[9] name='farewell' off=525 end=529
-  fixup[10] name='farewell' off=532 end=536
-  fixup[11] name='farewell' off=554 end=558
-  fixup[12] name='farewell' off=576 end=580
-  fixup[13] name='farewell' off=686 end=690
-  fixup[14] name='farewell' off=818 end=822
-  fixup[15] name='main_flow' off=93 end=97
-  fixup[16] name='main_flow' off=143 end=147
-  fixup[17] name='main_flow' off=520 end=524
-  fixup[18] name='main_flow' off=625 end=629
-  fixup[19] name='main_flow' off=839 end=843
-  fixup[20] name='main_flow' off=940 end=944
-  fixup[21] name='main_flow' off=997 end=1001
-  fixup[22] name='main_flow' off=1079 end=1083
-  fixup[23] name='main_flow' off=1306 end=1310
-  fixup[24] name='main_flow' off=1349 end=1353
-  fixup[25] name='main_flow' off=1449 end=1453
-  fixup[26] name='main_flow' off=1582 end=1586
-  fixup[27] name='main_flow' off=1736 end=1740
-  fixup[28] name='main_flow' off=1995 end=1999
-  fixup[29] name='main_flow' off=2049 end=2053
-  fixup[30] name='main_flow' off=2346 end=2350
-  fixup[31] name='main_flow' off=3043 end=3047
-  fixup[32] name='main_flow' off=3155 end=3159
-  fixup[33] name='main_flow' off=3267 end=3271
-  fixup[34] name='main_flow' off=3306 end=3310
-  fixup[35] name='main_flow' off=3363 end=3367
-  fixup[36] name='main_flow' off=3456 end=3460
-  fixup[37] name='main_flow' off=3595 end=3599
-  fixup[38] name='main_flow' off=3695 end=3699
-  fixup[39] name='main_flow' off=3767 end=3771
-  fixup[40] name='main_flow' off=3961 end=3965
-  fixup[41] name='main_flow' off=4008 end=4012
-  fixup[42] name='main_flow' off=4576 end=4580
-  fixup[43] name='main_flow' off=4597 end=4601
-  fixup[44] name='main_flow' off=4937 end=4941
-  fixup[45] name='main_flow' off=5034 end=5038
-  fixup[46] name='main_flow' off=5102 end=5106
-  fixup[47] name='main_flow' off=5199 end=5203
-  fixup[48] name='main_flow' off=5310 end=5314
-  fixup[49] name='main_flow' off=6032 end=6036
-  fixup[50] name='main_flow' off=6392 end=6396
-  fixup[51] name='main_flow' off=6510 end=6514
-  fixup[52] name='main_flow' off=6610 end=6614
-  fixup[53] name='main_flow' off=6699 end=6703
-  fixup[54] name='main_flow' off=6767 end=6771
-  fixup[55] name='main_flow' off=6839 end=6843
+  ciphertext: b8 6f 00 00 00 48 8d 3c 25 6f 00 00 00 48 8d 34 25 6f 00 00 00 41 83 ef 01 41 ff cf 41 83 ef 01 41 ff c6 41 ff cf 41 ff ce 41 ff ce 41 ff cf 90 41 83 ee 01 90 
+  plaintext:  b8 01 00 00 00 bf 01 00 00 00 48 8d 35 00 00 00 00 ba 0d 00 00 00 0f 05 eb 00 e9 00 00 00 00 41 83 e7 00 41 ff c7 41 83 e6 00 41 ff ce 41 ff cf 90 90 90 90 90 
+[DUMP] block 'farewell': ciphertext len=31, plaintext len=31
+  ciphertext: b8 de 00 00 00 bf de 00 00 00 41 ff c7 41 ff cf 41 ff cf 41 ff c7 41 83 e7 00 41 ff ce 90 90 
+  plaintext:  b8 01 00 00 00 bf 01 00 00 00 48 8d 35 00 00 00 00 ba 09 00 00 00 0f 05 eb 00 e9 00 00 00 00 
+[DUMP] block 'main_flow': ciphertext len=592, plaintext len=592
+  ciphertext: 48 8d 3d 00 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 01 80 77 00 6e 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 05 80 77 00 f7 48 ff c7 80 77 00 8c 48 ff c7 80 77 00 3c 48 ff c7 80 77 00 25 48 ff c7 80 77 00 6f 48 ff c7 80 77 00 48 48 ff c7 80 77 00 8d 48 ff c7 80 77 00 35 48 ff c7 80 77 00 48 48 ff c7 80 77 00 8d 48 ff c7 80 77 00 34 48 ff c7 80 77 00 25 48 ff c7 80 77 00 d5 48 ff c7 80 77 00 0d 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 15 80 77 00 41 48 ff c7 80 77 00 8c 48 ff c7 80 77 00 ea 48 ff c7 80 77 00 ea 48 ff c7 80 77 00 41 48 ff c7 80 77 00 16 48 ff c7 80 77 00 cf 48 ff c7 80 77 00 41 48 ff c7 80 77 00 83 48 ff c7 80 77 00 ef 48 ff c7 80 77 00 40 48 ff c7 80 77 00 c2 48 ff c7 80 77 00 18 48 ff c7 80 77 00 c6 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 25 80 77 00 08 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 27 80 77 00 7c 48 ff c7 80 77 00 28 48 ff c7 80 77 00 41 48 ff c7 80 77 00 be 48 ff c7 80 77 00 31 48 ff c7 80 77 00 8f 48 ff c7 80 77 00 be 48 ff c7 80 77 00 30 48 ff c7 80 77 00 5f 48 ff c7 80 77 00 d1 48 ff c7 80 77 00 13 48 ff c7 80 77 00 7e 48 ff c7 80 77 00 91 48 ff c7 eb 00 e9 00 00 00 00 48 8d 3d 00 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 01 80 47 00 dd 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 06 80 47 00 dd 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 0a 80 47 00 f9 48 ff c7 80 47 00 72 48 ff c7 80 47 00 92 48 ff c7 80 47 00 41 48 ff c7 80 47 00 ff 48 ff c7 80 47 00 cf 48 ff c7 80 47 00 41 48 ff c7 80 47 00 45 48 ff c7 80 47 00 c6 48 ff c7 80 47 00 41 48 ff c7 80 47 00 ff 48 ff c7 80 47 00 c7 48 ff c7 80 47 00 32 48 ff c7 80 47 00 7e 48 ff c7 80 47 00 fc 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 1a 80 47 00 58 48 ff c7 80 47 00 ff 48 ff c7 80 47 00 ce 48 ff c7 80 47 00 90 48 ff c7 80 47 00 90 48 ff c7 eb 00 e9 00 00 00 00 b8 3c 00 00 00 83 e7 00 0f 05 
+  plaintext:  83 e0 00 83 e7 00 41 ff c7 41 ff cf 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff ce 41 ff c7 41 ff c6 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff c6 41 ff c6 41 ff c6 41 83 e6 00 41 83 e7 00 41 ff c7 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff ce 41 ff c6 41 ff c6 41 ff cf 41 ff c6 41 83 e6 00 41 ff cf 41 ff ce 41 ff c7 41 83 e7 00 41 ff c7 41 83 e6 00 41 83 e7 00 41 ff ce 41 83 e7 00 41 83 e6 00 41 ff c6 41 ff cf 41 83 e7 00 41 83 e7 00 41 ff cf 41 ff cf 41 ff c7 41 83 e6 00 41 83 e6 00 41 83 e7 00 41 ff c6 41 83 e6 00 41 83 e7 00 41 ff c6 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff ce 41 ff c6 41 83 e7 00 41 ff cf 41 83 e6 00 41 83 e7 00 41 ff cf 41 ff ce 41 ff ce 41 83 e7 00 41 ff c7 41 ff cf 41 ff cf 41 83 e6 00 41 ff cf 41 83 e7 00 41 ff ce 41 ff ce 41 ff cf 41 ff cf 41 83 e6 00 41 ff c7 41 ff c6 41 ff ce 41 ff cf 41 83 e7 00 41 ff ce 41 ff ce 41 ff c6 41 ff c7 41 ff c7 41 ff c6 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 ff c6 41 83 e7 00 41 ff ce 41 83 e7 00 41 83 e6 00 41 ff c7 41 ff cf 41 83 e6 00 41 ff c6 41 ff c7 41 83 e6 00 41 ff ce 41 ff cf 41 ff cf 41 ff c7 41 83 e6 00 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff cf 41 83 e6 00 41 83 e7 00 41 ff cf 41 83 e7 00 41 ff c6 41 83 e7 00 41 ff cf 41 ff c7 41 ff c7 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c6 41 ff ce 41 ff c7 41 ff c7 41 83 e7 00 41 ff ce 41 ff c7 41 83 e6 00 41 83 e6 00 41 ff c6 41 ff c7 41 ff cf 41 ff cf 41 83 e7 00 41 ff cf 41 83 e6 00 41 ff c7 41 83 e7 00 41 ff ce 41 ff ce 41 83 e6 00 41 ff ce 41 83 e6 00 41 ff c6 41 83 e6 00 41 ff c7 41 ff ce 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 83 e6 00 41 ff c7 41 ff cf 41 ff ce 41 ff ce 41 83 e7 00 41 83 e7 00 41 ff ce 41 ff ce 41 ff cf 41 ff cf 41 ff cf 41 ff ce 41 83 e7 00 90 41 ff ce 90 90 
+[DEBUG] root_src apres substitution:
+---
+scan_start:
+%polyblock_ref greeting
+%polyblock_ref farewell
+next_block:
+lea rdi, [main_flow]
+xor [rdi], 203
+_INC rdi
+xor [rdi], 109
+_INC rdi
+xor [rdi], 61
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 231
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 6
+xor [rdi], 65
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 74
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 207
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 175
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 254
+_INC rdi
+xor [rdi], 70
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 72
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 204
+_INC rdi
+xor [rdi], 194
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 34
+xor [rdi], 33
+_INC rdi
+xor [rdi], 5
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 182
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 24
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 205
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 57
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 177
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 191
+_INC rdi
+xor [rdi], 174
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 3
+_INC rdi
+xor [rdi], 144
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 60
+xor [rdi], 100
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 3
+_INC rdi
+xor [rdi], 145
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 67
+xor [rdi], 46
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 57
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 3
+_INC rdi
+xor [rdi], 144
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 74
+xor [rdi], 9
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 49
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 177
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 114
+_INC rdi
+xor [rdi], 142
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 79
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 243
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 33
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 135
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 98
+xor [rdi], 9
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 204
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 24
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 117
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 37
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 119
+xor [rdi], 9
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 213
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 33
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 133
+xor [rdi], 8
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 14
+_INC rdi
+xor [rdi], 218
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 138
+xor [rdi], 65
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 72
+_INC rdi
+xor [rdi], 194
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 218
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 207
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 149
+xor [rdi], 183
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 3
+_INC rdi
+xor [rdi], 145
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 155
+xor [rdi], 205
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 234
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 165
+xor [rdi], 1
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 230
+_INC rdi
+xor [rdi], 234
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 32
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 135
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 33
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 208
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 33
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 1
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 193
+xor [rdi], 1
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 200
+xor [rdi], 8
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 230
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 32
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 32
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 214
+xor [rdi], 9
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 1
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 24
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 48
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 155
+_INC rdi
+xor [rdi], 174
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 69
+_INC rdi
+xor [rdi], 175
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 67
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 135
+_INC rdi
+xor [rdi], 194
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 234
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 230
+_INC rdi
+xor [rdi], 8
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 261
+xor [rdi], 9
+_INC rdi
+xor [rdi], 114
+_INC rdi
+xor [rdi], 251
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 76
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 164
+_INC rdi
+xor [rdi], 103
+_INC rdi
+xor [rdi], 119
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 78
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 238
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 286
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 199
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 290
+xor [rdi], 183
+_INC rdi
+xor [rdi], 57
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 3
+_INC rdi
+xor [rdi], 145
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 296
+xor [rdi], 255
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 230
+_INC rdi
+xor [rdi], 49
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 306
+xor [rdi], 1
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 143
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 313
+xor [rdi], 9
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 9
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 33
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 54
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 247
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 327
+xor [rdi], 8
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 244
+_INC rdi
+xor [rdi], 230
+_INC rdi
+xor [rdi], 95
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 334
+xor [rdi], 1
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 144
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 136
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 82
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 48
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 129
+_INC rdi
+xor [rdi], 143
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 68
+_INC rdi
+xor [rdi], 102
+_INC rdi
+xor [rdi], 119
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 18
+_INC rdi
+xor [rdi], 174
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 20
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 168
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 230
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 369
+xor [rdi], 65
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 67
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 230
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 376
+xor [rdi], 65
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 75
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 230
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 383
+xor [rdi], 65
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 69
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 130
+_INC rdi
+xor [rdi], 102
+_INC rdi
+xor [rdi], 71
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 34
+_INC rdi
+xor [rdi], 135
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 68
+_INC rdi
+xor [rdi], 174
+_INC rdi
+xor [rdi], 141
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 231
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 401
+xor [rdi], 65
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 76
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 133
+_INC rdi
+xor [rdi], 103
+_INC rdi
+xor [rdi], 71
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 34
+_INC rdi
+xor [rdi], 142
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 68
+_INC rdi
+xor [rdi], 175
+_INC rdi
+xor [rdi], 141
+_INC rdi
+xor [rdi], 124
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 207
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 143
+_INC rdi
+xor [rdi], 194
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 205
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 51
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 211
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 49
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 128
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 143
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 68
+_INC rdi
+xor [rdi], 103
+_INC rdi
+xor [rdi], 71
+_INC rdi
+xor [rdi], 65
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 456
+xor [rdi], 134
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 71
+_INC rdi
+xor [rdi], 6
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 41
+_INC rdi
+xor [rdi], 72
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 68
+_INC rdi
+xor [rdi], 102
+_INC rdi
+xor [rdi], 71
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 142
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 71
+_INC rdi
+xor [rdi], 6
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 138
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 479
+xor [rdi], 8
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 196
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 486
+xor [rdi], 8
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 196
+_INC rdi
+xor [rdi], 230
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 494
+xor [rdi], 193
+_INC rdi
+xor [rdi], 196
+_INC rdi
+xor [rdi], 231
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 500
+xor [rdi], 9
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 115
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 198
+_INC rdi
+xor [rdi], 63
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 25
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 199
+_INC rdi
+xor [rdi], 189
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 49
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 203
+_INC rdi
+xor [rdi], 107
+_INC rdi
+xor [rdi], 61
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 131
+_INC rdi
+xor [rdi], 230
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 536
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 538
+xor [rdi], 33
+_INC rdi
+xor [rdi], 26
+_INC rdi
+xor [rdi], 193
+_INC rdi
+xor [rdi], 196
+_INC rdi
+xor [rdi], 230
+_INC rdi
+xor [rdi], 88
+_INC rdi
+xor [rdi], 9
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 547
+xor [rdi], 193
+_INC rdi
+xor [rdi], 184
+_INC rdi
+xor [rdi], 207
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 49
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 137
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 77
+_INC rdi
+xor [rdi], 175
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 3
+_INC rdi
+xor [rdi], 160
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 564
+xor [rdi], 209
+_INC rdi
+xor [rdi], 183
+_INC rdi
+xor [rdi], 49
+_INC rdi
+xor [rdi], 134
+_INC rdi
+xor [rdi], 127
+_INC rdi
+xor [rdi], 137
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 111
+_INC rdi
+xor [rdi], 135
+_INC rdi
+xor [rdi], 190
+_INC rdi
+xor [rdi], 56
+_INC rdi
+xor [rdi], 36
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 22
+_INC rdi
+xor [rdi], 207
+_INC rdi
+xor [rdi], 65
+_INC rdi
+xor [rdi], 255
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 249
+_INC rdi
+xor [rdi], 191
+_INC rdi
+xor [rdi], 231
+_INC rdi
+lea rdi, [main_flow]
+add rdi, 586
+xor [rdi], 144
+_INC rdi
+xor [rdi], 194
+_INC rdi
+xor [rdi], 24
+_INC rdi
+xor [rdi], 206
+_INC rdi
+xor [rdi], 159
+_INC rdi
+xor [rdi], 149
+_INC rdi
+
+%polyblock_ref main_flow
+scan_end:
+greeting_msg:
+.string "Hello World!\n"
+farewell_msg:
+.string "Goodbye!\n"
+
+---
+[DEBUG] sym(greeting)=0 sym(farewell)=53 nfixups=53
+  fixup[0] name='greeting_msg' off=13 end=17
+  fixup[1] name='next_block' off=27 end=31
+  fixup[2] name='greeting' off=87 end=91
+  fixup[3] name='greeting' off=94 end=98
+  fixup[4] name='greeting' off=112 end=116
+  fixup[5] name='greeting' off=221 end=225
+  fixup[6] name='greeting' off=330 end=334
+  fixup[7] name='greeting' off=348 end=352
+  fixup[8] name='greeting' off=450 end=454
+  fixup[9] name='farewell' off=457 end=461
+  fixup[10] name='farewell' off=464 end=468
+  fixup[11] name='farewell' off=482 end=486
+  fixup[12] name='farewell' off=500 end=504
+  fixup[13] name='farewell' off=616 end=620
+  fixup[14] name='farewell' off=662 end=666
+  fixup[15] name='main_flow' off=87 end=91
+  fixup[16] name='main_flow' off=133 end=137
+  fixup[17] name='main_flow' off=389 end=393
+  fixup[18] name='main_flow' off=623 end=627
+  fixup[19] name='main_flow' off=684 end=688
+  fixup[20] name='main_flow' off=753 end=757
+  fixup[21] name='main_flow' off=965 end=969
+  fixup[22] name='main_flow' off=1148 end=1152
+  fixup[23] name='main_flow' off=1266 end=1270
+  fixup[24] name='main_flow' off=1312 end=1316
+  fixup[25] name='main_flow' off=1408 end=1412
+  fixup[26] name='main_flow' off=1469 end=1473
+  fixup[27] name='main_flow' off=1570 end=1574
+  fixup[28] name='main_flow' off=1813 end=1817
+  fixup[29] name='main_flow' off=1893 end=1897
+  fixup[30] name='main_flow' off=2022 end=2026
+  fixup[31] name='main_flow' off=2423 end=2427
+  fixup[32] name='main_flow' off=2626 end=2630
+  fixup[33] name='main_flow' off=2669 end=2673
+  fixup[34] name='main_flow' off=2730 end=2734
+  fixup[35] name='main_flow' off=2827 end=2831
+  fixup[36] name='main_flow' off=2891 end=2895
+  fixup[37] name='main_flow' off=3020 end=3024
+  fixup[38] name='main_flow' off=3084 end=3088
+  fixup[39] name='main_flow' off=3404 end=3408
+  fixup[40] name='main_flow' off=3476 end=3480
+  fixup[41] name='main_flow' off=3540 end=3544
+  fixup[42] name='main_flow' off=3697 end=3701
+  fixup[43] name='main_flow' off=4173 end=4177
+  fixup[44] name='main_flow' off=4393 end=4397
+  fixup[45] name='main_flow' off=4461 end=4465
+  fixup[46] name='main_flow' off=4533 end=4537
+  fixup[47] name='main_flow' off=4586 end=4590
+  fixup[48] name='main_flow' off=4901 end=4905
+  fixup[49] name='main_flow' off=4926 end=4930
+  fixup[50] name='main_flow' off=4997 end=5001
+  fixup[51] name='main_flow' off=5143 end=5147
+  fixup[52] name='main_flow' off=5348 end=5352
+[DEBUG] sym(main_flow)=84 sym(greeting)=0 sym(farewell)=53
