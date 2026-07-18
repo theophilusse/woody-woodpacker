@@ -834,17 +834,12 @@ int	emit_test_r64_r64(t_emitter *e, t_reg reg1, t_reg reg2)
 int emit_lea_abs(t_emitter *e, t_reg dst, int32_t addr)
 {
     uint8_t b[8];
-    if (addr == 853)
-        fprintf(stderr, "[DBG-LEA] emit_lea_abs appelee avec addr=%d (0x%x)\n", addr, (uint32_t)addr);
+    fprintf(stderr, "[DBG-LEA-ALL] addr=%d (0x%x) dst=%d e->len=%zu\n", addr, (uint32_t)addr, dst, e->len);
     b[0] = mk_rex(1, dst, 0);
     b[1] = 0x8D;
     b[2] = MODRM00(dst, 4);
     b[3] = 0x25;
     memcpy(b + 4, &addr, 4);
-    if (addr == 853)
-    {
-        fprintf(stderr, "[DBG-LEA] octets b[4..7] = %02x %02x %02x %02x\n", b[4], b[5], b[6], b[7]);
-    }
     return emit_raw(e, b, 8);
 }
 
