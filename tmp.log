@@ -1,0 +1,134 @@
+88A4359E2B7F6A5D639F8B1E34F3F050
+')
+[DEBUG] parse_polyblock('farewell')
+[DEBUG] parse_polyblock('main_flow')
+[DEBUG] parse_decrypt_directive line='    %DECRYPT greeting XOR'
+[DEBUG] parse_decrypt_directive line='    %DECRYPT farewell ADD, SUB'
+[DBG3] ligne #1 = ''
+[DBG3] ligne #2 = '    _SET eax, 111'
+[DBG3] ligne #3 = '    _SET edi, 111'
+[DBG3] ligne #4 = '    _SET esi, 111'
+[DBG3] ligne #5 = '    _JUNK 32'
+[DUMP] block 'greeting': ciphertext len=56, plaintext len=56
+  ciphertext: 48 8d 04 25 6f 00 00 00 48 8d 3c 25 6f 00 00 00 48 8d 34 25 6f 00 00 00 41 ff cf 41 83 ef 01 41 83 ef 01 41 81 c6 01 00 00 00 41 ff cf 41 83 ee 01 41 83 ee 01 90 90 90 
+  plaintext:  b8 01 00 00 00 bf 01 00 00 00 48 8d 35 00 00 00 00 ba 0d 00 00 00 0f 05 eb 00 e9 00 00 00 00 41 ff cf 41 ff c6 41 ff ce 41 83 e7 00 41 ff c7 41 83 e6 00 41 ff ce 90 90 
+[DUMP] block 'farewell': ciphertext len=37, plaintext len=37
+  ciphertext: b8 de 00 00 00 bf de 00 00 00 41 ff cf 41 ff c7 41 ff c6 41 ff c7 41 ff cf 41 ff cf 41 ff c7 41 83 e7 00 90 90 
+  plaintext:  b8 01 00 00 00 48 8d 3c 25 01 00 00 00 48 8d 35 00 00 00 00 48 8d 14 25 09 00 00 00 0f 05 eb 00 e9 00 00 00 00 
+[DUMP] block 'main_flow': ciphertext len=760, plaintext len=760
+  ciphertext: 48 8d 3d 00 00 00 00 80 77 00 f0 48 ff c7 80 77 00 8c 48 ff c7 80 77 00 04 48 ff c7 80 77 00 25 48 ff c7 80 77 00 6f 48 ff c7 80 77 00 bf 48 ff c7 80 77 00 01 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 08 80 77 00 48 48 ff c7 80 77 00 8d 48 ff c7 80 77 00 74 48 ff c7 80 77 00 a8 48 ff c7 80 77 00 5a 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 10 80 77 00 48 48 ff c7 80 77 00 37 48 ff c7 80 77 00 39 48 ff c7 80 77 00 25 48 ff c7 80 77 00 6f 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 16 80 77 00 0f 48 ff c7 80 77 00 05 48 ff c7 80 77 00 aa 48 ff c7 80 77 00 ff 48 ff c7 80 77 00 26 48 ff c7 80 77 00 41 48 ff c7 80 77 00 83 48 ff c7 80 77 00 ef 48 ff c7 80 77 00 01 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 20 80 77 00 7c 48 ff c7 80 77 00 20 48 ff c7 80 77 00 40 48 ff c7 80 77 00 be 48 ff c7 80 77 00 47 48 ff c7 80 77 00 87 48 ff c7 80 77 00 fe 48 ff c7 80 77 00 ce 48 ff c7 80 77 00 41 48 ff c7 80 77 00 83 48 ff c7 80 77 00 a6 48 ff c7 80 77 00 ff 48 ff c7 80 77 00 8e 48 ff c7 80 77 00 be 48 ff c7 80 77 00 44 48 ff c7 80 77 00 af 48 ff c7 80 77 00 82 48 ff c7 80 77 00 a7 48 ff c7 80 77 00 83 48 ff c7 80 77 00 af 48 ff c7 80 77 00 fe 48 ff c7 80 77 00 5e 48 ff c7 48 8d 3d 00 00 00 00 48 be 38 00 00 00 00 00 00 00 50 57 56 52 48 89 ff 48 89 f6 ba 05 00 00 00 b8 0a 00 00 00 0f 05 5a 5e 5f 58 eb 00 e9 00 00 00 00 48 8d 3d 00 00 00 00 48 8d 3d 00 00 00 00 48 83 c7 01 80 6f 00 23 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 05 80 6f 00 89 48 ff c7 80 6f 00 af 48 ff c7 80 6f 00 3c 48 ff c7 80 6f 00 25 48 ff c7 80 77 00 01 48 ff c7 80 6f 00 bf 48 ff c7 80 77 00 ff 48 ff c7 80 6f 00 31 48 ff c7 80 6f 00 07 48 ff c7 80 6f 00 8e 48 ff c7 80 6f 00 6e 48 ff c7 80 6f 00 bf 48 ff c7 80 77 00 ff 48 ff c7 80 6f 00 3a 48 ff c7 80 6f 00 bf 48 ff c7 80 6f 00 49 48 ff c7 80 6f 00 c6 48 ff c7 80 6f 00 d3 48 ff c7 80 6f 00 26 48 ff c7 80 6f 00 3a 48 ff c7 80 6f 00 bf 48 ff c7 80 77 00 ff 48 ff c7 80 6f 00 31 48 ff c7 80 6f 00 ce 48 ff c7 80 6f 00 06 48 ff c7 80 6f 00 24 48 ff c7 80 6f 00 bf 48 ff c7 80 6f 00 66 48 ff c7 80 6f 00 19 48 ff c7 48 8d 3d 00 00 00 00 48 83 c7 23 80 6f 00 70 48 ff c7 80 6f 00 70 48 ff c7 48 8d 3d 00 00 00 00 48 be 25 00 00 00 00 00 00 00 50 57 56 52 48 89 ff 48 89 f6 ba 05 00 00 00 b8 0a 00 00 00 0f 05 5a 5e 5f 58 eb 00 e9 00 00 00 00 b8 3c 00 00 00 31 ff 0f 05 
+  plaintext:  31 c0 31 ff 45 31 f6 41 81 c7 01 00 00 00 41 83 ef 01 45 31 ff 41 81 c6 01 00 00 00 45 31 f6 41 83 ee 01 41 81 c7 01 00 00 00 41 81 c6 01 00 00 00 45 31 f6 41 81 c6 01 00 00 00 45 31 ff 41 81 c6 01 00 00 00 41 81 c6 01 00 00 00 41 81 c6 01 00 00 00 45 31 f6 45 31 ff 41 81 c7 01 00 00 00 45 31 f6 41 81 c6 01 00 00 00 45 31 ff 41 83 ee 01 41 81 c6 01 00 00 00 41 81 c6 01 00 00 00 41 83 ef 01 41 81 c6 01 00 00 00 45 31 f6 41 83 ef 01 41 83 ee 01 41 81 c7 01 00 00 00 45 31 ff 41 81 c7 01 00 00 00 45 31 f6 45 31 ff 41 83 ee 01 45 31 ff 45 31 f6 41 81 c6 01 00 00 00 41 83 ef 01 45 31 ff 45 31 ff 41 83 ef 01 41 83 ef 01 41 81 c7 01 00 00 00 45 31 f6 45 31 f6 45 31 ff 41 81 c6 01 00 00 00 45 31 f6 45 31 ff 41 81 c6 01 00 00 00 45 31 f6 41 81 c6 01 00 00 00 45 31 f6 41 83 ee 01 41 81 c6 01 00 00 00 45 31 ff 41 83 ef 01 45 31 f6 45 31 ff 41 83 ef 01 41 83 ee 01 41 83 ee 01 45 31 ff 41 81 c7 01 00 00 00 41 83 ef 01 41 83 ef 01 45 31 f6 41 83 ef 01 45 31 ff 41 83 ee 01 41 83 ee 01 41 83 ef 01 41 83 ef 01 45 31 f6 41 81 c7 01 00 00 00 41 81 c6 01 00 00 00 41 83 ee 01 41 83 ef 01 45 31 ff 41 83 ee 01 41 83 ee 01 41 81 c6 01 00 00 00 41 81 c7 01 00 00 00 41 81 c7 01 00 00 00 41 81 c6 01 00 00 00 45 31 f6 45 31 f6 45 31 f6 41 81 c6 01 00 00 00 45 31 ff 41 83 ee 01 45 31 ff 45 31 f6 41 81 c7 01 00 00 00 41 83 ef 01 45 31 f6 41 81 c6 01 00 00 00 41 81 c7 01 00 00 00 45 31 f6 41 83 ee 01 41 83 ef 01 41 83 ef 01 41 81 c7 01 00 00 00 45 31 f6 45 31 f6 41 81 c6 01 00 00 00 45 31 f6 41 83 ee 01 45 31 f6 41 81 c6 01 00 00 00 45 31 f6 41 81 c6 01 00 00 00 45 31 f6 41 83 ef 01 45 31 f6 45 31 ff 41 83 ef 01 45 31 ff 41 81 c6 01 00 00 00 45 31 ff 41 83 ef 01 41 81 c7 01 00 00 00 41 81 c7 01 00 00 00 41 83 ee 01 45 31 f6 41 81 c6 01 00 00 00 45 31 f6 41 81 c6 01 00 00 00 41 83 ee 01 41 81 c7 01 00 00 00 41 81 c7 01 00 00 00 45 31 ff 41 83 ee 01 41 81 c7 01 00 00 00 45 31 f6 45 31 f6 41 81 c6 01 00 00 00 41 81 c7 01 00 00 00 41 83 ef 01 41 83 ef 01 45 31 ff 41 83 ef 01 45 31 f6 41 81 c7 01 00 00 00 45 31 ff 41 83 ee 01 41 83 ee 01 45 31 f6 41 83 ee 01 45 31 f6 41 81 c6 01 00 00 00 45 31 f6 41 81 c7 01 00 00 00 41 83 ee 01 45 31 f6 45 31 f6 45 31 f6 45 31 f6 41 81 c7 01 00 00 00 41 83 ef 01 41 83 ee 01 41 83 ee 01 45 31 ff 45 31 ff 41 83 ee 01 41 83 ee 01 41 83 ef 01 90 
+[DEBUG] diff.n_entries=722 target->ciphertext.bytecode_len=760
+
+[DEBUG] ===== ETAT AVANT INSERTION MPROTECT =====
+  block[0] 'greeting': final_offset=0 final_size=56 (fin=56)
+  block[1] 'farewell': final_offset=56 final_size=37 (fin=93)
+  block[2] 'main_flow': final_offset=93 final_size=760 (fin=853)
+[DEBUG] total_size calcule = 853 (0x355)
+[DEBUG] mprotect_block genere:
+---
+lea rdi, [scan_start]
+_SET rsi, 853
+push rax
+push rdi
+push rsi
+push rdx
+_SET rdi, rdi
+_SET rsi, rsi
+_SET edx, 7
+_SET eax, 10
+syscall
+pop rdx
+pop rsi
+pop rdi
+pop rax
+
+---
+[DEBUG] root_src AVANT insertion (100 premiers caracteres):
+---
+scan_start:
+%polyblock_ref greeting
+%polyblock_ref farewell
+next_block:
+lea rdi, [main_flow]
+sub [rd
+---
+[DEBUG] ===== FIN ETAT =====
+
+
+[DEBUG] ===== ETAT APRES CALCUL MPROTECT =====
+  block[0] 'greeting': final_offset=0 final_size=56 (fin=56)
+  block[1] 'farewell': final_offset=56 final_size=37 (fin=93)
+  block[2] 'main_flow': final_offset=93 final_size=760 (fin=853)
+[DEBUG] total_size calcule = 853 (0x355)
+[DEBUG] mprotect_block (deja calcule) =
+---
+lea rdi, [scan_start]
+_SET rsi, 853
+push rax
+push rdi
+push rsi
+push rdx
+_SET rdi, rdi
+_SET rsi, rsi
+_SET edx, 7
+_SET eax, 10
+syscall
+pop rdx
+pop rsi
+pop rdi
+pop rax
+
+---
+[DEBUG] root_src AVANT insertion (100 premiers caracteres):
+---
+scan_start:
+%polyblock_ref greeting
+%polyblock_ref farewell
+next_block:
+lea rdi, [main_flow]
+sub [rd
+---
+[DEBUG] ===== FIN ETAT =====
+
+[DBG1] new_root_src contient '864' ? NON
+[DBG1] new_root_src (200 premiers caracteres):
+---
+scan_start:
+lea rdi, [scan_start]
+_SET rsi, 853
+push rax
+push rdi
+push rsi
+push rdx
+_SET rdi, rdi
+_SET rsi, rsi
+_SET edx, 7
+_SET eax, 10
+syscall
+pop rdx
+pop rsi
+pop rdi
+pop rax
+%polyblock_ref greeting
+---
+[DBG2] ctx->root_src contient '864' ? NON
+[DBG2] longueur totale root_src = 18442
+
+[DEBUG] ===== ETAT AVANT RESOLUTION DES FIXUPS =====
+[DEBUG] labels nommes 'main_flow':
+  labels[2] off=93
+  labels[9] off=6975
+[DEBUG] labels nommes 'greeting':
+  labels[0] off=0
+  labels[6] off=42
+[DEBUG] labels nommes 'farewell':
+  labels[1] off=56
+  labels[7] off=98
+[DEBUG] nlabels=13 nfixups=45
+[DEBUG] fixup off=93 attendu -> recherche dans a.fixups[]:
+[DEBUG] sym(main_flow) au moment de la resolution = 6975
+[DEBUG] calcul attendu pour off=93,end=97: disp = 6975 - 97 = 6878
+[DEBUG] ===== FIN ETAT =====
+
+[DEBUG] buf[85..100] APRES resolution = 00 41 ff c7 41 83 e6 00 41 ff ce c6 ff ff ff 
