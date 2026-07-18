@@ -151,7 +151,11 @@ int assemble_source(t_asm *a, const char *src)
         llen = (int)(p - start);
         if (*p == '\n') p++;
         if (llen <= 0 || llen > 255) continue;
-        strncpy(line, start, (size_t)llen);
+		
+		if (strstr(line, "864"))
+		    fprintf(stderr, "[DEBUG-LINE] '%s' (llen=%d)\n", line, llen);
+        
+		strncpy(line, start, (size_t)llen);
         line[llen] = '\0';
         memset(toks, 0, sizeof(toks));
         n = tokenize(line, toks, 8);
