@@ -151,14 +151,25 @@ int assemble_source(t_asm *a, const char *src)
         llen = (int)(p - start);
         if (*p == '\n') p++;
         if (llen <= 0 || llen > 255) continue;
-		
-		if (strstr(line, "864"))
-		    fprintf(stderr, "[DEBUG-LINE] '%s' (llen=%d)\n", line, llen);
         
+		static int g_dbg_line_count = 0;
+		g_dbg_line_count++;
+		if (strstr(line, "864") || g_dbg_line_count <= 5)
+			fprintf(stderr, "[DBG3] ligne #%d = '%s'\n", g_dbg_line_count, line);
+
 		strncpy(line, start, (size_t)llen);
         line[llen] = '\0';
         memset(toks, 0, sizeof(toks));
         n = tokenize(line, toks, 8);
+
+		if (n > 0 && strstr(line, "864")) //
+		{
+			fprintf(stderr, "[DBG4] tokenize de '%s' -> n=%d : ", line, n);
+			for (int k = 0; k < n; k++)
+				fprintf(stderr, "toks[%d]='%s' ", k, toks[k]);
+			fprintf(stderr, "\n");
+		}
+
         if (n == 0) continue;
         tok0len = (int)strlen(toks[0]);
         if (tok0len > 1 && toks[0][tok0len - 1] == ':')
@@ -414,6 +425,10 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 	int		mt;
 	int8_t d8 = 0;
 	uint8_t op;
+
+	if (n >= 1 && strstr(toks[n-1], "864"))
+    fprintf(stderr, "[DBG5] ainstr appelee avec toks[0]='%s' toks[n-1]='%s' n=%d\n",
+            toks[0], toks[n-1], n);
 
 	if (n == 0) return 0;
 	base = idx = REG_RAX; s1 = s2 = 0; lbl[0] = '\0';
@@ -1373,9 +1388,6 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		size_t off_before = a->out->e.len;
 		char logname[32];
-
-		if (n >= 2 && !strcmp(toks[n-1], "864"))
-   			fprintf(stderr, "[DEBUG] ligne complete avec '864': toks[0]='%s' n=%d\n", toks[0], n);
 
 		if (toks[1][0] == '[')
 		{

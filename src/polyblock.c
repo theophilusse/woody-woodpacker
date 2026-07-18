@@ -533,8 +533,17 @@ int polyblock_assemble(t_asm *a, t_polyctx *ctx, t_format_backend *backend)
         strcat(new_root_src, ctx->root_src + prefix_len);
 
         free(ctx->root_src);
+
+        fprintf(stderr, "[DBG1] new_root_src contient '864' ? %s\n", //
+            strstr(new_root_src, "864") ? "OUI" : "NON");
+        fprintf(stderr, "[DBG1] new_root_src (200 premiers caracteres):\n---\n%.200s\n---\n", new_root_src);
+
         ctx->root_src = new_root_src;
     }
+
+    fprintf(stderr, "[DBG2] ctx->root_src contient '864' ? %s\n", //
+        strstr(ctx->root_src, "864") ? "OUI" : "NON");
+    fprintf(stderr, "[DBG2] longueur totale root_src = %zu\n", strlen(ctx->root_src));
 
     a->polyctx = ctx;
     if (assemble_source(a, ctx->root_src) < 0)
