@@ -1370,6 +1370,9 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		size_t off_before = a->out->e.len;
 		char logname[32];
 
+		if (n >= 2 && !strcmp(toks[n-1], "864"))
+   			fprintf(stderr, "[DEBUG] ligne complete avec '864': toks[0]='%s' n=%d\n", toks[0], n);
+
 		if (toks[1][0] == '[')
 		{
 			mt = pmem(toks[1], &base, &idx, lbl, &d8);
