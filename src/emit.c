@@ -829,6 +829,7 @@ int	emit_test_r64_r64(t_emitter *e, t_reg reg1, t_reg reg2)
 	return emit_raw(e, b, n);
 }
 
+#include <stdio.h>
 /* ── lea abs ─────────────────────────────────────────────────── */
 int emit_lea_abs(t_emitter *e, t_reg dst, int32_t addr)
 {
