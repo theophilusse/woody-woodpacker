@@ -26,6 +26,14 @@ back_from_farewell:
     _ZERO eax
     _ZERO edi
 
+%DECRYPT main_flow SYNC
+%POLYBLOCK_START test
+%CIPHERTEXT SYNC
+    _SET eax, 1
+%PLAINTEXT NOSYNC
+    _SET, eax, 2
+%POLYBLOCK_END
+
 scan_end:
 
 greeting_msg:
