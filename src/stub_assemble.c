@@ -69,9 +69,9 @@ char *build_stub_source(const t_opts *opts)
     }
     if (0)
     {
-        if (opts.source != NULL)
+        if (opts->source != NULL)
         {
-            blocks[n++] = src_load(opts.source);
+            blocks[n++] = src_load(opts->source);
             if (blocks[0] == NULL)
                 return (NULL)
         }
@@ -153,7 +153,7 @@ char *build_stub_source(const t_opts *opts)
     result[0] = '\0';
     for (i = 0; i < n; i++)
         strcat(result, blocks[i]);
-    if (opts.source)
+    if (opts->source)
         free(blocks[0]);
     return (result);
 }
