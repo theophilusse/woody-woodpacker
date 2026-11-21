@@ -68,6 +68,7 @@ char *build_stub_source(const t_opts *opts)
     {
         if (opts->source != NULL)
         {
+            DEBUG //
             printf("Loading custom source from: %s\n", opts->source);
             return (src_load(opts->source));
         }
