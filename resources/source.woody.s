@@ -20,11 +20,6 @@ next_block:
 back_from_greeting: 
     jmp farewell
 back_from_farewell:
-    _SET eax, 60
-    _ZERO edi
-    syscall
-    _ZERO eax
-    _ZERO edi
 
 %DECRYPT test SYNC
 %POLYBLOCK_START test
@@ -33,6 +28,18 @@ back_from_farewell:
 %PLAINTEXT NOSYNC
     _SET, eax, 2
 %POLYBLOCK_END
+
+    _SET edi, 1
+    lea rsi, [farewell_msg]
+    _SET edx, 9
+    syscall
+
+
+    _SET eax, 60
+    _ZERO edi
+    syscall
+    _ZERO eax
+    _ZERO edi
 
 scan_end:
 
