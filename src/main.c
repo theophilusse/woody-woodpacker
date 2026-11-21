@@ -346,6 +346,8 @@ int main(int argc, char **argv)
 	}
 	opts = parse_args(argc, argv);
 
+    DEBUG //
+    printf("Source: %p\n", opts.source);//
     ctx = load_and_validate(opts.file);
     if (!ctx)
         return (1);

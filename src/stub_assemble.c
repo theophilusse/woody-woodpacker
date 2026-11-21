@@ -7,7 +7,6 @@ static char	*src_load(const char *path)
     size_t size;
     char *raw;
 
-    printf("Path %p\n", path);//
 	if (!path)
 		return (NULL);
 	f = fopen(path, "r");
@@ -25,13 +24,12 @@ static char	*src_load(const char *path)
 	}
 	size = (size_t)ftell(f);
 	fseek(f, current_position, SEEK_SET);
-	if (!(raw = malloc(size)))
+	if (!(raw = malloc(size + 1)))
 	{
 		printf("Error allocating memory\n");
 		fclose(f);
 		return (NULL);
 	}
-	memset(raw, 0, size);
 	if (fread(raw, 1, size, f) != size)
 	{
 		printf("Error reading %s\n", path);
@@ -39,6 +37,7 @@ static char	*src_load(const char *path)
 		free(raw);
 		return (NULL);
 	}
+	raw[size] = '\0';
 	fclose(f);
     return (raw);
 }
