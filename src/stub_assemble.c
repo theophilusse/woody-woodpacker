@@ -42,7 +42,7 @@ static char	*src_load(const char *path)
     return (raw);
 }
 
-char *build_stub_source(const t_opts *opts)
+char *build_stub_source(t_opts *opts)
 {
     size_t      total_len;
     char        *result;

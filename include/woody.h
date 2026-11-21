@@ -91,7 +91,7 @@ void		rc4_apply(uint8_t *data, size_t len, const uint8_t *key, size_t key_len);
 
 /* stub_build.c */
 t_stub *stub_build(t_elf_ctx *ctx, t_crypto_ctx *crypto, const t_opts *opts, t_format_backend *backend);
-char		*build_stub_source(const t_opts *opts);
+char		*build_stub_source(t_opts *opts);
 void		stub_free(t_stub *stub);
 
 #endif
