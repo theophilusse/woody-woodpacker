@@ -13,7 +13,6 @@ static char	*src_load(const char *path)
 	if (f == NULL)
 	{
 		printf("Error reading %s\n", path);
-		free(ctx);
 		return (NULL);
 	}
 	current_position = ftell(f);
