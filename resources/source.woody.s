@@ -7,6 +7,7 @@ scan_start:
     syscall
     jmp next_block
 
+farewell:
     _SET eax, 1
     _SET edi, 1
     lea rsi, [farewell_msg]
@@ -16,7 +17,6 @@ scan_start:
 
 next_block:
 
-    jmp greeting
 back_from_greeting: 
     jmp farewell
 back_from_farewell:
