@@ -49,7 +49,7 @@ char *build_stub_source(const t_opts *opts)
 {
     size_t      total_len;
     char        *result;
-    const char  *blocks[32];
+    char  *blocks[32];
     int         n;
     int         i;
 
@@ -73,7 +73,7 @@ char *build_stub_source(const t_opts *opts)
         {
             blocks[n++] = src_load(opts->source);
             if (blocks[0] == NULL)
-                return (NULL)
+                return (NULL);
         }
         else
         {
