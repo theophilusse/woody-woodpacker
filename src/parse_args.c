@@ -8,6 +8,7 @@ static struct option long_opts[] = {
     { "lde", required_argument, 0, 'l'  },
 	{ "debug_display", required_argument, 0, 'p'  },
 	{ "custom_key", required_argument, 0, 'k'  },
+	{ "source", required_argument, 0, 's'  },
     { 0, 0, 0, 0 }  // terminateur de tableau pour getopt_long
 };
 
@@ -22,6 +23,7 @@ struct s_opts default_opts(void)
     opts.use_lde = 1;
 	opts.debug_display = 0;
 	opts.file = NULL;
+	opts.source = NULL;
 	return opts;
 }
 
@@ -70,7 +72,7 @@ t_opts  parse_args(int argc, char **argv)
     int     longindex;
 
 	opts = default_opts();
-	while ((opt = getopt_long(argc, argv, "vd:i:l:p:k:", long_opts, &longindex)) != -1)
+	while ((opt = getopt_long(argc, argv, "vd:i:l:p:k:s:", long_opts, &longindex)) != -1)
     {
 		switch (opt)
         {
@@ -112,6 +114,9 @@ t_opts  parse_args(int argc, char **argv)
 			case 'k':
 				opts = copy_pattern(opts);
 				opts.use_custom_key = 1;
+				break;
+			case 's':
+				opts.source = optarg;
 				break;
 			case '?':
 				usage(argv[0]);

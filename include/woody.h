@@ -60,6 +60,7 @@ typedef struct s_opts
 	int		debug_display;
 	int		use_custom_key;
 	char	custom_key[KEY_LEN];
+	char	*source;
 }   t_opts;
 
 # include "opts.h"

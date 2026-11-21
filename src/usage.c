@@ -8,5 +8,6 @@ int usage(const char *prog)
     printf(" -i        use int3 trap\n");
     printf(" -l        use LDE\n");
     printf(" -k        custom key\n");
+    printf(" -s        custom source\n");
 	return (1);
 }
