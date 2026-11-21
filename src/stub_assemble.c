@@ -7,6 +7,7 @@ static char	*src_load(const char *path)
     size_t size;
     char *raw;
 
+    printf("Path %p\n", path);//
 	if (!path)
 		return (NULL);
 	f = fopen(path, "r");
