@@ -26,7 +26,7 @@ back_from_farewell:
     _ZERO eax
     _ZERO edi
 
-%DECRYPT main_flow SYNC
+%DECRYPT test SYNC
 %POLYBLOCK_START test
 %CIPHERTEXT SYNC
     _SET eax, 1
