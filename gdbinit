@@ -9,4 +9,6 @@ define antidebug
 	set $rax = 0x0
 	continue
 end
-break *0x401161
+starti
+info auxv # AT_ENTRY
+break AT_ENTRY

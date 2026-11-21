@@ -51,7 +51,7 @@ char *build_stub_source(const t_opts *opts)
     int         i;
 
     n = 0;
-    if (1)
+    if (0)
     {
         blocks[n++] = STUB_SCAN_START;
         blocks[n++] = STUB_POLY_DEMO_BLOCKS;
@@ -64,7 +64,7 @@ char *build_stub_source(const t_opts *opts)
         blocks[n++] = STUB_FOOTER;
         blocks[n++] = STUB_AV_DATA;
     }
-    if (0)
+    if (1)
     {
         if (opts->source != NULL)
         {
