@@ -2,7 +2,6 @@
 
 static char	*src_load(const char *path)
 {
-	t_elf_ctx *ctx;
 	FILE *f;
 	long current_position;
     size_t size;
@@ -22,7 +21,6 @@ static char	*src_load(const char *path)
 	{
 		printf("Error reading %s\n", path);
 		fclose(f);
-		free(ctx);
 		return (NULL);
 	}
 	size = (size_t)ftell(f);
@@ -49,7 +47,7 @@ char *build_stub_source(const t_opts *opts)
 {
     size_t      total_len;
     char        *result;
-    char  *blocks[32];
+    const char  *blocks[32];
     int         n;
     int         i;
 
@@ -71,9 +69,7 @@ char *build_stub_source(const t_opts *opts)
     {
         if (opts->source != NULL)
         {
-            blocks[n++] = src_load(opts->source);
-            if (blocks[0] == NULL)
-                return (NULL);
+            return (src_load(opts->source));
         }
         else
         {
@@ -153,7 +149,5 @@ char *build_stub_source(const t_opts *opts)
     result[0] = '\0';
     for (i = 0; i < n; i++)
         strcat(result, blocks[i]);
-    if (opts->source)
-        free(blocks[0]);
     return (result);
 }
