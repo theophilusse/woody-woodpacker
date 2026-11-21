@@ -117,7 +117,6 @@ t_opts  parse_args(int argc, char **argv)
 				break;
 			case 's':
 				opts.source = optarg;
-				printf("Source file : %s\n", opts.source);
 				break;
 			case '?':
 				usage(argv[0]);
