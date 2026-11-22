@@ -68,7 +68,6 @@ char *build_stub_source(t_opts *opts)
     {
         if (opts->source != NULL)
         {
-            DEBUG //
             printf("Loading custom source\n");
             return (src_load(opts->source));
         }
@@ -128,6 +127,7 @@ char *build_stub_source(t_opts *opts)
             blocks[n++] = STUB_KSA;
             blocks[n++] = STUB_PRGA;
             blocks[n++] = STUB_SCAN_END;
+            blocks[n++] = STUB_FREE;
             blocks[n++] = STUB_FOOTER;
 
             /* ── Données embarquées ── */
