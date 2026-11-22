@@ -210,7 +210,7 @@ int elf_patch(t_elf_ctx *ctx, t_stub *stub, t_crypto_ctx *crypto, t_opts *opts)
     ctx->phdrs = (Elf64_Phdr *)(ctx->raw + ctx->ehdr->e_phoff);
     if (opts->use_polyblock)
     {
-        ctx->phdrs[ctx->target_phdr_idx].p_flag |= PF_W; /* rendre le segment modifiable pour l'injection polyblock */
+        ctx->phdrs[ctx->target_phdr_idx].p_flags |= PF_W; /* rendre le segment modifiable pour l'injection polyblock */
     }
     p = &ctx->phdrs[ctx->target_phdr_idx];
 
