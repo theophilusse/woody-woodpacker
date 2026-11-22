@@ -560,24 +560,16 @@ static const char STUB_AFTER_LDE[] =
 	"@after_lde:\n";
 
 static const char STUB_DEBUG_HEXBUF_SETUP[] =
-"sub rsp, 40\n"
-"_SET r8, rsp\n"
-"add r8, 40\n"
-"_SET rsi, rsp\n"
-"_SET r9, rsp\n"
-	/* DEBUG TEMPORAIRE : dump [r9..r9+39] avant la boucle */
-	//"push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
-	//"_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 40\n"
-	//"syscall\n"
-	//"pop rdx\n" "pop rsi\n" "pop rdi\n" "pop rax\n"
-	/* FIN DEBUG */
-"_ZERO r10\n"
-"_ZERO r11\n"
+"sub rsp, 40\n" //         ; buffer de 32 chars hex + '\n' + marge = 40 octets en [rsp..rsp+39]
+"_SET r8, rbp\n" //        ; R8 pointe sur le début de la clé (16 octets)
+"_SET r9, rsp\n" //        ; R9 pointe sur le buffer de sortie ASCII en pile
+"_ZERO r10\n" //           ; r10 = 0..15 (octet de la clé)
+"_ZERO r11\n" //           ; r11 = 0..31 (position dans le buffer hex)
 "_SET eax, 16\n"
 "jmp .loop_start\n"
 ".loop:\n"
 "_ZERO ebx\n"
-"_SET bl, [r8+r10]\n"
+"_SET bl, [r8+r10]\n" //    ; lit l'octet r10 de la clé
 "_SET ecx, ebx\n"
 "shr ecx, 4\n"
 "and ecx, 15\n"
