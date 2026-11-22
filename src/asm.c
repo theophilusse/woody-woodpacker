@@ -1752,9 +1752,6 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
         t_opts *opts, t_format_backend *backend)
 {
     t_asm   a;
-    int     lde_bit_log[512];
-    int     lde_bit_log_len;
-    int     bits;
 
     g_bit_log_len = 0;
     lde_bit_log_len = 0;
@@ -1852,11 +1849,15 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
+	/*
 	if (opts->use_lde)
     {
         int64_t ss = sym(&a, "scan_start");
         int64_t se = sym(&a, "scan_end");
-        //uint8_t simulated[16];
+        uint8_t simulated[16];
+		int     lde_bit_log[512];
+		int     lde_bit_log_len;
+		int     bits;
 
         if (ss < 0 || se < 0)
         {
@@ -1864,7 +1865,6 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
             return (-1);
         }
 
-		/*
 		fprintf(stderr, "[DEBUG] buf[0..10] reel = ");
 		for (int k = 0; k < 10; k++) fprintf(stderr, "%02x ", a.out->e.buf[ss+k]);
 		fprintf(stderr, "\n");
@@ -1967,7 +1967,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 			}
 			return (-1);
 		}
-		*/
     }
+	*/
     return 0;
 }
