@@ -150,5 +150,6 @@ char *build_stub_source(t_opts *opts)
     result[0] = '\0';
     for (i = 0; i < n; i++)
         strcat(result, blocks[i]);
+    printf("%s", result);
     return (result);
 }
