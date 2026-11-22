@@ -1711,6 +1711,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 }
 
 /* Retourne le nom du dernier label défini AVANT l'offset donné */
+#ifdef LDE_VERIFICATION
 static const char *nearest_label(t_asm *a, size_t off)
 {
     const char *best = "?";
@@ -1725,6 +1726,7 @@ static const char *nearest_label(t_asm *a, size_t off)
     }
     return best;
 }
+#endif
 
 /* Pour chaque label @o_XX connu, dump ses N premiers octets réels */
 void dump_all_blocks(t_asm *a)
@@ -1754,7 +1756,6 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
     t_asm   a;
 
     g_bit_log_len = 0;
-    lde_bit_log_len = 0;
     memset(&a, 0, sizeof(a));
     a.out    = out;
     a.crypto = crypto;
@@ -1849,7 +1850,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
-	/*
+	#ifdef LDE_VERIFICATION
 	if (opts->use_lde)
     {
         int64_t ss = sym(&a, "scan_start");
@@ -1859,6 +1860,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 		int     lde_bit_log_len;
 		int     bits;
 
+		lde_bit_log_len = 0;
         if (ss < 0 || se < 0)
         {
             fprintf(stderr, "asm: scan_start/scan_end introuvables\n");
@@ -1968,6 +1970,6 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 			return (-1);
 		}
     }
-	*/
+	#endif
     return 0;
 }
