@@ -497,7 +497,9 @@ static const char STUB_LDE_CORE_EPILOGUE[] =
 	"@o_b8:\n"
 	"cmp al, 0xb8\n" "jl @o_fe\n"
 	"cmp al, 0xbf\n" "jg @o_fe\n"
-	"_SET edx, [rsi-1]\n"                 /* octet precedent = potentiel REX */
+	"cmp rsi, [scan_start]\n"
+	"jbe @o_b8_32\n"
+	"_SET edx, [rsi-1]\n"                 /* octet precedent = potentiel REX */                 /* octet precedent = potentiel REX */
 	"cmp dl, 0x48\n" "jl @o_b8_32\n"
 	"cmp dl, 0x4f\n" "jg @o_b8_32\n"
 	"and edx, 0x08\n" "cmp edx, 0x08\n" "jne @o_b8_32\n"
@@ -560,9 +562,10 @@ static const char STUB_AFTER_LDE[] =
 	"@after_lde:\n";
 
 static const char STUB_DEBUG_HEXBUF_SETUP[] =
-"sub rsp, 40\n" //         ; buffer de 32 chars hex + '\n' + marge = 40 octets en [rsp..rsp+39]
-"_SET r8, rbp\n" //        ; R8 pointe sur le début de la clé (16 octets)
-"_SET r9, rsp\n" //        ; R9 pointe sur le buffer de sortie ASCII en pile
+"sub rsp, 40\n"
+"_SET r8, rbp\n"
+"_SET rsi, rsp\n"
+"_SET r9, rsp\n"
 "_ZERO r10\n" //           ; r10 = 0..15 (octet de la clé)
 "_ZERO r11\n" //           ; r11 = 0..31 (position dans le buffer hex)
 "_SET eax, 16\n"
@@ -645,25 +648,26 @@ static const char STUB_MPROTECT[] =
 
 static const char STUB_KSA[] =
 "sub rsp, 256\n"
+"_SET r13, rsp\n"
 "_SET rsi, rbp\n"
 "_ZERO ecx\n"
 "@ksa_init:\n"
-"mov [rsp+rcx], cl\n"
+"mov [r13+rcx], cl\n"
 "_INC cl\n"
 "jnz @ksa_init\n"
 "_ZERO ecx\n"
 "_ZERO edx\n"
 "@ksa_loop:\n"
-"_SET eax, [rsp+rcx]\n"
+"_SET eax, [r13+rcx]\n"
 "add dl, al\n"
 "mov al, cl\n"
 "and al, key_mask\n"
 "_SET eax, al\n"
 "_SET eax, [rsi+rax]\n"
 "add dl, al\n"
-"_SET eax, [rsp+rcx]\n"
-"xchg [rsp+rdx], al\n"
-"mov [rsp+rcx], al\n"
+"_SET eax, [r13+rcx]\n"
+"xchg [r13+rdx], al\n"
+"mov [r13+rcx], al\n"
 "_INC cl\n"
 "jnz @ksa_loop\n";
 
