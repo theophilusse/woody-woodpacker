@@ -61,6 +61,7 @@ typedef struct s_opts
 	int		use_custom_key;
 	char	custom_key[KEY_LEN];
 	char	*source;
+	int		use_polyblock;
 }   t_opts;
 
 # include "opts.h"

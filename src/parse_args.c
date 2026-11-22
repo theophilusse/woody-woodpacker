@@ -24,6 +24,7 @@ struct s_opts default_opts(void)
 	opts.debug_display = 0;
 	opts.file = NULL;
 	opts.source = NULL;
+	opts.use_polyblock = 0;
 	return opts;
 }
 

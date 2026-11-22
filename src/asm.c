@@ -1766,6 +1766,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 
     if (strstr(src, "%POLYBLOCK_START"))
 	{
+		opts.use_polyblock = 1;
 		t_polyctx *pctx;
 		pctx = polyblock_parse_all(src);
 		if (!pctx)
@@ -1775,6 +1776,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 	}
     else
     {
+		opts.use_polyblock = 0;
         if (assemble_source(&a, src) < 0)
             return (-1);
     }

@@ -328,6 +328,16 @@ const char *source_decrypt =
 
 */
 
+int get_magic(const char *path, char *magic, size_t magic_len)
+{
+    FILE *f = fopen(path, "rb");
+    if (!f)
+        return (-1);
+    size_t n = fread(magic, 1, magic_len, f);
+    fclose(f);
+    return ((int)n);
+}
+
 int main(int argc, char **argv)
 {
     t_elf_ctx       *ctx;
@@ -346,26 +356,52 @@ int main(int argc, char **argv)
 	}
 	opts = parse_args(argc, argv);
 
-    DEBUG //
-    printf("Source: %p %s\n", opts.source, opts.source);//
-    ctx = load_and_validate(opts.file);
-    if (!ctx)
-        return (1);
-
-    memset(&crypto, 0, sizeof(crypto));
-    if (setup_crypto(ctx, &crypto, &opts) != 0)
+    char magic[5] = {0};
+    switch (get_magic(opts.file, magic, sizeof(magic)))
     {
-        elf_free(ctx);
-        return (1);
+        case -1:
+            fprintf(stderr, "error: cannot read %s\n", opts.file);
+            return (1);
+        case 0:
+            fprintf(stderr, "error: file %s is empty\n", opts.file);
+            return (1);
+        default:
+            break;
     }
 
-    if (build_and_patch(ctx, &crypto, "woody", &opts) != 0)
+    if (memcmp(magic, "\x7f""ELF", 4) == 0) // Linux ELF file
     {
-        elf_free(ctx);
-        return (1);
-    }
+        ctx = load_and_validate(opts.file);
+        if (!ctx)
+            return (1);
 
-    print_key(&crypto);
-    elf_free(ctx);
-    return (0);
+        memset(&crypto, 0, sizeof(crypto));
+        if (setup_crypto(ctx, &crypto, &opts) != 0)
+        {
+            elf_free(ctx);
+            return (1);
+        }
+
+        if (build_and_patch(ctx, &crypto, "woody", &opts) != 0)
+        {
+            elf_free(ctx);
+            return (1);
+        }
+
+        print_key(&crypto);
+        elf_free(ctx);
+        return (0);
+    }
+    if (memcmp(magic, "PE", 2) == 0) // Windows PE file
+    {
+        printf("Coming soon: Windows PE support\n");
+        return (0);
+    }
+    if (memcmp(magic, "\xcf\xfa\xed\xfe", 4) == 0) // Macho-O file
+    {
+        printf("Coming soon: Macho-O support\n");
+        return (0);
+    }
+    fprintf(stderr, "error: file %s is not supported\n", opts.file);
+    return (1);
 }
