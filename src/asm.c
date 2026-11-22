@@ -1749,7 +1749,7 @@ void dump_all_blocks(t_asm *a)
 
 /* ── entree publique ────────────────────────────────────────────── */
 int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
-        const t_opts *opts, t_format_backend *backend)
+        t_opts *opts, t_format_backend *backend)
 {
     t_asm   a;
     int     lde_bit_log[512];
