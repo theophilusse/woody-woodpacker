@@ -7,7 +7,8 @@ static const char STUB_SCAN_START[] =
 static const char STUB_HEADER[] =
 	// preserves _dl_fini que le kernel passe dans rdx
 	"push rdx\n"
-	"push rbp\n";
+	"push rbp\n"
+	"mov r12, rsp\n";
 
 static const char STUB_ANTIDEBUG_1[] =
     //////////////////////////// ANTI_DEBUG ////////////////////////////
@@ -695,8 +696,7 @@ static const char STUB_PRGA[] =
 "jl @prga_loop\n";
 
 static const char STUB_FREE[] =
-	"add rsp, 256\n"     // libère le S-box
-	"add rsp, 16\n"      // ← DÉPLACÉ ICI : libère le buffer clé, seulement maintenant qu'on n'en a plus besoin
+	"mov rsp, r12\n"
 	"pop rdx\n"
 	"pop rbp\n";
 
