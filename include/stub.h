@@ -105,7 +105,7 @@ static const char STUB_RUN_LDE_ACTIVE[] =
 "@o_3c_break:\n"
 
 "@o_88:\n"
-"cmp al, 0x88\n" "jne @o_88_break\n"
+"cmp al, 0x88\n" "jne o_88_break\n"
 "_SET eax, [rsi+1]\n"
 "_SET edx, eax\n" "and edx, 0xc0\n" "and eax, 0x7\n"
 "cmp edx, 0x0\n" "je @o88_m00\n"
@@ -123,7 +123,7 @@ static const char STUB_RUN_LDE_ACTIVE[] =
 "cmp ecx, 128\n" "jge @adv_8801\n"
 "_INC ecx\n"
 "@adv_8801:\n" "add rsi, 4\n" "jmp @lde_loop\n"   /* opcode+modrm+SIB+disp8 = 4 octets */
-"@o_88_break\n";
+"o_88_break:\n";
 
 static const char STUB_LDE_INT3_TRAP[] =
 	"@o_cc:\n"
