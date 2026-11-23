@@ -54,7 +54,7 @@ static const char STUB_ZERO_KEY[] =
 	"_ZERO eax\n"//"xor eax, eax\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
 	"@zero_key:\n"
-	"_SET [rsp+rcx], al\n" //"mov [rsp+rcx], al\n"
+	"mov [rsp+rcx], al\n" //"mov [rsp+rcx], al\n"
 	"_INC ecx\n"
 	"cmp ecx, 16\n"
 	"jl @zero_key\n"

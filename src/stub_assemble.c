@@ -115,7 +115,7 @@ char *build_stub_source(t_opts *opts)
 
             blocks[n++] = STUB_WRITE_WOODY;
             blocks[n++] = STUB_AFTER_LDE;
-            blocks[n++] = STUB_SCAN_END;
+            blocks[n++] = STUB_SCAN_END;//
             
             if (opts->debug_display)
             {
