@@ -90,10 +90,7 @@ static int64_t	sym(t_asm *a, const char *n)
 	int i;
 
 	if (!strcmp(n,"prot_addr"))
-	{
-		printf("VIRTADDR %ld\n", (int64_t)(a->crypto->text_vaddr & ~(uint64_t)0xFFF));
 		return (int64_t)(a->crypto->text_vaddr & ~(uint64_t)0xFFF);
-	}
 	if (!strcmp(n,"prot_size"))
 		return (int64_t)(((a->crypto->text_vaddr & 0xFFF)
 				+ a->crypto->text_len + 0xFFF) & ~(size_t)0xFFF);
