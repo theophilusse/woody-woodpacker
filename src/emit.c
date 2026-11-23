@@ -316,7 +316,7 @@ int	emit_and_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
 {
 	uint8_t b[7];
 	int n = 0;
-	uint8_t rex = mk_rex(1, 0, reg); /* REX.W */
+	uint8_t rex = mk_rex(1, 0, reg) | 0x08; /* REX.W */
 
 	if (rex != 0x40)
 		b[n++] = rex;
