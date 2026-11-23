@@ -77,11 +77,6 @@ char *build_stub_source(t_opts *opts)
             blocks[n++] = STUB_SCAN_START;
             blocks[n++] = STUB_HEADER;
 
-            /* ── Source de la clé : LDE ou copie directe en clair ── */
-            if (opts->use_lde)
-                blocks[n++] = STUB_ZERO_KEY;
-            else
-                blocks[n++] = STUB_ZERO_KEY_NOLDE;
             /* ── Anti-debug (ptrace) ── */
             if (opts->use_antidebug)
             {
@@ -92,6 +87,12 @@ char *build_stub_source(t_opts *opts)
             }
             blocks[n++] = STUB_NO_ANTIDEBUG;
             blocks[n++] = STUB_EVASION_COMPLETE;
+
+            /* ── Source de la clé : LDE ou copie directe en clair ── */
+            if (opts->use_lde)
+                blocks[n++] = STUB_ZERO_KEY;
+            else
+                blocks[n++] = STUB_ZERO_KEY_NOLDE;
 
             /* ── Corps du LDE : actif (scan complet) ou bypass (rbp deja rempli) ── */
             if (opts->use_lde)
