@@ -192,8 +192,6 @@ int emit_sub_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 int emit_mov_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 int emit_xor_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 
-int emit_xchg_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg,
-                          int32_t disp, int force_disp8);
 int emit_xchg_mem_sib_r16(t_emitter *e, t_reg base, t_reg idx, t_reg reg,
                            int32_t disp, int force_disp8);
 int emit_xchg_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg reg,

@@ -1456,18 +1456,6 @@ int emit_call_indirect_sib(t_emitter *e, t_reg base, t_reg idx, int scale, int32
 	return emit_raw(e, b, n);
 }
 
-int emit_xchg_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg,
-                          int32_t disp, int force_disp8)
-{
-    uint8_t b[12]; int n = 0;
-    uint8_t rex = mk_rex_sib(0, reg, idx, base);
-
-    if (rex != 0x40 || (reg >= 4 && reg <= 7)) b[n++] = rex;
-    b[n++] = 0x86;
-    emit_modrm_sib_disp(b, &n, reg, base, idx, 0, disp, force_disp8);
-    return emit_raw(e, b, n);
-}
-
 int emit_xchg_mem_sib_r16(t_emitter *e, t_reg base, t_reg idx, t_reg reg,
                            int32_t disp, int force_disp8)
 {
