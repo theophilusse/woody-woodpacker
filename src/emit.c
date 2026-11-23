@@ -312,6 +312,22 @@ int	emit_and_r64_imm8(t_emitter *e, t_reg dst, uint8_t imm)
 	return emit_raw(e, b, 4);
 }
 
+int	emit_and_r64_imm32(t_emitter *e, t_reg reg, int32_t imm)
+{
+	uint8_t b[7];
+	int n = 0;
+	uint8_t rex = mk_rex(1, 0, reg); /* REX.W */
+
+	if (rex != 0x40)
+		b[n++] = rex;
+	b[n++] = 0x81;
+	b[n++] = MODRM11(4, reg); /* opcode /4 = AND */
+	memcpy(b + n, &imm, 4);
+	n += 4;
+
+	return emit_raw(e, b, n);
+}
+
 /* ── add ─────────────────────────────────────────────────────── */
 int	emit_add_r8_r8(t_emitter *e, t_reg dst, t_reg src)
 {

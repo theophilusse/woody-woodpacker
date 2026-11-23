@@ -115,6 +115,7 @@ int emit_add_r64_imm8(t_emitter *e, t_reg reg, int8_t imm);
 int emit_and_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm);
 int emit_and_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm);
 int emit_sar_r32_imm8(t_emitter *e, t_reg reg, uint8_t imm);
+int	emit_and_r64_imm32(t_emitter *e, t_reg reg, int32_t imm);
 int emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src);
 int emit_movzx_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base);
 int emit_movzx_r32_mem_disp8(t_emitter *e, t_reg dst, t_reg base, int8_t disp);
