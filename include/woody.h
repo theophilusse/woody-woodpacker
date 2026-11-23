@@ -18,6 +18,7 @@
 # define WOODY_MSG_LEN 14
 # define EVASION_MSG "F*ck you\n"
 # define EVASION_MSG_LEN 9
+# define LDE_VERIFICATION 1
 
 # define DEBUG_MODE 0
 # define DEBUG printf("DEBUG: %s:%d\n", __FILE__, __LINE__);
