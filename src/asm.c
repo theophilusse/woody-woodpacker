@@ -1095,6 +1095,12 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		return -1;
 	}
 	*/
+	if (!strcmp(toks[0], "xchg") && n == 3 && toks[1][0] == '[')
+    {
+        mt = pmem(toks[1], &base, &idx, lbl, &d8);
+        if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
+            { emit_xchg_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
+    }
 	if (!strcmp(toks[0], "lea") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
 	{
 		mt = pmem(toks[2], &base, &idx, lbl, &d8);
