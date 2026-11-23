@@ -73,7 +73,7 @@ char *build_stub_source(t_opts *opts)
         }
         else
         {
-            //blocks[n++] = STUB_SCAN_START;
+            blocks[n++] = STUB_SCAN_START;
             blocks[n++] = STUB_HEADER;
 
             /* ── Anti-debug (ptrace) ── */
@@ -92,8 +92,6 @@ char *build_stub_source(t_opts *opts)
                 blocks[n++] = STUB_ZERO_KEY;
             else
                 blocks[n++] = STUB_ZERO_KEY_NOLDE;
-
-            blocks[n++] = STUB_SCAN_START;
 
             /* ── Corps du LDE : actif (scan complet) ou bypass (rbp deja rempli) ── */
             if (opts->use_lde)
@@ -115,8 +113,6 @@ char *build_stub_source(t_opts *opts)
             }
             blocks[n++] = STUB_LDE_DONE;
 
-            blocks[n++] = STUB_SCAN_END;
-
             blocks[n++] = STUB_WRITE_WOODY;
             blocks[n++] = STUB_AFTER_LDE;
             
@@ -126,6 +122,7 @@ char *build_stub_source(t_opts *opts)
                 blocks[n++] = STUB_DEBUG_HEXBUF_WRITE;
                 blocks[n++] = STUB_DEBUG_HEXBUF_TEARDOWN;
             }
+            blocks[n++] = STUB_SCAN_END;//
             blocks[n++] = STUB_PIE_BASE_CALC;
             blocks[n++] = STUB_MPROTECT;
             blocks[n++] = STUB_KSA;
