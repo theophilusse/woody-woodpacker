@@ -693,8 +693,8 @@ static const char STUB_PRGA[] =
 
 static const char STUB_FREE[] =
 	"mov rsp, r12\n"
-	"pop rdx\n"
-	"pop rbp\n";
+	"pop rbp\n"
+	"pop rdx\n";
 
 static const char STUB_SCAN_END[] =
 	"scan_end:\n";

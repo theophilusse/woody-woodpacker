@@ -607,7 +607,17 @@ int	emit_movzx_r32_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
 	uint8_t r = mk_rex_sib(0, dst, idx, base);
 	if (r != 0x40) b[n++] = r;
 	b[n++] = 0x0F; b[n++] = 0xB6;
-	b[n++] = MODRM00(dst, 4); b[n++] = SIB(0, idx, base);
+    if ((base & 7) == 5)
+	{
+		b[n++] = MODRM01(dst, 4);
+		b[n++] = SIB(0, idx, base);
+		b[n++] = 0x00; // disp8 = 0 obligatoire pour garder les registres en base avec mod=01
+	}
+	else
+	{
+		b[n++] = MODRM00(dst, 4);
+		b[n++] = SIB(0, idx, base);
+	}
 	return emit_raw(e, b, n);
 }
 
