@@ -1034,7 +1034,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		if (mt != 1) idx = REG_RSP;
 
-		if (regsz == 8)  { emit_xchg_mem_sib_r8 (&a->out->e, base, idx, reg, d8); return 0; }
+		if (regsz == 8)  { emit_xchg_mem_sib_r8 (&a->out->e, base, idx, reg); return 0; }
 		if (regsz == 16) { emit_xchg_mem_sib_r16(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
 		if (regsz == 32) { emit_xchg_mem_sib_r32(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
 		if (regsz == 64) { emit_xchg_mem_sib_r64(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
@@ -1144,9 +1144,9 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		if (regsz == 8)
 		{
 			emit_xor_r8_r8(&a->out->e, STORE_T1, STORE_T1);
-			emit_xchg_mem_sib_r8(&a->out->e, base, idx, STORE_T1, d8);
+			emit_xchg_mem_sib_r8(&a->out->e, base, idx, STORE_T1);
 			emit_mov_r8_r8(&a->out->e, STORE_T2, reg);
-			emit_xadd_mem_sib_r8(&a->out->e, base, idx, STORE_T2, d8);
+			emit_xadd_mem_sib_r8(&a->out->e, base, idx, STORE_T2);
 			emit_mov_r8_r8(&a->out->e, REG_RAX, reg);
 			emit_mov_r8_r8(&a->out->e, STORE_T3, reg);
 			emit_cmpxchg_mem_sib_r8(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
