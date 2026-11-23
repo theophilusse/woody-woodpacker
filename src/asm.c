@@ -1158,7 +1158,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		if (regsz == 8)
 		{
 			emit_xor_r8_r8(&a->out->e, STORE_T1, STORE_T1);
-			emit_xchg_mem_sib_r8(&a->out->e, base, idx, STORE_T1, d8);
+			emit_xchg_mem_sib_r8(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
 			emit_mov_r8_r8(&a->out->e, STORE_T2, reg);
 			emit_xadd_mem_sib_r8(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
 			emit_mov_r8_r8(&a->out->e, REG_RAX, reg);
@@ -1179,7 +1179,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		else if (regsz == 32)
 		{
 			emit_xor_r32_r32(&a->out->e, STORE_T1, STORE_T1);
-			emit_xchg_mem_sib_r32(&a->out->e, base, idx, STORE_T1, d8);
+			emit_xchg_mem_sib_r32(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
 			emit_mov_r32_r32(&a->out->e, STORE_T2, reg);
 			emit_xadd_mem_sib_r32(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
 			emit_mov_r32_r32(&a->out->e, REG_RAX, reg);
@@ -1189,7 +1189,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		else
 		{
 			emit_xor_r64_r64(&a->out->e, STORE_T1, STORE_T1);
-			emit_xchg_mem_sib_r64(&a->out->e, base, idx, STORE_T1, d8);
+			emit_xchg_mem_sib_r64(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
 			emit_mov_r64_r64(&a->out->e, STORE_T2, reg);
 			emit_xadd_mem_sib_r64(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
 			emit_mov_r64_r64(&a->out->e, REG_RAX, reg);

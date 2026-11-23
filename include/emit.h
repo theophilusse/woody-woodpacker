@@ -92,8 +92,8 @@ int		emit_test_r8_r8(t_emitter *e, t_reg reg1, t_reg reg2);
 int		emit_mov_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src);
 int		emit_movzx_r32_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
 int		emit_add_r8_mem_sib8(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
-int		emit_xchg_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg);
-int		emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg);
+int emit_xchg_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg,
+                          int32_t disp, int force_disp8);int		emit_xor_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg reg);
 int		emit_or_mem_sib_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src);
 int		emit_or_mem_sib_disp8_r8(t_emitter *e, t_reg base, t_reg idx, t_reg src, int8_t disp);
 int		emit_mov_r32_mem_reg(t_emitter *e, t_reg dst, t_reg base);
