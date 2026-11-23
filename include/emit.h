@@ -33,6 +33,8 @@ int		emit_raw(t_emitter *e, const uint8_t *bytes, size_t n);
 void	patch_disp32(t_emitter *e, size_t at, int32_t value);
 void	patch_disp32_buf(uint8_t *buf, size_t at, int32_t value);
 
+int		emit_int3(t_emitter *e);
+
 /* registres / immediats */
 int		emit_mov_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm);
 int		emit_mov_r64_imm64(t_emitter *e, t_reg dst, uint64_t imm);

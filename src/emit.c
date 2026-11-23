@@ -89,6 +89,13 @@ void	patch_disp32(t_emitter *e, size_t at, int32_t value)
 void	patch_disp32_buf(uint8_t *buf, size_t at, int32_t value)
 	{ memcpy(buf + at, &value, 4); }
 
+/* INT3 : CC (breakpoint / trap debogueur) */
+int emit_int3(t_emitter *e)
+{
+	uint8_t b = 0xCC;
+	return emit_raw(e, &b, 1);
+}
+
 /* ── pile ────────────────────────────────────────────────────── */
 int emit_push_r64(t_emitter *e, t_reg reg)
 {

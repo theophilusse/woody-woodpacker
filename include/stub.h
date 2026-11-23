@@ -648,6 +648,7 @@ static const char STUB_MPROTECT[] =
 "mprotect_ok:\n";
 
 static const char STUB_KSA[] =
+"break\n" // DEBUG
 "sub rsp, 256\n"
 "_SET r9, rsp\n"
 "_SET rsi, rbp\n"
@@ -690,7 +691,8 @@ static const char STUB_PRGA[] =
 "xor [rdi+rbx], al\n"
 "_INC rbx\n"
 "cmp ebx, text_len\n"
-"jl @prga_loop\n";
+"jl @prga_loop\n"
+"break\n"; // DEBUG
 
 static const char STUB_FREE[] =
 	"mov rsp, r12\n"
