@@ -856,13 +856,12 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
 			emit_and_r32_imm32(&a->out->e, r1, (uint32_t)val);   /* REVERT : toujours forme longue */
 		}
-		/*
 		else if (s1 == 64)
 		{
 			val = sym(a, toks[2]);
 			if (val < 0) val = strtoll(toks[2], NULL, 0);
 			emit_and_r64_imm32(&a->out->e, r1, (int32_t)val);
-		}*/
+		}
 		return 0;
 	}
 	if (!strcmp(toks[0], "neg") && n == 2 && preg(toks[1], &r1, &s1))

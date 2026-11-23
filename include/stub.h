@@ -633,7 +633,7 @@ static const char STUB_PIE_BASE_CALC[] =
 static const char STUB_MPROTECT[] =
 "_SET rdi, rax\n"
 "add rdi, prot_addr\n"
-//"and rdi, -4096\n" // DEBUGGING : alignement page
+"and rdi, -4096\n" // DEBUGGING : alignement page
 "mov esi, prot_size\n"
 "_SET edx, 7\n"
 "_SET eax, 10\n"
