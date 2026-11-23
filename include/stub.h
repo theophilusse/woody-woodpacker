@@ -8,7 +8,7 @@ static const char STUB_HEADER[] =
 	// preserves _dl_fini que le kernel passe dans rdx
 	"push rdx\n"
 	"push rbp\n"
-	"mov r12, rsp\n";
+	"_SET r12, rsp\n";
 
 static const char STUB_ANTIDEBUG_1[] =
     //////////////////////////// ANTI_DEBUG ////////////////////////////
@@ -54,7 +54,7 @@ static const char STUB_ZERO_KEY[] =
 	"_ZERO eax\n"//"xor eax, eax\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
 	"@zero_key:\n"
-	"mov [rsp+rcx], al\n" //"mov [rsp+rcx], al\n"
+	"_STORE [rsp+rcx], al\n" //"mov [rsp+rcx], al\n" // BATMAN
 	"_INC ecx\n"
 	"cmp ecx, 16\n"
 	"jl @zero_key\n"
@@ -68,7 +68,7 @@ static const char STUB_ZERO_KEY_NOLDE[] =
 	"_ZERO ecx\n"
 	"@copy_key_plain:\n"
 	"_SET al, [rsi+rcx]\n"
-	"mov [rbp+rcx], al\n"
+	"_STORE [rbp+rcx], al\n"
 	"_INC ecx\n"
 	"cmp ecx, 16\n"
 	"jl @copy_key_plain\n"
@@ -583,7 +583,7 @@ static const char STUB_DEBUG_HEXBUF_SETUP[] =
 ".digit_high:\n"
 "add ecx, 48\n"
 ".store_high:\n"
-"mov [r9+r11], cl\n"
+"_STORE [r9+r11], cl\n"//"mov [r9+r11], cl\n"
 "_INC r11\n"
 "_SET ecx, ebx\n"
 "and ecx, 15\n"
@@ -594,7 +594,7 @@ static const char STUB_DEBUG_HEXBUF_SETUP[] =
 ".digit_low:\n"
 "add ecx, 48\n"
 ".store_low:\n"
-"mov [r9+r11], cl\n"
+"_STORE [r9+r11], cl\n"//"mov [r9+r11], cl\n"
 "_INC r11\n"
 "_INC r10\n"
 "_DEC eax\n"
@@ -613,7 +613,7 @@ static const char STUB_DEBUG_HEXBUF_WRITE[] =
 "_SET rax, 1\n" "_SET rdi, 1\n" "_SET rsi, r9\n" "_SET rdx, 32\n"
 "syscall\n"
 "mov cl, 10\n"
-"mov [r9+32], cl\n"
+"_STORE [r9+32], cl\n"//"mov [r9+32], cl\n"
 "_SET rax, 1\n" "_SET rdi, 1\n"
 "_SET rsi, r9\n" "add rsi, 32\n"
 "_SET rdx, 1\n"
@@ -628,12 +628,12 @@ static const char STUB_PIE_BASE_CALC[] =
 "mov rdx, pie_base_marker\n"
 "sub rax, rdx\n"
 "sub rax, stub_load_vaddr\n"
-"_SET r15, rax\n";
+"_SET rbp, rax\n";
 
 static const char STUB_MPROTECT[] =
 "_SET rdi, rax\n"
 "add rdi, prot_addr\n"
-"and rdi, -4096\n" // DEBUGGING : alignement page
+"and rdi, -4096\n" // alignement page
 "mov esi, prot_size\n"
 "_SET edx, 7\n"
 "_SET eax, 10\n"
@@ -649,44 +649,44 @@ static const char STUB_MPROTECT[] =
 
 static const char STUB_KSA[] =
 "sub rsp, 256\n"
-"_SET r13, rsp\n"
+"_SET r9, rsp\n"
 "_SET rsi, rbp\n"
 "_ZERO ecx\n"
 "@ksa_init:\n"
-"mov [r13+rcx], cl\n"
+"_STORE [r9+rcx], cl\n"//"mov [r9+rcx], cl\n"
 "_INC cl\n"
 "jnz @ksa_init\n"
 "_ZERO ecx\n"
 "_ZERO edx\n"
 "@ksa_loop:\n"
-"_SET eax, [r13+rcx]\n"
+"_SET eax, [r9+rcx]\n"
 "add dl, al\n"
 "mov al, cl\n"
 "and al, key_mask\n"
 "_SET eax, al\n"
 "_SET eax, [rsi+rax]\n"
 "add dl, al\n"
-"_SET eax, [r13+rcx]\n"
-"xchg [r13+rdx], al\n"
-"mov [r13+rcx], al\n"
+"_SET eax, [r9+rcx]\n"
+"xchg [r9+rdx], al\n"
+"_STORE [r9+rcx], al\n"//"mov [r9+rcx], al\n"
 "_INC cl\n"
 "jnz @ksa_loop\n";
 
 static const char STUB_PRGA[] =
-"_SET rdi, r15\n"
+"_SET rdi, rbp\n"
 "add rdi, text_vaddr\n"
 "_ZERO ecx\n"
 "_ZERO edx\n"
 "_ZERO ebx\n"
 "@prga_loop:\n"
 "_INC cl\n"
-"_SET eax, [rsp+rcx]\n"
+"_SET eax, [r9+rcx]\n"
 "add dl, al\n"
-"xchg [rsp+rdx], al\n"
-"mov [rsp+rcx], al\n"
-"add al, [rsp+rdx]\n"
+"xchg [r9+rdx], al\n"
+"_STORE [r9+rcx], al\n"//"mov [r9+rcx], al\n"
+"add al, [r9+rdx]\n"
 "_SET eax, al\n"
-"_SET eax, [rsp+rax]\n"
+"_SET eax, [r9+rax]\n"
 "xor [rdi+rbx], al\n"
 "_INC rbx\n"
 "cmp ebx, text_len\n"

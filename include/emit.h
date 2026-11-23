@@ -192,6 +192,17 @@ int emit_sub_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 int emit_mov_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 int emit_xor_mem_disp8_imm8(t_emitter *e, t_reg base, int8_t disp, uint8_t imm);
 
+int emit_xchg_mem_sib(t_emitter *e, int sz, t_reg reg,
+                       t_reg base, t_reg idx, uint8_t scale,
+                       int32_t disp, int force_disp8);
+int emit_xadd_mem_sib(t_emitter *e, int sz, t_reg reg,
+                       t_reg base, t_reg idx, uint8_t scale,
+                       int32_t disp, int force_disp8);
+int emit_cmpxchg_mem_sib(t_emitter *e, int sz, t_reg reg,
+                          t_reg base, t_reg idx, uint8_t scale,
+                          int32_t disp, int force_disp8);
+
+
 /* opcodes jcc utiles */
 # define JL   0x7C
 # define JNZ  0x75

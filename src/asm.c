@@ -1012,6 +1012,87 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			}
 		}
 	}
+	if (!strcmp(toks[0], "xchg") && n == 3)
+	{
+		t_reg reg;
+		int   regsz;
+		char  *memtok = NULL, *regtok = NULL;
+
+		if (toks[1][0] == '[') { memtok = toks[1]; regtok = toks[2]; }
+		else if (toks[2][0] == '[') { memtok = toks[2]; regtok = toks[1]; }
+
+		if (!memtok || !preg(regtok, &reg, &regsz))
+		{
+			fprintf(stderr, "asm: xchg attend (reg,[mem]) ou ([mem],reg)\n");
+			return -1;
+		}
+		mt = pmem(memtok, &base, &idx, lbl, &d8);
+		if (mt != 1 && mt != 3 && mt != 4)
+		{
+			fprintf(stderr, "asm: xchg [mem] (mt=%d) non gere\n", mt);
+			return -1;
+		}
+		if (mt != 1) idx = REG_RSP;
+
+		if (regsz == 8)  { emit_xchg_mem_sib_r8 (&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 16) { emit_xchg_mem_sib_r16(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 32) { emit_xchg_mem_sib_r32(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 64) { emit_xchg_mem_sib_r64(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		fprintf(stderr, "asm: xchg taille de registre inconnue (%d)\n", regsz);
+		return -1;
+	}
+
+	if (!strcmp(toks[0], "xadd") && n == 3 && toks[1][0] == '[')
+	{
+		t_reg reg;
+		int   regsz;
+
+		if (!preg(toks[2], &reg, &regsz))
+		{
+			fprintf(stderr, "asm: xadd attend un registre en 2e operande\n");
+			return -1;
+		}
+		mt = pmem(toks[1], &base, &idx, lbl, &d8);
+		if (mt != 1 && mt != 3 && mt != 4)
+		{
+			fprintf(stderr, "asm: xadd [mem] (mt=%d) non gere\n", mt);
+			return -1;
+		}
+		if (mt != 1) idx = REG_RSP;
+
+		if (regsz == 8)  { emit_xadd_mem_sib_r8 (&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 16) { emit_xadd_mem_sib_r16(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 32) { emit_xadd_mem_sib_r32(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 64) { emit_xadd_mem_sib_r64(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		fprintf(stderr, "asm: xadd taille de registre inconnue (%d)\n", regsz);
+		return -1;
+	}
+
+	if (!strcmp(toks[0], "cmpxchg") && n == 3 && toks[1][0] == '[')
+	{
+		t_reg reg;
+		int   regsz;
+
+		if (!preg(toks[2], &reg, &regsz))
+		{
+			fprintf(stderr, "asm: cmpxchg attend un registre en 2e operande\n");
+			return -1;
+		}
+		mt = pmem(toks[1], &base, &idx, lbl, &d8);
+		if (mt != 1 && mt != 3 && mt != 4)
+		{
+			fprintf(stderr, "asm: cmpxchg [mem] (mt=%d) non gere\n", mt);
+			return -1;
+		}
+		if (mt != 1) idx = REG_RSP;
+
+		if (regsz == 8)  { emit_cmpxchg_mem_sib_r8 (&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 16) { emit_cmpxchg_mem_sib_r16(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 32) { emit_cmpxchg_mem_sib_r32(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		if (regsz == 64) { emit_cmpxchg_mem_sib_r64(&a->out->e, base, idx, reg, d8, mt == 4); return 0; }
+		fprintf(stderr, "asm: cmpxchg taille de registre inconnue (%d)\n", regsz);
+		return -1;
+	}
 	if (!strcmp(toks[0], "lea") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
 	{
 		mt = pmem(toks[2], &base, &idx, lbl, &d8);
@@ -1034,11 +1115,79 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			if (mt == 4) { emit_movzx_r32_mem_disp8(&a->out->e, r1, base, d8); return 0; }
 		}
 	}
-	if (!strcmp(toks[0], "xchg") && n == 3 && toks[1][0] == '[')
+	#define STORE_T1 REG_R13
+	#define STORE_T2 REG_R14
+	#define STORE_T3 REG_R15
+	if (!strcmp(toks[0], "_store") && n == 3 && toks[1][0] == '[')
 	{
+		t_reg reg;
+		int   regsz;
+
+		if (!preg(toks[2], &reg, &regsz))
+		{
+			fprintf(stderr, "asm: _store attend un registre en 2e operande\n");
+			return -1;
+		}
 		mt = pmem(toks[1], &base, &idx, lbl, &d8);
-		if (mt == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
-			{ emit_xchg_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
+		if (mt != 1 && mt != 3 && mt != 4)
+		{
+			fprintf(stderr, "asm: _store [mem] (mt=%d) non gere\n", mt);
+			return -1;
+		}
+		if (mt != 1) idx = REG_RSP;
+
+		/* [mem] = reg, jamais via "mov [mem], reg", reg jamais ecrit :
+		**  1) xchg    : vide [mem] vers T1 (parti de 0)      -> [mem] = 0
+		**  2) xadd    : ajoute une copie de reg (T2) a [mem] -> [mem] = reg
+		**  3) cmpxchg : reconfirme atomiquement [mem] == reg -> detecte une interference (ZF)
+		** sacrifie R13/R14/R15. */
+		if (regsz == 8)
+		{
+			emit_xor_r8_r8(&a->out->e, STORE_T1, STORE_T1);
+			emit_xchg_mem_sib_r8(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
+			emit_mov_r8_r8(&a->out->e, STORE_T2, reg);
+			emit_xadd_mem_sib_r8(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
+			emit_mov_r8_r8(&a->out->e, REG_RAX, reg);
+			emit_mov_r8_r8(&a->out->e, STORE_T3, reg);
+			emit_cmpxchg_mem_sib_r8(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
+			return 0;
+		}
+		/*
+		if (regsz == 16)
+		{
+			emit_xor_r16_r16(&a->out->e, STORE_T1, STORE_T1);
+			emit_xchg_mem_sib_r16(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
+			emit_mov_r16_r16(&a->out->e, STORE_T2, reg);
+			emit_xadd_mem_sib_r16(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
+			emit_mov_r16_r16(&a->out->e, REG_RAX, reg);
+			emit_mov_r16_r16(&a->out->e, STORE_T3, reg);
+			emit_cmpxchg_mem_sib_r16(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
+			return 0;
+		}*/
+		if (regsz == 32)
+		{
+			emit_xor_r32_r32(&a->out->e, STORE_T1, STORE_T1);
+			emit_xchg_mem_sib_r32(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
+			emit_mov_r32_r32(&a->out->e, STORE_T2, reg);
+			emit_xadd_mem_sib_r32(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
+			emit_mov_r32_r32(&a->out->e, REG_RAX, reg);
+			emit_mov_r32_r32(&a->out->e, STORE_T3, reg);
+			emit_cmpxchg_mem_sib_r32(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
+			return 0;
+		}
+		if (regsz == 64)
+		{
+			emit_xor_r64_r64(&a->out->e, STORE_T1, STORE_T1);
+			emit_xchg_mem_sib_r64(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
+			emit_mov_r64_r64(&a->out->e, STORE_T2, reg);
+			emit_xadd_mem_sib_r64(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
+			emit_mov_r64_r64(&a->out->e, REG_RAX, reg);
+			emit_mov_r64_r64(&a->out->e, STORE_T3, reg);
+			emit_cmpxchg_mem_sib_r64(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
+			return 0;
+		}
+		fprintf(stderr, "asm: _store taille de registre inconnue (%d)\n", regsz);
+		return -1;
 	}
 	if (!strcmp(toks[0], "test") && n == 3 && preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
 	{
