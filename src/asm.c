@@ -1130,10 +1130,16 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 	{
 		t_reg reg;
 		int   regsz;
+		uint8_t push_rax = 0x50, pop_rax = 0x58;
 
 		if (!preg(toks[2], &reg, &regsz))
 		{
 			fprintf(stderr, "asm: _store attend un registre en 2e operande\n");
+			return -1;
+		}
+		if (regsz != 8 && regsz != 16 && regsz != 32 && regsz != 64)
+		{
+			fprintf(stderr, "asm: _store taille de registre inconnue (%d)\n", regsz);
 			return -1;
 		}
 		mt = pmem(toks[1], &base, &idx, lbl, &d8);
@@ -1144,24 +1150,23 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		}
 		if (mt != 1) idx = REG_RSP;
 
-		/* [mem] = reg, jamais via "mov [mem], reg", reg jamais ecrit :
-		**  1) xchg    : vide [mem] vers T1 (parti de 0)      -> [mem] = 0
-		**  2) xadd    : ajoute une copie de reg (T2) a [mem] -> [mem] = reg
-		**  3) cmpxchg : reconfirme atomiquement [mem] == reg -> detecte une interference (ZF)
-		** sacrifie R13/R14/R15. */
+		/* cmpxchg impose AL/AX/EAX/RAX comme accumulateur de comparaison :
+		** on sauvegarde le rax de l'appelant autour de toute la sequence
+		** pour que _store ne corrompe plus rien en dehors de R13/R14/R15. */
+		emit_raw(&a->out->e, &push_rax, 1);
+
 		if (regsz == 8)
 		{
 			emit_xor_r8_r8(&a->out->e, STORE_T1, STORE_T1);
-			emit_xchg_mem_sib_r8(&a->out->e, base, idx, STORE_T1);
+			emit_xchg_mem_sib_r8(&a->out->e, base, idx, STORE_T1, d8);
 			emit_mov_r8_r8(&a->out->e, STORE_T2, reg);
 			emit_xadd_mem_sib_r8(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
 			emit_mov_r8_r8(&a->out->e, REG_RAX, reg);
 			emit_mov_r8_r8(&a->out->e, STORE_T3, reg);
 			emit_cmpxchg_mem_sib_r8(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
-			return 0;
 		}
 		/*
-		if (regsz == 16)
+		else if (regsz == 16)
 		{
 			emit_xor_r16_r16(&a->out->e, STORE_T1, STORE_T1);
 			emit_xchg_mem_sib_r16(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
@@ -1170,32 +1175,30 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_mov_r16_r16(&a->out->e, REG_RAX, reg);
 			emit_mov_r16_r16(&a->out->e, STORE_T3, reg);
 			emit_cmpxchg_mem_sib_r16(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
-			return 0;
 		}*/
-		if (regsz == 32)
+		else if (regsz == 32)
 		{
 			emit_xor_r32_r32(&a->out->e, STORE_T1, STORE_T1);
-			emit_xchg_mem_sib_r32(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
+			emit_xchg_mem_sib_r32(&a->out->e, base, idx, STORE_T1, d8);
 			emit_mov_r32_r32(&a->out->e, STORE_T2, reg);
 			emit_xadd_mem_sib_r32(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
 			emit_mov_r32_r32(&a->out->e, REG_RAX, reg);
 			emit_mov_r32_r32(&a->out->e, STORE_T3, reg);
 			emit_cmpxchg_mem_sib_r32(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
-			return 0;
 		}
-		if (regsz == 64)
+		else
 		{
 			emit_xor_r64_r64(&a->out->e, STORE_T1, STORE_T1);
-			emit_xchg_mem_sib_r64(&a->out->e, base, idx, STORE_T1, d8, mt == 4);
+			emit_xchg_mem_sib_r64(&a->out->e, base, idx, STORE_T1, d8);
 			emit_mov_r64_r64(&a->out->e, STORE_T2, reg);
 			emit_xadd_mem_sib_r64(&a->out->e, base, idx, STORE_T2, d8, mt == 4);
 			emit_mov_r64_r64(&a->out->e, REG_RAX, reg);
 			emit_mov_r64_r64(&a->out->e, STORE_T3, reg);
 			emit_cmpxchg_mem_sib_r64(&a->out->e, base, idx, STORE_T3, d8, mt == 4);
-			return 0;
 		}
-		fprintf(stderr, "asm: _store taille de registre inconnue (%d)\n", regsz);
-		return -1;
+
+		emit_raw(&a->out->e, &pop_rax, 1);
+		return 0;
 	}
 	if (!strcmp(toks[0], "test") && n == 3 && preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
 	{
