@@ -1012,6 +1012,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			}
 		}
 	}
+	/*
 	if (!strcmp(toks[0], "xchg") && n == 3)
 	{
 		t_reg reg;
@@ -1093,12 +1094,13 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		fprintf(stderr, "asm: cmpxchg taille de registre inconnue (%d)\n", regsz);
 		return -1;
 	}
+	*/
 	if (!strcmp(toks[0], "lea") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
 	{
 		mt = pmem(toks[2], &base, &idx, lbl, &d8);
 		if (mt == 2) { lea_label(a, r1, lbl); return 0; }
 		if (mt == 4) { emit_lea_r64_mem_disp8(&a->out->e, r1, base, d8); return 0; }
-		if (mt == 3) { emit_lea_r64_reg0(&a->out->e, r1, base); return 0; }  /* deja existante, disp=0 */
+		if (mt == 3) { emit_lea_r64_reg0(&a->out->e, r1, base); return 0; }  // deja existante, disp=0
 		fprintf(stderr, "asm: lea %s,%s (mt=%d) non gere\n", toks[1], toks[2], mt);
 		return -1;
 	}
