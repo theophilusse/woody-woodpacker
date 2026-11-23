@@ -1854,6 +1854,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
 
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
+	#define LDE_VERIFICATION 1
 	#ifdef LDE_VERIFICATION
 	if (opts->use_lde)
     {
