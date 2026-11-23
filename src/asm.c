@@ -1012,7 +1012,6 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			}
 		}
 	}
-	/*
 	if (!strcmp(toks[0], "xchg") && n == 3)
 	{
 		t_reg reg;
@@ -1094,7 +1093,6 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		fprintf(stderr, "asm: cmpxchg taille de registre inconnue (%d)\n", regsz);
 		return -1;
 	}
-	*/
 	if (!strcmp(toks[0], "xchg") && n == 3 && toks[1][0] == '[')
     {
         mt = pmem(toks[1], &base, &idx, lbl, &d8);
