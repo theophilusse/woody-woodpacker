@@ -122,12 +122,11 @@ char *build_stub_source(t_opts *opts)
                 blocks[n++] = STUB_DEBUG_HEXBUF_WRITE;
                 blocks[n++] = STUB_DEBUG_HEXBUF_TEARDOWN;
             }
-            blocks[n++] = STUB_SCAN_END;//
             blocks[n++] = STUB_PIE_BASE_CALC;
             blocks[n++] = STUB_MPROTECT;
             blocks[n++] = STUB_KSA;
             blocks[n++] = STUB_PRGA;
-            //blocks[n++] = STUB_SCAN_END;
+            blocks[n++] = STUB_SCAN_END;
             blocks[n++] = STUB_FREE;
             blocks[n++] = STUB_FOOTER;
 
