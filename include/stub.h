@@ -8,7 +8,7 @@ static const char STUB_HEADER[] =
 	// preserves _dl_fini que le kernel passe dans rdx
 	"push rdx\n"
 	"push rbp\n"
-	"_SET r12, rsp\n";
+	"mov r12, rsp\n";
 
 static const char STUB_ANTIDEBUG_1[] =
     //////////////////////////// ANTI_DEBUG ////////////////////////////
