@@ -54,7 +54,7 @@ static const char STUB_ZERO_KEY[] =
 	"_ZERO eax\n"//"xor eax, eax\n"
 	"_ZERO ecx\n"//"xor ecx, ecx\n"
 	"@zero_key:\n"
-	"_STORE [rsp+rcx], al\n" //"mov [rsp+rcx], al\n" // BATMAN
+	"_STORE [rsp+rcx], al\n" //"mov [rsp+rcx], al\n"
 	"_INC ecx\n"
 	"cmp ecx, 16\n"
 	"jl @zero_key\n"
@@ -628,7 +628,7 @@ static const char STUB_PIE_BASE_CALC[] =
 "mov rdx, pie_base_marker\n"
 "sub rax, rdx\n"
 "sub rax, stub_load_vaddr\n"
-"_SET rbp, rax\n";
+"_SET r10, rax\n"; // BATMAN
 
 static const char STUB_MPROTECT[] =
 "_SET rdi, rax\n"
@@ -651,7 +651,7 @@ static const char STUB_KSA[] =
 "break\n" // DEBUG
 "sub rsp, 256\n"
 "_SET r9, rsp\n"
-"_SET rsi, rbp\n"
+"_SET rsi, r10\n" // BATMAN
 "_ZERO ecx\n"
 "@ksa_init:\n"
 "_STORE [r9+rcx], cl\n"//"mov [r9+rcx], cl\n"
@@ -674,22 +674,22 @@ static const char STUB_KSA[] =
 "jnz @ksa_loop\n";
 
 static const char STUB_PRGA[] =
-"_SET rdi, rbp\n"
+"_SET rdi, r10\n" // BATMAN
 "add rdi, text_vaddr\n"
 "_ZERO ecx\n"
 "_ZERO edx\n"
-"_ZERO ebx\n"
+"_ZERO r8\n"
 "@prga_loop:\n"
 "_INC cl\n"
-"_SET eax, [r9+rcx]\n"
-"add dl, al\n"
-"xchg [r9+rdx], al\n"
-"_STORE [r9+rcx], al\n"//"mov [r9+rcx], al\n"
-"add al, [r9+rdx]\n"
-"_SET eax, al\n"
-"_SET eax, [r9+rax]\n"
-"xor [rdi+rbx], al\n"
-"_INC rbx\n"
+"_SET ebx, [r9+rcx]\n"
+"add dl, bl\n"
+"xchg [r9+rdx], bl\n"
+"_STORE [r9+rcx], bl\n"//"mov [r9+rcx], al\n"
+"add bl, [r9+rdx]\n"
+"_SET ebx, bl\n"
+"_SET ebx, [r9+rax]\n"
+"xor [rdi+r8], bl\n"
+"_INC r8\n"
 "cmp ebx, text_len\n"
 "jl @prga_loop\n"
 "break\n"; // DEBUG
