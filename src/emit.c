@@ -1607,3 +1607,71 @@ int emit_cmpxchg_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg reg,
     emit_modrm_sib_disp(b, &n, reg, base, idx, 0, disp, force_disp8);
     return emit_raw(e, b, n);
 }
+
+int	emit_add_r64_r64(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t	b[3];
+	int		n;
+
+	n = 0;
+	b[n++] = mk_rex(1, src, dst);
+	b[n++] = 0x01;
+	b[n++] = MODRM11(src, dst);
+	return (emit_raw(e, b, n));
+}
+
+int	emit_add_r64_imm8(t_emitter *e, t_reg dst, int8_t imm)
+{
+	uint8_t	b[4];
+	int		n;
+
+	n = 0;
+	b[n++] = mk_rex(1, 0, dst);
+	b[n++] = 0x83;
+	b[n++] = MODRM11(0, dst);
+	b[n++] = (uint8_t)imm;
+	return (emit_raw(e, b, n));
+}
+
+int	emit_add_r64_imm32(t_emitter *e, t_reg dst, int32_t imm)
+{
+	uint8_t	b[7];
+	int		n;
+
+	n = 0;
+	b[n++] = mk_rex(1, 0, dst);
+	b[n++] = 0x81;
+	b[n++] = MODRM11(0, dst);
+	memcpy(b + n, &imm, 4);
+	n += 4;
+	return (emit_raw(e, b, n));
+}
+
+int	emit_add_r32_imm8(t_emitter *e, t_reg dst, int8_t imm)
+{
+	uint8_t	b[4];
+	int		n;
+
+	n = 0;
+	uint8_t r = mk_rex(0, 0, dst);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x83;
+	b[n++] = MODRM11(0, dst);
+	b[n++] = (uint8_t)imm;
+	return (emit_raw(e, b, n));
+}
+
+int	emit_add_r32_imm32(t_emitter *e, t_reg dst, uint32_t imm)
+{
+	uint8_t	b[7];
+	int		n;
+
+	n = 0;
+	uint8_t r = mk_rex(0, 0, dst);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x81;
+	b[n++] = MODRM11(0, dst);
+	memcpy(b + n, &imm, 4);
+	n += 4;
+	return (emit_raw(e, b, n));
+}

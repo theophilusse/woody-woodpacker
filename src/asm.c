@@ -599,15 +599,84 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		fprintf(stderr, "asm: xor [mem],imm (mt=%d) non gere\n", mt);
 		return -1;
 	}
-	if (!strcmp(toks[0], "add") && n == 3 && toks[1][0] == '[' && isdigit((unsigned char)toks[2][0]))
+	if (!strcmp(toks[0], "add") && n == 3)
 	{
-		mt = pmem(toks[1], &base, &idx, lbl, &d8);
-		val = sym(a, toks[2]);
-		if (val < 0) val = strtoll(toks[2], NULL, 0);
-		if (mt == 3) { emit_add_mem_disp8_imm8(&a->out->e, base, 0, (uint8_t)val); return 0; }
-		if (mt == 4) { emit_add_mem_disp8_imm8(&a->out->e, base, d8, (uint8_t)val); return 0; }
-		fprintf(stderr, "asm: add [mem],imm (mt=%d) non gere\n", mt);
-		return -1;
+		/* 1. Mémoire à gauche + immédiat à droite : add [mem], imm */
+		if (toks[1][0] == '[' && toks[2][0] != '[')
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			if (mt == 3)
+				return (emit_add_mem_disp8_imm8(&a->out->e, base, 0, (uint8_t)val));
+			if (mt == 4)
+				return (emit_add_mem_disp8_imm8(&a->out->e, base, d8, (uint8_t)val));
+			fprintf(stderr, "asm: add [mem],imm (mt=%d) non gere\n", mt);
+			return (-1);
+		}
+
+		/* 2. Mémoire à gauche + registre 8 bits à droite : add [mem], r8 */
+		if (toks[1][0] == '[' && preg(toks[2], &r2, &s2) && s2 == 8)
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			if (mt == 1)
+				return (emit_add_r8_mem_r8(&a->out->e, base, idx, r2));
+			fprintf(stderr, "asm: add [mem],r8 (mt=%d) non gere\n", mt);
+			return (-1);
+		}
+
+		/* 3. Registre 8 bits à gauche + mémoire à droite : add r8, [mem] */
+		if (preg(toks[1], &r1, &s1) && s1 == 8 && toks[2][0] == '[')
+		{
+			mt = pmem(toks[2], &base, &idx, lbl, &d8);
+			if (mt == 1)
+				return (emit_add_r8_mem_sib8(&a->out->e, r1, base, idx));
+			fprintf(stderr, "asm: add r8,[mem] (mt=%d) non gere\n", mt);
+			return (-1);
+		}
+
+		/* 4. Registre à gauche + registre à droite : add reg, reg */
+		if (preg(toks[1], &r1, &s1) && preg(toks[2], &r2, &s2))
+		{
+			if (s1 == 64 && s2 == 64)
+				return (emit_add_r64_r64(&a->out->e, r1, r2));
+			if (s1 == 8 && s2 == 8)
+				return (emit_add_r8_r8(&a->out->e, r1, r2));
+			fprintf(stderr, "asm: add r%d,r%d non gere\n", s1, s2);
+			return (-1);
+		}
+
+		/* 5. Registre à gauche + constante / symbole à droite : add reg, imm/sym */
+		if (preg(toks[1], &r1, &s1) && toks[2][0] != '[')
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+
+			if (r1 == REG_RSP && s1 == 64)
+				return (emit_add_rsp_imm32(&a->out->e, (uint32_t)val));
+			if (s1 == 64)
+			{
+				if (val >= -128 && val <= 127)
+					return (emit_add_r64_imm8(&a->out->e, r1, (int8_t)val));
+				return (emit_add_r64_imm32(&a->out->e, r1, (int32_t)val));
+			}
+			if (s1 == 32)
+			{
+				if (val >= -128 && val <= 127)
+					return (emit_add_r32_imm8(&a->out->e, r1, (int8_t)val));
+				return (emit_add_r32_imm32(&a->out->e, r1, (uint32_t)val));
+			}
+			if (s1 == 8)
+			{
+				if (val >= -128 && val <= 127)
+					return (emit_add_r8_imm8(&a->out->e, r1, (uint8_t)val));
+				fprintf(stderr, "asm: add r8 imm hors plage\n");
+				return (-1);
+			}
+		}
+
+		fprintf(stderr, "asm: forme add invalide (%s, %s)\n", toks[1], toks[2]);
+		return (-1);
 	}
 	if (!strcmp(toks[0], "sub") && n == 3 && toks[1][0] == '[' && isdigit((unsigned char)toks[2][0]))
 	{
@@ -874,59 +943,6 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		if (s1 == 8)  { emit_neg_r8(&a->out->e, r1); return 0; }
 		if (s1 == 32) { emit_neg_r32(&a->out->e, r1); return 0; }
 		if (s1 == 64) { emit_neg_r64(&a->out->e, r1); return 0; }
-	}
-	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && r1 == REG_RSP)
-    { emit_add_rsp_imm32(&a->out->e, (uint32_t)strtoll(toks[2], NULL, 0)); return 0; }
-	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
-	{
-		val = sym(a, toks[2]);
-		if (val < 0) val = strtoll(toks[2], NULL, 0);
-		if (val >= -128 && val <= 127)
-			emit_add_r64_imm8(&a->out->e, r1, (int8_t)val);
-		else
-			emit_add_r64_imm32(&a->out->e, r1, (int32_t)val);
-		return 0;
-	}
-	if (!strcmp(toks[0], "add") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
-	{
-		val = sym(a, toks[2]);
-		if (val < 0) val = strtoll(toks[2], NULL, 0);
-		if (val >= -128 && val <= 127)
-			emit_add_r32_imm8(&a->out->e, r1, (int8_t)val);
-		else
-			emit_add_r32_imm32(&a->out->e, r1, (uint32_t)val);
-		return 0;
-	}
-	if (!strcmp(toks[0], "add") && n == 3)
-	{
-		if (toks[1][0] != '[' && toks[2][0] != '[' && preg(toks[1], &r1, &s1) && s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
-			return emit_add_r8_r8(&a->out->e, r1, r2);
-		if (toks[1][0] == '[' && (mt = pmem(toks[1], &base, &idx, lbl, &d8)) == 1 && preg(toks[2], &r2, &s2) && s2 == 8)
-        		return emit_add_r8_mem_r8(&a->out->e, base, idx, r2);
-		if (toks[2][0] == '[' && preg(toks[1], &r1, &s1) && s1 == 8 && (mt = pmem(toks[2], &base, &idx, lbl, &d8)) == 1)
-			return emit_add_r8_mem_sib8(&a->out->e, r1, base, idx);
-		if (toks[2][0] != '[' && preg(toks[1], &r1, &s1))
-		{
-			if (s1 == 8)
-			{
-				val = sym(a, toks[2]);
-				if (val < 0) val = strtoll(toks[2], NULL, 0);
-				if (val >= -128 && val <= 127)
-            		return emit_add_r8_imm8(&a->out->e, r1, (uint8_t)val);
-			}
-			else if (s1 == 32)
-			{
-				val = sym(a, toks[2]);
-				if (val < 0) val = strtoll(toks[2], NULL, 0);
-				return emit_add_r32_imm32(&a->out->e, r1, (uint32_t)val);
-			}
-			else if (s1 == 64)
-			{
-				val = sym(a, toks[2]);
-				if (val < 0) val = strtoll(toks[2], NULL, 0);
-				return emit_add_r64_imm8(&a->out->e, r1, (int64_t)val);
-			}        
-		}
 	}
 	if (!strcmp(toks[0], "mov") && n == 3)
 	{
