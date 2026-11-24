@@ -355,6 +355,7 @@ int main(int argc, char **argv)
         return (usage(argv[0]));
 	}
 	opts = parse_args(argc, argv);
+    printf("woody-woodpacker: %s\nFile: %s\n", argv[0], opts.file);
 
     char magic[5] = {0};
     switch (get_magic(opts.file, magic, sizeof(magic)))
