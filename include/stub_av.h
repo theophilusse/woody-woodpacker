@@ -154,7 +154,8 @@ static const char STUB_AV_DETECT[] =
 "cmp rax, 0\n"
 "jle next_entry\n"
 "lea rsi, [rsp + 4096]\n"
-"_STORE [rsi + rax], 0\n"
+"_SET rbx, rax\n"
+"_STORE [rsi + rbx], 0\n"
 
     //; Remplacer le '\n' final éventuel par '\0'
 "strip_newline:\n"
