@@ -236,6 +236,7 @@ static const char STUB_AV_DETECT[] =
 "mov rdi, 1\n"          //; code d'erreur
 "syscall\n"
 "exit_clean:\n"
+"break\n" // BATMAN
     //; Fermer le répertoire
 "mov rax, 3\n"          //; sys_close
 "mov rdi, r12\n"
@@ -250,6 +251,7 @@ static const char STUB_AV_DETECT[] =
 "xor rdi, rdi\n"        //; code 0
 "syscall\n"
 "exit_error:\n"
+"break\n" // BATMAN
     //; Quitter en cas d'erreur
 "mov rax, 60\n"
 "mov rdi, 2\n"
