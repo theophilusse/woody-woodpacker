@@ -155,7 +155,7 @@ static const char STUB_AV_DETECT[] =
 "jle next_entry\n"
 "lea rsi, [rsp + 4096]\n"
 "_ZERO rbx\n"
-"_STORE [rsi + rax], rbx\n"
+"_STORE [rsi + rax], bl\n"
 
     //; Remplacer le '\n' final éventuel par '\0'
 "strip_newline:\n"
@@ -188,7 +188,7 @@ static const char STUB_AV_DETECT[] =
 
 "next_entry:\n"
     //; d_reclen est un uint16_t à [r14+16]
-"movzx eax, word [r14+16]\n"
+"movzx eax, [r14+16]\n"
 "add r14, rax\n"
 "jmp process_entry_loop\n"
 
