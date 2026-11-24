@@ -86,6 +86,10 @@ char *build_stub_source(t_opts *opts)
                 blocks[n++] = STUB_EVASION_FAIL;
             }
             blocks[n++] = STUB_NO_ANTIDEBUG;
+            if (opts->use_antiav)
+            {
+                blocks[n++] = STUB_ANTIAV;
+            }
             blocks[n++] = STUB_EVASION_COMPLETE;
 
             /* ── Source de la clé : LDE ou copie directe en clair ── */
@@ -136,6 +140,8 @@ char *build_stub_source(t_opts *opts)
             if (opts->use_antidebug)
                 blocks[n++] = STUB_DATA_EVAMSG;
             blocks[n++] = STUB_DATA_WOODYMSG;
+            //if (opts->use_antiav)
+            //    blocks[n++] = STUB_AV_DATA;
             if (!opts->use_lde)
                 blocks[n++] = STUB_DATA_CLEARKEY;
         }

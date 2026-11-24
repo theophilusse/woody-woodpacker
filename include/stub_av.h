@@ -56,7 +56,6 @@ static const char STUB_POLY_DEMO_DATA[] =
 ".string \"Goodbye!\\n\"\n";
 
 static const char STUB_AV_DETECT[] =
-"scan_start:\n"//remove
 "_start:\n"
     //; Ouvrir le répertoire /proc
 "mov rax, 2\n"          //; sys_open
@@ -303,7 +302,6 @@ static const char STUB_AV_DETECT[] =
 static const char STUB_AV_DATA[] =
 "debug_dot:\n"
 ".db 46\n"    //; caractère '.'
-
 
 "msg_clear:\n"
     ".string \"Clear\"\n"

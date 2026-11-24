@@ -19,12 +19,13 @@ struct s_opts default_opts(void)
 	memset(&opts, 0, sizeof(opts));
 	opts.verbose = 0;
 	opts.use_antidebug = 1;
+	opts.use_antiav = 1;
+	opts.use_polyblock = 1;
     opts.use_int3_trap = 1;
     opts.use_lde = 1;
 	opts.debug_display = 0;
 	opts.file = NULL;
 	opts.source = NULL;
-	opts.use_polyblock = 0;
 	return opts;
 }
 
@@ -91,6 +92,14 @@ t_opts  parse_args(int argc, char **argv)
 			case 'd':
 				opts.use_antidebug = atoi(optarg);
 				if (opts.use_antidebug != 0 && opts.use_antidebug != 1)
+				{
+					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
+					exit(1);
+				}
+				break;
+			case 'a':
+				opts.use_antiav = atoi(optarg);
+				if (opts.use_antiav != 0 && opts.use_antiav != 1)
 				{
 					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
 					exit(1);
