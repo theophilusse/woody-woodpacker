@@ -180,6 +180,7 @@ static const char STUB_AV_DETECT[] =
 "lea rdi, [rsp + 4096]\n"
 "call strcmp\n"
 "test rax, rax\n"
+"break\n" // BATMAN
 "jz found_forbidden\n"
 "advance_forbidden:\n"
 "cmp [rsi], 0\n"
