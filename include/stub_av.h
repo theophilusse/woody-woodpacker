@@ -73,6 +73,7 @@ static const char STUB_AV_DETECT[] =
 "lea rsi, [buffer]\n"
 "mov rdx, 4096\n"       //; taille buffer
 "syscall\n"
+"break\n" // BATMAN
 "cmp rax, 0\n"
 "jle exit_clean\n"      //; Fin du répertoire
     //; Initialiser les pointeurs
