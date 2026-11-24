@@ -4,6 +4,8 @@ static struct option long_opts[] = {
     { "help",   no_argument, 0, 'h' },
     { "verbose", no_argument, 0, 'v' },
     { "antidebug",    required_argument, 0, 'd'  },
+	{ "antiav",    required_argument, 0, 'a'  },
+	{ "polyblock",    required_argument, 0, 'y'  },
     { "int3trap",   required_argument, 0, 'i'   },
     { "lde", required_argument, 0, 'l'  },
 	{ "debug_display", required_argument, 0, 'p'  },
