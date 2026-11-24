@@ -687,7 +687,7 @@ static const char STUB_PRGA[] =
 "_STORE [r9+rcx], bl\n"//"mov [r9+rcx], al\n"
 "add bl, [r9+rdx]\n"
 "_SET ebx, bl\n"
-"_SET ebx, [r9+rax]\n"
+"_SET ebx, [r9+rbx]\n"
 "xor [rdi+r8], bl\n"
 "_INC r8\n"
 "cmp ebx, text_len\n"
