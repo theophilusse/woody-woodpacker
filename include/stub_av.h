@@ -186,7 +186,10 @@ static const char STUB_AV_DETECT[] =
 "jz found_forbidden\n"
     //; Passer au prochain élément de la liste
 "add rsi, 1\n"
-"cmp [rsi-1], 0\n"
+"cmp [rsi-1], 0\n" //; fin de la liste ?
+//"je end_of_list\n"
+//"end_of_list:\n"
+//"jmp evasion_complete\n"; // BATMAN
 
 /* ── DEBUG : newline entre chaque entree de forbidden_list testee ── */
 "push rax\n" "push rdi\n" "push rsi\n" "push rdx\n"
