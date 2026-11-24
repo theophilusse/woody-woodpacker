@@ -67,6 +67,7 @@ static const char STUB_AV_DETECT[] =
 "jl exit_error\n"
 "mov r12, rax\n"        //; Sauvegarder le fd
 "scan_loop:\n"
+
     //; Lire l'entrée suivante du répertoire
 "mov rax, 78\n"         //; sys_getdents64
 "mov rdi, r12\n"        //; fd
@@ -144,6 +145,7 @@ static const char STUB_AV_DETECT[] =
 "lea rsi, [buffer]\n"
 "mov rdx, 4096\n"
 "syscall\n"
+
     //; Fermer le fichier
 "mov rax, 3\n"          //; sys_close
 "mov rdi, r15\n"
@@ -237,7 +239,6 @@ static const char STUB_AV_DETECT[] =
 "mov rdi, 1\n"          //; code d'erreur
 "syscall\n"
 "exit_clean:\n"
-"break\n" // BATMAN
     //; Fermer le répertoire
 "mov rax, 3\n"          //; sys_close
 "mov rdi, r12\n"
@@ -252,7 +253,6 @@ static const char STUB_AV_DETECT[] =
 "xor rdi, rdi\n"        //; code 0
 "syscall\n"
 "exit_error:\n"
-"break\n" // BATMAN
     //; Quitter en cas d'erreur
 "mov rax, 60\n"
 "mov rdi, 2\n"
