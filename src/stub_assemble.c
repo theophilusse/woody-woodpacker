@@ -140,8 +140,8 @@ char *build_stub_source(t_opts *opts)
             if (opts->use_antidebug)
                 blocks[n++] = STUB_DATA_EVAMSG;
             blocks[n++] = STUB_DATA_WOODYMSG;
-            //if (opts->use_antiav)
-            //    blocks[n++] = STUB_AV_DATA;
+            if (opts->use_antiav)
+                blocks[n++] = STUB_AV_DATA;
             if (!opts->use_lde)
                 blocks[n++] = STUB_DATA_CLEARKEY;
         }
