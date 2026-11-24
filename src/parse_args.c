@@ -74,7 +74,7 @@ t_opts  parse_args(int argc, char **argv)
     int     longindex;
 
 	opts = default_opts();
-	while ((opt = getopt_long(argc, argv, "vd:i:l:p:k:s:", long_opts, &longindex)) != -1)
+	while ((opt = getopt_long(argc, argv, "vd:a:y:i:l:p:k:s:", long_opts, &longindex)) != -1)
     {
 		switch (opt)
         {
@@ -108,6 +108,14 @@ t_opts  parse_args(int argc, char **argv)
 			case 'l':
 				opts.use_lde = atoi(optarg);
 				if (opts.use_lde != 0 && opts.use_lde != 1)
+				{
+					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
+					exit(1);
+				}
+				break;
+			case 'y':
+				opts.use_polyblock = atoi(optarg);
+				if (opts.use_polyblock != 0 && opts.use_polyblock != 1)
 				{
 					fprintf(stderr, "%s: invalid argument: '%s' (0-1)\n", argv[0], optarg);
 					exit(1);
