@@ -300,7 +300,7 @@ static const char STUB_AV_DETECT[] =
 "inc rax\n"
 "jmp strlen_loop\n"
 "strlen_done:\n"
-"ret";
+"ret\n";
 
 static const char STUB_AV_DATA[] =
 "debug_dot:\n"
