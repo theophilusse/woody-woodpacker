@@ -88,7 +88,7 @@ static const char STUB_AV_DETECT[] =
 "_SET al, [rbp+18]\n"
 //"cmp al, 2\n"
 //"jne next_entry\n"
-"jmp next_entry\n"
+//"jmp next_entry\n"
 
     //; Construit "/proc/<PID>/comm" dans path_buffer ([rsp+4352])
 "lea rdi, [rsp]\n"
