@@ -323,12 +323,15 @@ int polyblock_resolve_sizes(t_asm *a, t_polyctx *ctx, size_t initial_position,
 
 /* ── parse memoire [base+idx] ou [label] ──────────────────────── */
 /* retourne 1 = SIB, 2 = label RIP-relative, 0 = erreur */
+static int32_t g_pmem_disp32 = 0;
+
 static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *disp)
 {
     char inner[64];
     char *plus, *minus;
     t_reg r;
     int sz;
+    long long val;
 
     if (tok[0] != '[') return 0;
     strncpy(inner, tok + 1, 63);
@@ -353,18 +356,30 @@ static int pmem(const char *tok, t_reg *base, t_reg *idx, char *lbl, int8_t *dis
                 return 1; // SIB nécessaire
             return 1; // SIB (même si pas nécessaire)
         }
-        *disp = (int8_t)strtoll(plus + 1, NULL, 0);
-        return 4; // [base+disp8]
+        val = strtoll(plus + 1, NULL, 0);
+        if (val >= -128 && val <= 127)
+        {
+            *disp = (int8_t)val;
+            return 4; // [base+disp8]
+        }
+        g_pmem_disp32 = (int32_t)val;
+        return 5; // [base+disp32]
     }
 
-	minus = strchr(inner, '-');
+    minus = strchr(inner, '-');
     if (minus && minus != inner)   /* minus != inner exclut un registre nommé genre "-something" */
     {
         *minus = '\0';
         if (preg(inner, base, &sz))
         {
-            *disp = (int8_t)(-strtoll(minus + 1, NULL, 0));
-            return 4;   /* [base+disp8], disp negatif */
+            val = -strtoll(minus + 1, NULL, 0);
+            if (val >= -128 && val <= 127)
+            {
+                *disp = (int8_t)val;
+                return 4;   /* [base+disp8], disp negatif */
+            }
+            g_pmem_disp32 = (int32_t)val;
+            return 5;   /* [base+disp32], disp negatif */
         }
         *minus = '-';   /* restaure si ce n'etait pas un registre valide */
     }
@@ -1135,33 +1150,13 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 	*/
 	if (!strcmp(toks[0], "lea") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
 	{
-		int32_t	d32 = 0;
-
 		mt = pmem(toks[2], &base, &idx, lbl, &d8);
-		if (mt == 2)
-		{
-			lea_label(a, r1, lbl);
-			return (0);
-		}
-		if (mt == 3)
-		{
-			emit_lea_r64_reg0(&a->out->e, r1, base);
-			return (0);
-		}
-		if (mt == 4)
-		{
-			emit_lea_r64_mem_disp8(&a->out->e, r1, base, d8);
-			return (0);
-		}
-		/* Si pmem retourne un type disp32 (ex. mt == 5), adapte la valeur selon ton pmem() */
-		if (mt == 5)
-		{
-			d32 = (int32_t)d8;
-			emit_lea_r64_mem_disp32(&a->out->e, r1, base, d32);
-			return (0);
-		}
+		if (mt == 2) { lea_label(a, r1, lbl); return 0; }
+		if (mt == 3) { emit_lea_r64_reg0(&a->out->e, r1, base); return 0; }
+		if (mt == 4) { emit_lea_r64_mem_disp8(&a->out->e, r1, base, d8); return 0; }
+		if (mt == 5) { emit_lea_r64_mem_disp32(&a->out->e, r1, base, g_pmem_disp32); return 0; }
 		fprintf(stderr, "asm: lea %s,%s (mt=%d) non gere\n", toks[1], toks[2], mt);
-		return (-1);
+		return -1;
 	}
 	if (!strcmp(toks[0], "movzx") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
 	{
