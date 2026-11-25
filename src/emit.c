@@ -1619,3 +1619,25 @@ int	emit_add_r64_r64(t_emitter *e, t_reg dst, t_reg src)
 	b[n++] = MODRM11(src, dst);
 	return (emit_raw(e, b, n));
 }
+
+int	emit_lea_r64_mem_disp32(t_emitter *e, t_reg dst, t_reg base, int32_t disp)
+{
+	uint8_t	b[8];
+	int		n;
+
+	n = 0;
+	b[n++] = mk_rex(1, dst, base);
+	b[n++] = 0x8D;
+	if ((base & 7) == 4)
+	{
+		b[n++] = MODRM(2, dst, 4);
+		b[n++] = SIB(0, 4, base);
+	}
+	else
+	{
+		b[n++] = MODRM(2, dst, base);
+	}
+	memcpy(b + n, &disp, sizeof(disp));
+	n += 4;
+	return (emit_raw(e, b, n));
+}

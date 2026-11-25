@@ -1122,6 +1122,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
             { emit_xchg_mem_sib_r8(&a->out->e, base, idx, r2); return 0; }
     }
 	*/
+	/*
 	if (!strcmp(toks[0], "lea") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
 	{
 		mt = pmem(toks[2], &base, &idx, lbl, &d8);
@@ -1130,6 +1131,37 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		if (mt == 3) { emit_lea_r64_reg0(&a->out->e, r1, base); return 0; }  // deja existante, disp=0
 		fprintf(stderr, "asm: lea %s,%s (mt=%d) non gere\n", toks[1], toks[2], mt);
 		return -1;
+	}
+	*/
+	if (!strcmp(toks[0], "lea") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 64)
+	{
+		int32_t	d32 = 0;
+
+		mt = pmem(toks[2], &base, &idx, lbl, &d8);
+		if (mt == 2)
+		{
+			lea_label(a, r1, lbl);
+			return (0);
+		}
+		if (mt == 3)
+		{
+			emit_lea_r64_reg0(&a->out->e, r1, base);
+			return (0);
+		}
+		if (mt == 4)
+		{
+			emit_lea_r64_mem_disp8(&a->out->e, r1, base, d8);
+			return (0);
+		}
+		/* Si pmem retourne un type disp32 (ex. mt == 5), adapte la valeur selon ton pmem() */
+		if (mt == 5)
+		{
+			d32 = (int32_t)d8;
+			emit_lea_r64_mem_disp32(&a->out->e, r1, base, d32);
+			return (0);
+		}
+		fprintf(stderr, "asm: lea %s,%s (mt=%d) non gere\n", toks[1], toks[2], mt);
+		return (-1);
 	}
 	if (!strcmp(toks[0], "movzx") && n == 3 && preg(toks[1], &r1, &s1) && s1 == 32)
 	{

@@ -218,6 +218,7 @@ int emit_cmpxchg_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg reg,
                               int32_t disp, int force_disp8);
 
 int	emit_add_r64_r64(t_emitter *e, t_reg dst, t_reg src);
+int	emit_lea_r64_mem_disp32(t_emitter *e, t_reg dst, t_reg base, int32_t disp);
 
 
 /* opcodes jcc utiles */
