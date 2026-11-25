@@ -76,7 +76,7 @@ static const char STUB_AV_DETECT[] =
 
 "mov rbx, rsp\n"
 "add rbx, rax\n"        //; fin des octets lus
-"mov rbp, rsp\n"        //; pointeur d'entrée courant
+"mov rbp, rsp\n"        //; entrée courante (linux_dirent64)
 
 "process_entry_loop:\n"
 "cmp rbp, rbx\n"
