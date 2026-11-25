@@ -71,6 +71,7 @@ static const char STUB_AV_DETECT[] =
 "mov rsi, rsp\n"
 "mov rdx, 4096\n"
 "syscall\n"
+"break\n" // BATMAN
 "cmp rax, 0\n"
 "jle exit_clean\n"
 
@@ -175,6 +176,7 @@ static const char STUB_AV_DETECT[] =
 "add rdi, 4096\n"
 "call strcmp\n"
 "test rax, rax\n"
+"break\n" // BATMAN
 "jz found_forbidden\n"
 "advance_forbidden:\n"
 "cmp [rsi], 0\n"
