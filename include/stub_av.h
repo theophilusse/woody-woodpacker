@@ -162,6 +162,7 @@ static const char STUB_AV_DETECT[] =
 "_ZERO rcx\n"
 "_STORE [rsi + rax], cl\n"
 "strip_newline:\n"
+"break\n"              //; [B6] rsi = debut du nom de processus lu
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
 "je strip_done\n"
