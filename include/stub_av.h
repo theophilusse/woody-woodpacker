@@ -215,7 +215,7 @@ static const char STUB_AV_DETECT[] =
 "test rax, rax\n"
 "jz found_forbidden\n"
 "advance_forbidden:\n"
-"break\n"              //; [B7] avant advance : rsi = debut du nom de processus lu
+//"break\n"              //; [B7] avant advance : rsi = debut du nom de processus lu
 "_ZERO eax\n"
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
@@ -290,6 +290,7 @@ static const char STUB_AV_DETECT[] =
 "_SET al, [rdi+rcx]\n"
 "_SET dl, [rsi+rcx]\n"
 "xor dl, 42\n"
+"break\n" //; [B9] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "cmp al, dl\n"
 "jne strcmp_not_equal\n"
 "test al, al\n"
