@@ -333,7 +333,7 @@ static const char STUB_AV_DATA[] =
 "newline:\n"
     ".db 10\n"
 "found_msg:\n"
-    ".string \"Processus interdit détecté: \"\n"
+    ".string \"Processus interdit détecté: \"\n";
 
 static const char STUB_POLY_DEMO_DATA[] =
 "greeting_msg:\n"
