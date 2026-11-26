@@ -505,6 +505,34 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 				return 0;
 			}
 		}
+		else // Cas 1: CALL direct simule avec pile initialisee via emetteurs existants
+		{
+			size_t	rip_patch;
+			size_t	after_lea;
+			size_t	jmp_disp;
+			size_t	after_call_sim;
+
+			/* lea rax, [rip + disp32] : enregistre l'offset du disp32 dans rip_patch */
+			emit_lea_rip(&a->out->e, REG_RAX, &rip_patch);
+			after_lea = rip_patch + 4;
+
+			/* push rax : empile l'adresse de retour */
+			emit_push_r64(&a->out->e, REG_RAX);
+
+			/* Trampoline d'origine conserve */
+			{
+				uint8_t eb00[2] = {0xEB, 0};
+				emit_raw(&a->out->e, eb00, 2);
+			}
+			emit_jmp_rel32(&a->out->e, &jmp_disp);
+			addfixup(a, toks[1], jmp_disp, jmp_disp + 4, 0);
+
+			/* Calcule la distance entre la fin de lea (after_lea) et l'instruction suivante */
+			after_call_sim = jmp_disp + 4;
+			patch_disp32(&a->out->e, rip_patch, (int32_t)(after_call_sim - after_lea));
+			return 0;
+		}
+		/*
 		else // Cas 1: CALL direct (rel32, forme trampoline pour rester coherent avec le reste)
 		{
 			uint8_t bytes[2] = {0xEB, 0};
@@ -514,6 +542,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			addfixup(a, toks[1], dummy, dummy + 4, 0);
 			return 0;
 		}
+		*/
 		fprintf(stderr, "asm: call %s non gere\n", toks[1]);
 		return -1;
 	}
