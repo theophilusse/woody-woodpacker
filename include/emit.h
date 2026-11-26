@@ -226,16 +226,16 @@ int	emit_or_r64_imm32(t_emitter *e, t_reg reg, uint32_t imm);
 int	emit_or_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg src);
 int	emit_or_mem_sib_disp8_r64(t_emitter *e, t_reg base, t_reg idx,
 		t_reg src, int8_t disp);
-int	emit_or_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src)
+int	emit_or_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src);
 int	emit_or_mem_sib_disp8_r32(t_emitter *e, t_reg base, t_reg idx,
 		t_reg src, int8_t disp);
-int	emit_or_r32_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
+int	emit_or_r32_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
 int	emit_or_r32_mem_sib_disp8(t_emitter *e, t_reg dst, t_reg base,
 		t_reg idx, int8_t disp);
-int	emit_or_r8_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
+int	emit_or_r8_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx);
 int	emit_or_r8_mem_sib_disp8(t_emitter *e, t_reg dst, t_reg base,
 		t_reg idx, int8_t disp);
-int	emit_or_mem_sib_imm32(t_emitter *e, t_reg base, t_reg idx, uint32_t imm)
+int	emit_or_mem_sib_imm32(t_emitter *e, t_reg base, t_reg idx, uint32_t imm);
 int	emit_or_mem_sib_disp8_imm32(t_emitter *e, t_reg base, t_reg idx,
 		int8_t disp, uint32_t imm);
 
