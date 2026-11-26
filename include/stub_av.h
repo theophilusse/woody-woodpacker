@@ -203,7 +203,6 @@ static const char STUB_AV_DETECT[] =
 
     //; Comparer contre forbidden_list (XOR 42)
 "lea rsi, [forbidden_list]\n"
-"break\n"              //; [B8] rsi = debut de forbidden_list, rdi = debut de comm
 "check_forbidden:\n"
 "_ZERO eax\n"
 "_SET al, [rsi]\n"
@@ -213,7 +212,7 @@ static const char STUB_AV_DETECT[] =
 "add rdi, 4096\n"
 //"break\n"              //; [B6] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "call strcmp\n"
-//"break\n"              //; [B7] apres strcmp : rax = 0 si match, 1 sinon
+"break\n"              //; [B7] apres strcmp : rax = 0 si match, 1 sinon
 "test rax, rax\n"
 "jz found_forbidden\n"
 "advance_forbidden:\n"
