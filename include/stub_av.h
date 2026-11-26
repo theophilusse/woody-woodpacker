@@ -220,10 +220,11 @@ static const char STUB_AV_DETECT[] =
 "next_entry:\n"
 "_ZERO eax\n"
 "_SET al, [rbp+17]\n"
-"shl eax, 8\n"
-"_SET al, [rbp+16]\n"
+"shl rax, 8\n"
+"_ZERO rcx\n"
+"_SET cl, [rbp+16]\n"
+"or rax, rcx\n"
 "add rbp, rax\n"
-"break\n"              //; [B7] apres d_reclen : eax = reclen, rbp = entree suivante
 "jmp process_entry_loop\n"
 
 "found_forbidden:\n"

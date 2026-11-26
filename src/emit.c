@@ -506,6 +506,154 @@ int	emit_or_r32_imm32(t_emitter *e, t_reg reg, uint32_t imm)
 	return emit_raw(e, b, n);
 }
 
+/* OR r64, r64 : REX.W 09 /r */
+int	emit_or_r64_r64(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(1, src, dst);
+	b[n++] = r;
+	b[n++] = 0x09; b[n++] = MODRM11(src, dst);
+	return emit_raw(e, b, n);
+}
+
+/* OR r32, r32 : 09 /r */
+int	emit_or_r32_r32(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, src, dst);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x09; b[n++] = MODRM11(src, dst);
+	return emit_raw(e, b, n);
+}
+
+/* OR r64, imm32 : REX.W 81 /1 id */
+int	emit_or_r64_imm32(t_emitter *e, t_reg reg, uint32_t imm)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex(1, 0, reg);
+	b[n++] = r;
+	b[n++] = 0x81; b[n++] = MODRM11(1, reg);
+	memcpy(b + n, &imm, 4); n += 4;
+	return emit_raw(e, b, n);
+}
+
+/* OR [base+idx], r64 : REX.W 09 /r SIB */
+int	emit_or_mem_sib_r64(t_emitter *e, t_reg base, t_reg idx, t_reg src)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(1, src, idx, base);
+	b[n++] = r;
+	b[n++] = 0x09;
+	emit_modrm_sib_disp(b, &n, src, base, idx, 0, 0, 0);
+	return emit_raw(e, b, n);
+}
+
+/* OR [base+idx+disp8], r64 : REX.W 09 /r SIB mod=01 */
+int	emit_or_mem_sib_disp8_r64(t_emitter *e, t_reg base, t_reg idx,
+		t_reg src, int8_t disp)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(1, src, idx, base);
+	b[n++] = r;
+	b[n++] = 0x09;
+	emit_modrm_sib_disp(b, &n, src, base, idx, 0, disp, 1);
+	return emit_raw(e, b, n);
+}
+
+/* OR [base+idx], r32 : 09 /r SIB */
+int	emit_or_mem_sib_r32(t_emitter *e, t_reg base, t_reg idx, t_reg src)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(0, src, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x09;
+	emit_modrm_sib_disp(b, &n, src, base, idx, 0, 0, 0);
+	return emit_raw(e, b, n);
+}
+
+/* OR [base+idx+disp8], r32 : 09 /r SIB mod=01 */
+int	emit_or_mem_sib_disp8_r32(t_emitter *e, t_reg base, t_reg idx,
+		t_reg src, int8_t disp)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(0, src, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x09;
+	emit_modrm_sib_disp(b, &n, src, base, idx, 0, disp, 1);
+	return emit_raw(e, b, n);
+}
+
+/* OR r32, [base+idx] : 0B /r SIB */
+int	emit_or_r32_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(0, dst, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x0B;
+	emit_modrm_sib_disp(b, &n, dst, base, idx, 0, 0, 0);
+	return emit_raw(e, b, n);
+}
+
+/* OR r32, [base+idx+disp8] : 0B /r SIB mod=01 */
+int	emit_or_r32_mem_sib_disp8(t_emitter *e, t_reg dst, t_reg base,
+		t_reg idx, int8_t disp)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(0, dst, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x0B;
+	emit_modrm_sib_disp(b, &n, dst, base, idx, 0, disp, 1);
+	return emit_raw(e, b, n);
+}
+
+/* OR r8, [base+idx] : 0A /r SIB */
+int	emit_or_r8_mem_sib(t_emitter *e, t_reg dst, t_reg base, t_reg idx)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(0, dst, idx, base);
+	if (r != 0x40 || dst >= 4) b[n++] = r;
+	b[n++] = 0x0A;
+	emit_modrm_sib_disp(b, &n, dst, base, idx, 0, 0, 0);
+	return emit_raw(e, b, n);
+}
+
+/* OR r8, [base+idx+disp8] : 0A /r SIB mod=01 */
+int	emit_or_r8_mem_sib_disp8(t_emitter *e, t_reg dst, t_reg base,
+		t_reg idx, int8_t disp)
+{
+	uint8_t b[8]; int n = 0;
+	uint8_t r = mk_rex_sib(0, dst, idx, base);
+	if (r != 0x40 || dst >= 4) b[n++] = r;
+	b[n++] = 0x0A;
+	emit_modrm_sib_disp(b, &n, dst, base, idx, 0, disp, 1);
+	return emit_raw(e, b, n);
+}
+
+/* OR [base+idx], imm32 : 81 /1 SIB id */
+int	emit_or_mem_sib_imm32(t_emitter *e, t_reg base, t_reg idx, uint32_t imm)
+{
+	uint8_t b[12]; int n = 0;
+	uint8_t r = mk_rex_sib(0, 0, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x81;
+	emit_modrm_sib_disp(b, &n, 1, base, idx, 0, 0, 0);
+	memcpy(b + n, &imm, 4); n += 4;
+	return emit_raw(e, b, n);
+}
+
+/* OR [base+idx+disp8], imm32 : 81 /1 SIB mod=01 id */
+int	emit_or_mem_sib_disp8_imm32(t_emitter *e, t_reg base, t_reg idx,
+		int8_t disp, uint32_t imm)
+{
+	uint8_t b[12]; int n = 0;
+	uint8_t r = mk_rex_sib(0, 0, idx, base);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x81;
+	emit_modrm_sib_disp(b, &n, 1, base, idx, 0, disp, 1);
+	memcpy(b + n, &imm, 4); n += 4;
+	return emit_raw(e, b, n);
+}
+
 /* ── cmp ─────────────────────────────────────────────────────── */
 int	emit_cmp_r32_imm8(t_emitter *e, t_reg reg, int8_t imm)
 {

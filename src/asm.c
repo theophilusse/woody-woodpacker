@@ -783,7 +783,124 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		fprintf(stderr, "asm: sub %s,%s non gere\n", toks[1], toks[2]);
 		return -1;
 	}
-
+	if (!strcmp(toks[0], "or") && n == 3)
+	{
+		/* or r64, r64 */
+		if (preg(toks[1], &r1, &s1) && s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
+		{
+			emit_or_r64_r64(&a->out->e, r1, r2);
+			return 0;
+		}
+		/* or r32, r32 */
+		if (preg(toks[1], &r1, &s1) && s1 == 32 && preg(toks[2], &r2, &s2) && s2 == 32)
+		{
+			emit_or_r32_r32(&a->out->e, r1, r2);
+			return 0;
+		}
+		/* or r8, r8 */
+		if (preg(toks[1], &r1, &s1) && s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
+		{
+			emit_or_r8_r8(&a->out->e, r1, r2);
+			return 0;
+		}
+		/* or r64, imm32 */
+		if (preg(toks[1], &r1, &s1) && s1 == 64)
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			emit_or_r64_imm32(&a->out->e, r1, (uint32_t)val);
+			return 0;
+		}
+		/* or r32, imm32 */
+		if (preg(toks[1], &r1, &s1) && s1 == 32)
+		{
+			val = sym(a, toks[2]);
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
+			emit_or_r32_imm32(&a->out->e, r1, (uint32_t)val);
+			return 0;
+		}
+		/* or r32, [mem] */
+		if (preg(toks[1], &r1, &s1) && s1 == 32 && toks[2][0] == '[')
+		{
+			mt = pmem(toks[2], &base, &idx, lbl, &d8);
+			if (mt == 1)
+			{
+				if (base == REG_RBP || d8 != 0)
+					emit_or_r32_mem_sib_disp8(&a->out->e, r1, base, idx, d8);
+				else
+					emit_or_r32_mem_sib(&a->out->e, r1, base, idx);
+				return 0;
+			}
+		}
+		/* or r8, [mem] */
+		if (preg(toks[1], &r1, &s1) && s1 == 8 && toks[2][0] == '[')
+		{
+			mt = pmem(toks[2], &base, &idx, lbl, &d8);
+			if (mt == 1)
+			{
+				if (base == REG_RBP || d8 != 0)
+					emit_or_r8_mem_sib_disp8(&a->out->e, r1, base, idx, d8);
+				else
+					emit_or_r8_mem_sib(&a->out->e, r1, base, idx);
+				return 0;
+			}
+		}
+		/* or [mem], r64 */
+		if (toks[1][0] == '[' && preg(toks[2], &r2, &s2) && s2 == 64)
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			if (mt == 1)
+			{
+				if (base == REG_RBP || d8 != 0)
+					emit_or_mem_sib_disp8_r64(&a->out->e, base, idx, r2, d8);
+				else
+					emit_or_mem_sib_r64(&a->out->e, base, idx, r2);
+				return 0;
+			}
+		}
+		/* or [mem], r32 */
+		if (toks[1][0] == '[' && preg(toks[2], &r2, &s2) && s2 == 32)
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			if (mt == 1)
+			{
+				if (base == REG_RBP || d8 != 0)
+					emit_or_mem_sib_disp8_r32(&a->out->e, base, idx, r2, d8);
+				else
+					emit_or_mem_sib_r32(&a->out->e, base, idx, r2);
+				return 0;
+			}
+		}
+		/* or [mem], r8 */
+		if (toks[1][0] == '[' && preg(toks[2], &r2, &s2) && s2 == 8)
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			if (mt == 1)
+			{
+				if (base == REG_RBP || d8 != 0)
+					emit_or_mem_sib_disp8_r8(&a->out->e, base, idx, r2, d8);
+				else
+					emit_or_mem_sib_r8(&a->out->e, base, idx, r2);
+				return 0;
+			}
+		}
+		/* or [mem], imm32 */
+		if (toks[1][0] == '[')
+		{
+			mt = pmem(toks[1], &base, &idx, lbl, &d8);
+			if (mt == 1)
+			{
+				val = sym(a, toks[2]);
+				if (val < 0) val = strtoll(toks[2], NULL, 0);
+				if (base == REG_RBP || d8 != 0)
+					emit_or_mem_sib_disp8_imm32(&a->out->e, base, idx, d8, (uint32_t)val);
+				else
+					emit_or_mem_sib_imm32(&a->out->e, base, idx, (uint32_t)val);
+				return 0;
+			}
+		}
+	}
+	/*
 	if (!strcmp(toks[0], "or") && n == 3)
 	{
 		if (preg(toks[1], &r1, &s1) && s1 == 32)
@@ -805,6 +922,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			return 0;
 		}
 	}
+	*/
 	if (!strcmp(toks[0], "shl") && n == 3
         && preg(toks[1], &r1, &s1) && s1 == 8
         && !strcmp(toks[2], "cl"))
