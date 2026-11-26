@@ -223,12 +223,14 @@ static const char STUB_AV_DETECT[] =
 "_ZERO eax\n"
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
-"je advance_next_entry\n"
-"inc r8\n"
-"break\n" //; [B8] r8 = offset dans forbidden_list de l'entrée en cours
-"jmp advance_forbidden\n"
 "advance_next_entry:\n"
 "inc r8\n"
+"lea rsi, [forbidden_list]\n"
+"add rsi, r8\n"
+"_ZERO eax\n"
+"_SET al, [rsi]\n"
+"cmp al, 0\n"
+"je next_entry\n"
 "jmp check_forbidden\n"
 
 "next_entry:\n"
