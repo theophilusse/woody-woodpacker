@@ -239,8 +239,6 @@ static const char STUB_AV_DETECT[] =
 "call strlen\n"
 "mov rdx, rax\n"
 "mov rax, 1\n"
-"xor rdx, rdx\n"
-"_SET dl, [len_found_msg]\n"
 "syscall\n"
 "lea rsi, [rsp]\n"
 "add rsi, 4096\n"
