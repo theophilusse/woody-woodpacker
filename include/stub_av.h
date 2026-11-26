@@ -225,6 +225,7 @@ static const char STUB_AV_DETECT[] =
 "cmp al, 0\n"
 "je advance_next_entry\n"
 "inc r8\n"
+"break\n" //; [B8] r8 = offset dans forbidden_list de l'entrée en cours
 "jmp advance_forbidden\n"
 "advance_next_entry:\n"
 "inc r8\n"
@@ -274,7 +275,7 @@ static const char STUB_AV_DETECT[] =
 "_SET eax, 1\n"
 "_SET edi, 1\n"
 "lea rsi, [msg_clear]\n"
-"_SET edx, 6\n"
+"_SET edx, 7\n"
 "syscall\n"
 "add rsp, 4416\n"
 "mov rax, 60\n"
