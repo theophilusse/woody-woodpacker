@@ -174,6 +174,7 @@ static const char STUB_AV_DETECT[] =
 "_ZERO eax\n"
 "_STORE [rsi], al\n"
 "strip_done:\n"
+"break\n"              //; [B7] rsi = debut du nom de processus lu, '\n' remplacé par '\0'
 
     //; Afficher le nom de processus lu ([rsp+4096])
 "push rbx\n"
