@@ -203,7 +203,7 @@ static const char STUB_AV_DETECT[] =
 
     //; Comparer contre forbidden_list (XOR 42)
 "lea rsi, [forbidden_list]\n"
-"brealk\n"              //; [B8] rsi = debut de forbidden_list, rdi = debut de comm
+"break\n"              //; [B8] rsi = debut de forbidden_list, rdi = debut de comm
 "check_forbidden:\n"
 "_ZERO eax\n"
 "_SET al, [rsi]\n"
