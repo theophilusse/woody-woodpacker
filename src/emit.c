@@ -674,23 +674,6 @@ int	emit_cmp_r32_imm32(t_emitter *e, t_reg reg, int32_t imm)
 	return emit_raw(e, b, n);
 }
 
-int	emit_cmp_r32_r32(t_emitter *e, t_reg dst, t_reg src)
-{
-	uint8_t b[3]; int n = 0;
-	uint8_t r = mk_rex(0, src, dst);
-	if (r != 0x40) b[n++] = r;
-	b[n++] = 0x39; b[n++] = MODRM11(src, dst);
-	return emit_raw(e, b, n);
-}
-
-int	emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src)
-{
-	uint8_t b[3];
-	b[0] = mk_rex(1, src, dst);
-	b[1] = 0x39; b[2] = MODRM11(src, dst);
-	return emit_raw(e, b, 3);
-}
-
 int	emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm)
 {
 	uint8_t b[7];
