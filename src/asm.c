@@ -1400,7 +1400,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_cmp_mem_disp8_imm8(&a->out->e, base, d8, (uint8_t)val);
 			return 0;
 		}
-		if (mt == 1)   /* [base+idx], SIB */
+		if (mt == 1)
 		{
 			emit_cmp_mem_sib_imm8(&a->out->e, base, idx, (uint8_t)val);
 			return 0;
@@ -1410,6 +1410,25 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 	}
 	if (!strcmp(toks[0], "cmp") && n == 3 && preg(toks[1], &r1, &s1))
 	{
+		/* cmp r64, r64 */
+		if (s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
+		{
+			emit_cmp_r64_r64(&a->out->e, r1, r2);
+			return 0;
+		}
+		/* cmp r32, r32 */
+		if (s1 == 32 && preg(toks[2], &r2, &s2) && s2 == 32)
+		{
+			emit_cmp_r32_r32(&a->out->e, r1, r2);
+			return 0;
+		}
+		/* cmp r8, r8 */
+		if (s1 == 8 && preg(toks[2], &r2, &s2) && s2 == 8)
+		{
+			emit_cmp_r8_r8(&a->out->e, r1, r2);
+			return 0;
+		}
+		/* cmp r8, imm8 */
 		if (s1 == 8)
 		{
 			val = sym(a, toks[2]);
@@ -1417,44 +1436,26 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 			emit_cmp_r8_imm8(&a->out->e, r1, (uint8_t)val);
 			return 0;
 		}
-
-		/* cmp r64, r64 : 48 39 /r */
-		if (s1 == 64 && preg(toks[2], &r2, &s2) && s2 == 64)
-		{
-			emit_cmp_r64_r64(&a->out->e, r1, r2);
-			return 0;
-		}
-		/* cmp r32, r32 : 39 /r */
-		if (s1 == 32 && preg(toks[2], &r2, &s2) && s2 == 32)
-		{
-			uint8_t bytes[2] = {0x39, (3 << 6) | (r2 << 3) | r1};
-			emit_raw(&a->out->e, bytes, 2);
-			return 0;
-		}
-		/* cmp r32, imm (avec support des immédiats signés) */
+		/* cmp r32, imm */
 		if (s1 == 32)
 		{
 			val = sym(a, toks[2]);
-			if (val < 0) val = strtoll(toks[2], NULL, 0);  // Convertir la chaîne en entier signé
-
-			// Vérifier si l'immédiat tient sur 8 bits signés (-128 à 127)
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
 			if (val >= -128 && val <= 127)
 				emit_cmp_r32_imm8(&a->out->e, r1, (int8_t)val);
 			else
 				emit_cmp_r32_imm32(&a->out->e, r1, (int32_t)val);
 			return 0;
 		}
-		/* cmp r64, imm (nouveau cas) */
+		/* cmp r64, imm */
 		if (s1 == 64)
 		{
 			val = sym(a, toks[2]);
-			if (val < 0) val = strtoll(toks[2], NULL, 0);  // Convertir la chaîne en entier signé
-
-			// Vérifier si l'immédiat tient sur 32 bits signés (-2^31 à 2^31-1)
+			if (val < 0) val = strtoll(toks[2], NULL, 0);
 			if (val >= -2147483648LL && val <= 2147483647LL)
 				emit_cmp_r64_imm32(&a->out->e, r1, (int32_t)val);
 			else
-				emit_cmp_r64_imm64(&a->out->e, r1, val);  // Cas rare (immédiat 64 bits)
+				emit_cmp_r64_imm64(&a->out->e, r1, val);
 			return 0;
 		}
 	}

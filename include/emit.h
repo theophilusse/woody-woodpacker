@@ -239,6 +239,10 @@ int	emit_or_mem_sib_imm32(t_emitter *e, t_reg base, t_reg idx, uint32_t imm);
 int	emit_or_mem_sib_disp8_imm32(t_emitter *e, t_reg base, t_reg idx,
 		int8_t disp, uint32_t imm);
 
+int	emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src);
+int	emit_cmp_r32_r32(t_emitter *e, t_reg dst, t_reg src);
+int	emit_cmp_r8_r8(t_emitter *e, t_reg dst, t_reg src);
+
 /* opcodes jcc utiles */
 # define JL   0x7C
 # define JNZ  0x75

@@ -700,6 +700,36 @@ int	emit_cmp_r64_imm32(t_emitter *e, t_reg dst, int32_t imm)
 	return emit_raw(e, b, 7);
 }
 
+/* CMP r64, r64 : REX.W 39 /r */
+int	emit_cmp_r64_r64(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(1, src, dst);
+	b[n++] = r;
+	b[n++] = 0x39; b[n++] = MODRM11(src, dst);
+	return emit_raw(e, b, n);
+}
+
+/* CMP r32, r32 : 39 /r */
+int	emit_cmp_r32_r32(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, src, dst);
+	if (r != 0x40) b[n++] = r;
+	b[n++] = 0x39; b[n++] = MODRM11(src, dst);
+	return emit_raw(e, b, n);
+}
+
+/* CMP r8, r8 : 38 /r */
+int	emit_cmp_r8_r8(t_emitter *e, t_reg dst, t_reg src)
+{
+	uint8_t b[3]; int n = 0;
+	uint8_t r = mk_rex(0, src, dst);
+	if (r != 0x40 || dst >= 4 || src >= 4) b[n++] = r;
+	b[n++] = 0x38; b[n++] = MODRM11(src, dst);
+	return emit_raw(e, b, n);
+}
+
 /* ── sauts ───────────────────────────────────────────────────── */
 int	emit_jcc_rel8(t_emitter *e, uint8_t op, size_t *patch_offset)
 {
