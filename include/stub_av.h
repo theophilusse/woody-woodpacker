@@ -218,9 +218,12 @@ static const char STUB_AV_DETECT[] =
 "_ZERO eax\n"
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
-"je check_forbidden\n"
+"je advance_next_entry\n"
 "inc rsi\n"
 "jmp advance_forbidden\n"
+"advance_next_entry:\n"
+"inc rsi\n"              // <-- passe par-dessus le '\0' vers la chaine suivante
+"jmp check_forbidden\n"
 
 "next_entry:\n"
 "_ZERO eax\n"
