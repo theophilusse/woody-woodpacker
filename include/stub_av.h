@@ -212,7 +212,6 @@ static const char STUB_AV_DETECT[] =
 "add rdi, 4096\n"
 //"break\n"              //; [B6] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "call strcmp\n"
-"break\n"              //; [B7] apres strcmp : rax = 0 si match, 1 sinon
 "test rax, rax\n"
 "jz found_forbidden\n"
 "advance_forbidden:\n"
@@ -290,6 +289,26 @@ static const char STUB_AV_DETECT[] =
 "_SET al, [rdi+rcx]\n"
 "_SET dl, [rsi+rcx]\n"
 "xor dl, 42\n"
+//; --- DEBUG WRITE : affiche l'octet decode dans dl ---
+"push rax\n"
+"push rdi\n"
+"push rsi\n"
+"push rdx\n"
+"push rcx\n"
+"sub rsp, 8\n"
+"mov [rsp], dl\n"
+"mov rax, 1\n"
+"mov rdi, 1\n"
+"mov rsi, rsp\n"
+"mov rdx, 1\n"
+"syscall\n"
+"add rsp, 8\n"
+"pop rcx\n"
+"pop rdx\n"
+"pop rsi\n"
+"pop rdi\n"
+"pop rax\n"
+    //; --- FIN DEBUG WRITE ---
 //"break\n" //; [B9] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "cmp al, dl\n"
 "jne strcmp_not_equal\n"
