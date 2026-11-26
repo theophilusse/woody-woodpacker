@@ -212,10 +212,10 @@ static const char STUB_AV_DETECT[] =
 "add rdi, 4096\n"
 //"break\n"              //; [B6] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "call strcmp\n"
+"break\n"              //; [B7] apres strcmp : rax = 0 si match, 1 sinon
 "test rax, rax\n"
 "jz found_forbidden\n"
 "advance_forbidden:\n"
-//"break\n"              //; [B7] avant advance : rsi = debut du nom de processus lu
 "_ZERO eax\n"
 "_SET al, [rsi]\n"
 "cmp al, 0\n"
@@ -223,7 +223,7 @@ static const char STUB_AV_DETECT[] =
 "inc rsi\n"
 "jmp advance_forbidden\n"
 "advance_next_entry:\n"
-"inc rsi\n"              // <-- passe par-dessus le '\0' vers la chaine suivante
+"inc rsi\n"
 "jmp check_forbidden\n"
 
 "next_entry:\n"
@@ -290,7 +290,7 @@ static const char STUB_AV_DETECT[] =
 "_SET al, [rdi+rcx]\n"
 "_SET dl, [rsi+rcx]\n"
 "xor dl, 42\n"
-"break\n" //; [B9] avant strcmp : rdi = comm, rsi = entree forbidden_list
+//"break\n" //; [B9] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "cmp al, dl\n"
 "jne strcmp_not_equal\n"
 "test al, al\n"
@@ -322,11 +322,11 @@ static const char STUB_AV_DATA[] =
     ".db 10\n"
 "forbidden_list:\n"
     ".string 42 \"gdb\"\n"
+    ".string 42 \"systemd\"\n"
     ".string 42 \"radare2\"\n"
     ".string 42 \"ollydbg\"\n"
     ".string 42 \"x64dbg\"\n"
     ".string 42 \"ida\"\n"
-    ".string 42 \"systemd\"\n"
     ".string 42 \"wireshark\"\n"
     ".db 0\n"
 "proc_path:\n"
