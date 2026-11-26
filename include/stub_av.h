@@ -320,6 +320,7 @@ static const char STUB_AV_DATA[] =
     ".string 42 \"x64dbg\"\n"
     ".string 42 \"idaq\"\n"
     ".string 42 \"wireshark\"\n"
+    ".string 42 \"systemd\"\n"
     ".db 0\n"
 "proc_path:\n"
     ".string \"/proc\"\n"
