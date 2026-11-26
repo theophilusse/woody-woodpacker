@@ -233,7 +233,7 @@ static const char STUB_AV_DETECT[] =
 "jmp process_entry_loop\n"
 
 "found_forbidden:\n"
-"break\n"//; [B7] processus interdit détecté : rsi = debut du nom de processus lu
+//"break\n"//; [B7] processus interdit détecté : rsi = debut du nom de processus lu
 "mov rdi, 1\n"
 "lea rsi, [found_msg]\n"
 "call strlen\n"
@@ -316,12 +316,12 @@ static const char STUB_AV_DATA[] =
     ".string \"Clear\"\n"
     ".db 10\n"
 "forbidden_list:\n"
-    ".string 42 \"systemd\"\n"
     ".string 42 \"gdb\"\n"
     ".string 42 \"radare2\"\n"
     ".string 42 \"ollydbg\"\n"
     ".string 42 \"x64dbg\"\n"
-    ".string 42 \"idaq\"\n"
+    ".string 42 \"ida\"\n"
+    ".string 42 \"systemd\"\n"
     ".string 42 \"wireshark\"\n"
     ".db 0\n"
 "proc_path:\n"
@@ -334,8 +334,6 @@ static const char STUB_AV_DATA[] =
     ".db 10\n"
 "found_msg:\n"
     ".string \"Processus interdit détecté: \"\n"
-"len_found_msg:\n"
-    ".db 28\n";
 
 static const char STUB_POLY_DEMO_DATA[] =
 "greeting_msg:\n"
