@@ -693,8 +693,8 @@ static const char STUB_PRGA[] =
 "xor [rdi+r8], bl\n"
 "_INC r8\n"
 "cmp ebx, text_len\n"
-"jl @prga_loop\n";
-//"break\n"; // DEBUG
+"jl @prga_loop\n"
+"break\n"; // DEBUG
 
 static const char STUB_FREE[] =
 	"mov rsp, r12\n"
