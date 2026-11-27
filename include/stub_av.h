@@ -220,14 +220,12 @@ static const char STUB_AV_DETECT[] =
 "advance_forbidden:\n"
 "_INC r8\n"
 "lea rsi, [forbidden_list]\n"
-"break\n"              //; [B8] rsi = entree forbidden_list, r8 = offset
 "skip_forbidden_entry:\n"
 "_ZERO eax\n"
 "_SET al, [rsi+r8]\n"
 "_INC r8\n"
 "cmp al, 0\n"
 "jne skip_forbidden_entry\n"
-"break\n"              //; [B9] rsi = entree forbidden_list, r8 = offset
 
 "_ZERO eax\n"
 "_SET al, [rsi+r8]\n"
