@@ -629,7 +629,6 @@ static const char STUB_PIE_BASE_CALC[] =
 "sub rax, rdx\n"
 "sub rax, stub_load_vaddr\n"
 "_SET r10, rax\n"
-"_STORE [r12-8], r10\n"
 "break\n";
 
 static const char STUB_MPROTECT[] =
@@ -653,10 +652,10 @@ static const char STUB_KSA[] =
 "break\n" // DEBUG
 "sub rsp, 256\n"
 "_SET r9, rsp\n"
-"_SET rsi, rbp\n" // BATMAN
+"_SET rsi, rbp\n"
 "_ZERO ecx\n"
 "@ksa_init:\n"
-"_STORE [r9+rcx], cl\n"//"mov [r9+rcx], cl\n"
+"_STORE [r9+rcx], cl\n"
 "_INC cl\n"
 "jnz @ksa_init\n"
 "_ZERO ecx\n"
@@ -671,13 +670,12 @@ static const char STUB_KSA[] =
 "add dl, al\n"
 "_SET eax, [r9+rcx]\n"
 "xchg [r9+rdx], al\n"
-"_STORE [r9+rcx], al\n"//"mov [r9+rcx], al\n"
+"_STORE [r9+rcx], al\n"
 "_INC cl\n"
 "jnz @ksa_loop\n";
 
 static const char STUB_PRGA[] =
 "break\n"
-"_SET r10, [r12]\n"
 "_SET rdi, r10\n"
 "add rdi, text_vaddr\n"
 "_ZERO ecx\n"
