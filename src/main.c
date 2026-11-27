@@ -47,13 +47,20 @@ static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto, t_opts *opts)
 		}
 	}
     p = &ctx->phdrs[ctx->target_phdr_idx];
-    crypto->text_vaddr = p->p_vaddr;
-    crypto->text_len   = p->p_filesz;       /* p_filesz ORIGINAL, avant injection */
+    
+    size_t entry_off = 0;
+
+    if (ctx->ehdr->e_entry >= p->p_vaddr &&
+        ctx->ehdr->e_entry < p->p_vaddr + p->p_filesz)
+        entry_off = (size_t)(ctx->ehdr->e_entry - p->p_vaddr);
+
+    crypto->text_vaddr = p->p_vaddr + entry_off;
+    crypto->text_len = (p->p_filesz > entry_off) ? (p->p_filesz - entry_off) : 0;
     crypto->stub_load_vaddr = p->p_vaddr + p->p_filesz;
 
-    rc4_apply(ctx->raw + p->p_offset, crypto->text_len,
+    rc4_apply(ctx->raw + p->p_offset + entry_off, crypto->text_len,
         crypto->key, crypto->key_len);
-
+        
 	if (opts->verbose)
 	    printf("chiffrement : vaddr=0x%lx len=%zu key[0]=%02X\n",
     	    crypto->text_vaddr, crypto->text_len, crypto->key[0]);

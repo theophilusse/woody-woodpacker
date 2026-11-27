@@ -2211,7 +2211,7 @@ int asm_build(const char *src, t_crypto_ctx *crypto, t_asm_result *out,
     /* ── verification LDE : bloque la generation si le scan runtime
     ** ne pourrait pas retrouver la cle depuis le stub genere ── */
 	#ifdef LDE_VERIFICATION
-	if (opts->use_lde)
+	if (opts->use_lde && opts->use_polyblock == 0)
     {
         int64_t ss = sym(&a, "scan_start");
         int64_t se = sym(&a, "scan_end");
