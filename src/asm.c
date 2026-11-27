@@ -1635,7 +1635,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 					uint8_t c = *((const uint8_t *)(s + 1 + i)) ^ (char)xor_key;
 					emit_raw(&a->out->e, &c, 1);
 				}
-				uint8_t zero = 0 ^ (char)xor_key;
+				uint8_t zero = 0; // ^ (char)xor_key;
 				emit_raw(&a->out->e, &zero, 1);   /* .string ajoute un octet nul final, contrairement a .ascii */
 				return 0;
 			}

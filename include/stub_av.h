@@ -216,6 +216,7 @@ static const char STUB_AV_DETECT[] =
 "call strcmp\n"
 "test rax, rax\n"
 "jz found_forbidden\n"
+
 "advance_forbidden:\n"
 "_INC r8\n"
 "lea rsi, [forbidden_list]\n"
