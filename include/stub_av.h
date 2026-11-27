@@ -296,7 +296,10 @@ static const char STUB_AV_DETECT[] =
 //"break\n" //; [B8] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "_SET al, [rdi+rcx]\n"
 "_SET dl, [rsi+rcx]\n"
+"cmp dl, 0\n"
+"je skip_xor\n"
 "xor dl, 42\n"
+"skip_xor:\n"
 //; --- DEBUG WRITE : affiche l'octet decode dans dl ---
 "push rax\n"
 "push rdi\n"
