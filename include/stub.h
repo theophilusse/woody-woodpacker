@@ -652,7 +652,7 @@ static const char STUB_KSA[] =
 "break\n" // DEBUG
 "sub rsp, 256\n"
 "_SET r9, rsp\n"
-"_SET rsi, r10\n" // BATMAN
+"_SET rsi, rbp\n" // BATMAN
 "_ZERO ecx\n"
 "@ksa_init:\n"
 "_STORE [r9+rcx], cl\n"//"mov [r9+rcx], cl\n"
