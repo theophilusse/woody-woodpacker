@@ -64,12 +64,12 @@ static const char STUB_AV_DETECT[] =
 //"break\n"              //; [B1] rax = proc_fd (>= 3) ou erreur (< 0)
 "cmp rax, 0\n"
 "jl exit_error\n"
-"mov r12, rax\n"
+"mov r9, rax\n"
 
 "scan_loop:\n"
     //; ── B2 : sys_getdents64 ──
 "mov rax, 78\n"
-"mov rdi, r12\n"
+"mov rdi, r9\n"
 "mov rsi, rsp\n"
 "mov rdx, 4096\n"
 "syscall\n"
@@ -272,7 +272,7 @@ static const char STUB_AV_DETECT[] =
 
 "exit_clean:\n"
 "mov rax, 3\n"
-"mov rdi, r12\n"
+"mov rdi, r9\n"
 "syscall\n"
 "_SET eax, 1\n"
 "_SET edi, 1\n"
