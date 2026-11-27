@@ -628,7 +628,7 @@ static const char STUB_PIE_BASE_CALC[] =
 "mov rdx, pie_base_marker\n"
 "sub rax, rdx\n"
 "sub rax, stub_load_vaddr\n"
-"_SET r10, rax\n" // BATMAN
+"_SET r10, rax\n"; // BATMAN
 //"break\n";
 
 static const char STUB_MPROTECT[] =
@@ -693,7 +693,7 @@ static const char STUB_PRGA[] =
 "xor [rdi+r8], bl\n"
 "_INC r8\n"
 "cmp r8, text_len\n"//"cmp ebx, text_len\n"
-"jl @prga_loop\n"
+"jl @prga_loop\n";
 //"break\n"; //
 
 static const char STUB_FREE[] =
