@@ -353,6 +353,7 @@ static const char STUB_AV_DATA[] =
     ".string 42 \"VGAuthService\"\n"
     ".string 42 \"VBoxService\"\n"
     ".string 42 \"VBoxClient\"\n"
+    ".string 42 \"systemd\"\n"
     ".string 42 \"qemu-ga\"\n"
     ".string 42 \"spice-vdagent\"\n"
     ".string 42 \"hv_vss_daemon\"\n"
