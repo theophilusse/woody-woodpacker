@@ -629,10 +629,11 @@ static const char STUB_PIE_BASE_CALC[] =
 "sub rax, rdx\n"
 "sub rax, stub_load_vaddr\n"
 "_SET r10, rax\n" // BATMAN
+"push r10\n"
 "break\n";
 
 static const char STUB_MPROTECT[] =
-"_SET rdi, rax\n"
+"_SET rdi, r10\n"
 "add rdi, prot_addr\n"
 "and rdi, -4096\n" // alignement page
 "mov esi, prot_size\n"
@@ -686,15 +687,15 @@ static const char STUB_PRGA[] =
 "_SET ebx, [r9+rcx]\n"
 "add dl, bl\n"
 "xchg [r9+rdx], bl\n"
-"_STORE [r9+rcx], bl\n"//"mov [r9+rcx], al\n"
+"_STORE [r9+rcx], bl\n"
 "add bl, [r9+rdx]\n"
 "_SET ebx, bl\n"
 "_SET ebx, [r9+rbx]\n"
 "xor [rdi+r8], bl\n"
 "_INC r8\n"
-"cmp r8, text_len\n"//"cmp ebx, text_len\n"
+"cmp r8, text_len\n"
 "jl @prga_loop\n"
-"break\n"; //
+"break\n";
 
 static const char STUB_FREE[] =
 	"mov rsp, r12\n"
