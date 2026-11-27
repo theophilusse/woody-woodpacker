@@ -627,9 +627,7 @@ static const char STUB_PIE_BASE_CALC[] =
 "lea rax, [pie_base_marker]\n"
 "mov rdx, pie_base_marker\n"
 "sub rax, rdx\n"
-"sub rax, stub_load_vaddr\n"
-"_SET r10, rax\n" // BATMAN
-"push r10\n"
+"_SET r10, rax\n"
 "break\n";
 
 static const char STUB_MPROTECT[] =
