@@ -67,18 +67,49 @@ static int setup_crypto(t_elf_ctx *ctx, t_crypto_ctx *crypto, t_opts *opts)
     return (0);
 }
 
+static uint64_t compute_target_stub_vaddr(t_elf_ctx *ctx, size_t stub_len)
+{
+    Elf64_Phdr  *p = &ctx->phdrs[ctx->target_phdr_idx];
+    size_t      avail = padding_available(ctx, p);
+
+    if (stub_len <= avail)
+        return (p->p_vaddr + p->p_filesz);
+
+    size_t max_end = 0;
+    for (size_t i = 0; i < ctx->ehdr->e_phnum; i++)
+    {
+        size_t end = ctx->phdrs[i].p_vaddr + ctx->phdrs[i].p_memsz;
+        if (end > max_end)
+            max_end = end;
+    }
+    return ((max_end + 0x1000 - 1) & ~(size_t)0xFFF);
+}
+
 /* Étape 3 : construction du stub + patch ELF + écriture du binaire final */
 static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
         const char *out_path, t_opts *opts)
 {
     t_stub *stub;
-
+    uint64_t          expected_vaddr;
     t_format_backend *backend = &g_elf_backend;   /* seul backend disponible pour l'instant */
+
     stub = stub_build(ctx, crypto, opts, backend);
     if (!stub)
     {
         fprintf(stderr, "error: stub generation failed\n");
         return (-1);
+    }
+    expected_vaddr = compute_target_stub_vaddr(ctx, stub->len);
+    if (crypto->stub_load_vaddr != expected_vaddr)
+    {
+        crypto->stub_load_vaddr = expected_vaddr;
+        stub_free(stub);
+        stub = stub_build(ctx, crypto, opts, backend);
+        if (!stub)
+        {
+            fprintf(stderr, "error: stub rebuild failed\n");
+            return (-1);
+        }
     }
     if (elf_patch(ctx, stub, crypto, opts) != 0)
     {

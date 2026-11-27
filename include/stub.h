@@ -629,7 +629,6 @@ static const char STUB_PIE_BASE_CALC[] =
 "sub rax, rdx\n"
 "sub rax, stub_load_vaddr\n"
 "_SET r10, rax\n"
-"push r10\n"
 "break\n";
 
 static const char STUB_MPROTECT[] =
@@ -677,7 +676,6 @@ static const char STUB_KSA[] =
 
 static const char STUB_PRGA[] =
 "break\n"
-"pop r10\n"
 "_SET rdi, r10\n"
 "add rdi, text_vaddr\n"
 "_ZERO ecx\n"
