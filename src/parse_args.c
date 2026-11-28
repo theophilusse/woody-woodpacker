@@ -31,6 +31,25 @@ struct s_opts default_opts(void)
 	return opts;
 }
 
+void display_opts(t_opts *opts)
+{
+	printf("Options:\n");
+	printf("  verbose: %d\n", opts->verbose);
+	printf("  use_antidebug: %d\n", opts->use_antidebug);
+	printf("  use_antiav: %d\n", opts->use_antiav);
+	printf("  use_polyblock: %d\n", opts->use_polyblock);
+	printf("  use_int3_trap: %d\n", opts->use_int3_trap);
+	printf("  use_lde: %d\n", opts->use_lde);
+	printf("  debug_display: %d\n", opts->debug_display);
+	if (opts->use_custom_key)
+		printf("  custom_key: ");
+		for (size_t i = 0; i < KEY_LEN; i++)
+			printf("%02X", opts->custom_key[i]);
+		printf("\n");
+	if (opts->source)
+		printf("  source: %s\n", opts->source);
+}
+
 static struct s_opts copy_pattern(struct s_opts opts)
 {
 	char key[KEY_LEN * 2 + 1];
@@ -147,5 +166,9 @@ t_opts  parse_args(int argc, char **argv)
     if (optind >= argc)
         return opts;
     opts.file = argv[optind];
+	if (opts.verbose)
+	{
+		display_opts(&opts);
+	}
     return opts;
 }
