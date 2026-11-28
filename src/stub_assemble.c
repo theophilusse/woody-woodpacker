@@ -73,8 +73,6 @@ char *build_stub_source(t_opts *opts)
         }
         else
         {
-
-            blocks[n++] = STUB_SCAN_START;
             blocks[n++] = STUB_HEADER;
 
             /* ── Anti-debug (ptrace) ── */
@@ -91,6 +89,7 @@ char *build_stub_source(t_opts *opts)
                 blocks[n++] = STUB_AV_DETECT;
             }
             blocks[n++] = STUB_EVASION_COMPLETE;
+            blocks[n++] = STUB_SCAN_START;
 
             /* ── Source de la clé : LDE ou copie directe en clair ── */
             if (opts->use_lde)
