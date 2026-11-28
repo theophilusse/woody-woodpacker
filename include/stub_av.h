@@ -202,7 +202,7 @@ static const char STUB_AV_DETECT[] =
 //"syscall\n"
 
     //; Comparer contre forbidden_list (XOR 42)
-"_ZERO r8, r8\n"
+"_ZERO r8\n"
 "check_forbidden:\n"
 "lea rsi, [forbidden_list]\n"
 "_ZERO eax\n"
@@ -221,7 +221,7 @@ static const char STUB_AV_DETECT[] =
 "_INC r8\n"
 "lea rsi, [forbidden_list]\n"
 "skip_forbidden_entry:\n"
-"_ZERO eax\n"
+"_ZERO rax\n"
 "_SET al, [rsi+r8]\n"
 "_INC r8\n"
 "cmp al, 0\n"
@@ -292,7 +292,7 @@ static const char STUB_AV_DETECT[] =
 "syscall\n"
 
 "strcmp:\n"
-"_ZERO rcx, rcx\n"
+"_ZERO rcx\n"
 "strcmp_loop:\n"
 //"break\n" //; [B8] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "_SET al, [rdi+rcx]\n"
@@ -316,9 +316,9 @@ static const char STUB_AV_DETECT[] =
 "ret\n"
 
 "strlen:\n"
-"_ZERO rax, rax\n"
+"_ZERO rax\n"
 "strlen_loop:\n"
-"_ZERO edx\n"
+"_ZERO rdx\n"
 "_SET dl, [rsi+rax]\n"
 "cmp dl, 0\n"
 "je strlen_done\n"
