@@ -57,29 +57,29 @@ static const char STUB_AV_DETECT[] =
 "sub rsp, 4416\n"
 
     //; ── B1 : sys_open("/proc", O_DIRECTORY) ──
-"mov rax, 2\n"
+"_SET rax, 2\n"
 "lea rdi, [proc_path]\n"
-"mov rsi, 0x10000\n"
+"_SET rsi, 0x10000\n"
 "syscall\n"
 //"break\n"              //; [B1] rax = proc_fd (>= 3) ou erreur (< 0)
 "cmp rax, 0\n"
 "jl exit_error\n"
-"mov r9, rax\n"
+"_SET r9, rax\n"
 
 "scan_loop:\n"
     //; ── B2 : sys_getdents64 ──
-"mov rax, 78\n"
-"mov rdi, r9\n"
-"mov rsi, rsp\n"
-"mov rdx, 4096\n"
+"_SET rax, 78\n"
+"_SET rdi, r9\n"
+"_SET rsi, rsp\n"
+"_SET rdx, 4096\n"
 "syscall\n"
 //"break\n"              //; [B2] rax = nb octets lus ; rbx = fin ; rbp = debut
 "cmp rax, 0\n"
 "jle exit_clean\n"
 
-"mov rbx, rsp\n"
+"_SET rbx, rsp\n"
 "add rbx, rax\n"
-"mov rbp, rsp\n"
+"_SET rbp, rsp\n"
 
 "process_entry_loop:\n"
 "cmp rbp, rbx\n"
@@ -128,27 +128,27 @@ static const char STUB_AV_DETECT[] =
 //"break\n"              //; [B4] chemin "/proc/<pid>/comm" construit a [rsp+4352]
 
     //; Ouvrir /proc/<pid>/comm
-"mov rax, 2\n"
+"_SET rax, 2\n"
 "lea rdi, [rsp]\n"
 "add rdi, 4352\n"
-"mov rsi, 0\n"
+"_SET rsi, 0\n"
 "syscall\n"
 "cmp rax, 0\n"
 "jl next_entry\n"
-"mov r10, rax\n"
+"_SET r10, rax\n"
 
     //; Lire comm dans [rsp+4096]
-"mov rax, 0\n"
-"mov rdi, r10\n"
+"_SET rax, 0\n"
+"_SET rdi, r10\n"
 "lea rsi, [rsp]\n"
 "add rsi, 4096\n"
-"mov rdx, 255\n"
+"_SET rdx, 255\n"
 "syscall\n"
 "push rax\n"
 
     //; Fermer /proc/<pid>/comm
-"mov rax, 3\n"
-"mov rdi, r10\n"
+"_SET rax, 3\n"
+"_SET rdi, r10\n"
 "syscall\n"
 
 "pop rax\n"
@@ -185,7 +185,7 @@ static const char STUB_AV_DETECT[] =
 "_SET al, [rsi + rdx]\n"
 "cmp al, 0\n"
 "je comm_len_done\n"
-"inc rdx\n"
+"_INC rdx\n"
 "jmp comm_len_loop\n"
 "comm_len_done:\n"
 
@@ -202,7 +202,7 @@ static const char STUB_AV_DETECT[] =
 //"syscall\n"
 
     //; Comparer contre forbidden_list (XOR 42)
-"xor r8, r8\n"
+"_ZERO r8, r8\n"
 "check_forbidden:\n"
 "lea rsi, [forbidden_list]\n"
 "_ZERO eax\n"
@@ -245,34 +245,34 @@ static const char STUB_AV_DETECT[] =
 
 "found_forbidden:\n"
 //"break\n"//; [B7] processus interdit détecté : rsi = debut du nom de processus lu
-"mov rdi, 1\n"
+"_SET rdi, 1\n"
 "lea rsi, [found_msg]\n"
 "call strlen\n"
-"mov rdx, rax\n"
-"mov rax, 1\n"
+"_SET rdx, rax\n"
+"_SET rax, 1\n"
 "syscall\n"
 "lea rsi, [rsp]\n"
 "add rsi, 4096\n"
 "call strlen\n"
-"mov rdx, rax\n"
-"mov rax, 1\n"
-"mov rdi, 1\n"
+"_SET rdx, rax\n"
+"_SET rax, 1\n"
+"_SET rdi, 1\n"
 "lea rsi, [rsp]\n"
 "add rsi, 4096\n"
 "syscall\n"
-"mov rax, 1\n"
-"mov rdi, 1\n"
+"_SET rax, 1\n"
+"_SET rdi, 1\n"
 "lea rsi, [newline]\n"
-"mov rdx, 1\n"
+"_SET rdx, 1\n"
 "syscall\n"
 "add rsp, 4416\n"
-"mov rax, 60\n"
-"mov rdi, 1\n"
+"_SET rax, 60\n"
+"_SET rdi, 1\n"
 "syscall\n"
 
 "exit_clean:\n"
-"mov rax, 3\n"
-"mov rdi, r9\n"
+"_SET rax, 3\n"
+"_SET rdi, r9\n"
 "syscall\n"
 "_SET eax, 1\n"
 "_SET edi, 1\n"
@@ -287,12 +287,12 @@ static const char STUB_AV_DETECT[] =
 
 "exit_error:\n"
 "add rsp, 4416\n"
-"mov rax, 60\n"
-"mov rdi, 2\n"
+"_SET rax, 60\n"
+"_SET rdi, 2\n"
 "syscall\n"
 
 "strcmp:\n"
-"xor rcx, rcx\n"
+"_ZERO rcx, rcx\n"
 "strcmp_loop:\n"
 //"break\n" //; [B8] avant strcmp : rdi = comm, rsi = entree forbidden_list
 "_SET al, [rdi+rcx]\n"
@@ -306,23 +306,23 @@ static const char STUB_AV_DETECT[] =
 "jne strcmp_not_equal\n"
 "test al, al\n"
 "jz strcmp_equal\n"
-"inc rcx\n"
+"_INC rcx\n"
 "jmp strcmp_loop\n"
 "strcmp_equal:\n"
-"xor rax, rax\n"
+"_ZERO rax\n"
 "ret\n"
 "strcmp_not_equal:\n"
-"mov rax, 1\n"
+"_SET rax, 1\n"
 "ret\n"
 
 "strlen:\n"
-"xor rax, rax\n"
+"_ZERO rax, rax\n"
 "strlen_loop:\n"
 "_ZERO edx\n"
 "_SET dl, [rsi+rax]\n"
 "cmp dl, 0\n"
 "je strlen_done\n"
-"inc rax\n"
+"_INC rax\n"
 "jmp strlen_loop\n"
 "strlen_done:\n"
 "ret\n";
@@ -374,7 +374,7 @@ static const char STUB_AV_DATA[] =
 "newline:\n"
     ".db 10\n"
 "found_msg:\n"
-    ".string \"Stop: \"\n";
+    ".string \"Reason: \"\n";
 
 static const char STUB_POLY_DEMO_DATA[] =
 "greeting_msg:\n"
