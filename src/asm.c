@@ -566,6 +566,7 @@ int	ainstr(t_asm *a, char toks[][64], int n)
 		if (s1 == 8)       emit_dec_r8(&a->out->e, r1);
 		else if (s1 == 32) emit_dec_r32(&a->out->e, r1);
 		else               emit_dec_r64(&a->out->e, r1);
+		return 0;
 	}
 	if (!strcmp(toks[0], "xor") && n == 3)
 	{

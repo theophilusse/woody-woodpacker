@@ -93,6 +93,7 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
     uint64_t          expected_vaddr;
     t_format_backend *backend = &g_elf_backend;   /* seul backend disponible pour l'instant */
 
+    printf("stub generation: load_vaddr=0x%lx\n", crypto->stub_load_vaddr);
     stub = stub_build(ctx, crypto, opts, backend);
     if (!stub)
     {
@@ -103,6 +104,7 @@ static int build_and_patch(t_elf_ctx *ctx, t_crypto_ctx *crypto,
     if (crypto->stub_load_vaddr != expected_vaddr)
     {
         crypto->stub_load_vaddr = expected_vaddr;
+        printf("rebuilding stub with new load_vaddr=0x%lx\n", crypto->stub_load_vaddr);
         stub_free(stub);
         stub = stub_build(ctx, crypto, opts, backend);
         if (!stub)
