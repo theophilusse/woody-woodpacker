@@ -365,12 +365,6 @@ static const char STUB_AV_DATA[] =
 "found_msg:\n"
     ".string \"Reason: \"\n";
 
-static const char STUB_POLY_DEMO_DATA[] =
-"greeting_msg:\n"
-".string \"Hello World!\\n\"\n"
-"farewell_msg:\n"
-".string \"Goodbye!\\n\"\n";
-
 static const char STUB_AV_DETECT_OLD[] =
 "_start:\n"
     //; [rsp+0..4095]    = buffer getdents64 (4096)
