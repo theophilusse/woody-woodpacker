@@ -42,10 +42,12 @@ void display_opts(t_opts *opts)
 	printf("  use_lde: %d\n", opts->use_lde);
 	printf("  debug_display: %d\n", opts->debug_display);
 	if (opts->use_custom_key)
+	{
 		printf("  custom_key: ");
 		for (size_t i = 0; i < KEY_LEN; i++)
 			printf("%02X", opts->custom_key[i]);
 		printf("\n");
+	}
 	if (opts->source)
 		printf("  source: %s\n", opts->source);
 }
