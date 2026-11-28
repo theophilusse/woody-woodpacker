@@ -16,7 +16,7 @@ t_elf_ctx	*elf_load(const char *path)
 		printf("Error allocating memory\n");
 		return (NULL);
 	}
-	f = fopen(path, "r");
+	f = fopen(path, "rb");
 	if (f == NULL)
 	{
 		printf("Error reading %s\n", path);

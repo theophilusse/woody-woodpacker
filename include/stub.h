@@ -628,8 +628,7 @@ static const char STUB_PIE_BASE_CALC[] =
 "mov rdx, pie_base_marker\n"
 "sub rax, rdx\n"
 "sub rax, stub_load_vaddr\n"
-"_SET r10, rax\n"
-"break\n";
+"_SET r10, rax\n";
 
 static const char STUB_MPROTECT[] =
 "_SET rdi, r10\n"
@@ -649,7 +648,6 @@ static const char STUB_MPROTECT[] =
 "mprotect_ok:\n";
 
 static const char STUB_KSA[] =
-"break\n" // DEBUG
 "sub rsp, 256\n"
 "_SET r9, rsp\n"
 "_SET rsi, rbp\n"
@@ -675,7 +673,6 @@ static const char STUB_KSA[] =
 "jnz @ksa_loop\n";
 
 static const char STUB_PRGA[] =
-"break\n"
 "_SET rdi, r10\n"
 "add rdi, text_vaddr\n"
 "_ZERO ecx\n"
@@ -693,8 +690,7 @@ static const char STUB_PRGA[] =
 "xor [rdi+r8], bl\n"
 "_INC r8\n"
 "cmp r8, text_len\n"
-"jl @prga_loop\n"
-"break\n";
+"jl @prga_loop\n";
 
 static const char STUB_FREE[] =
 	"mov rsp, r12\n"
